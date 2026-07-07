@@ -4,7 +4,7 @@ title: 2. DPO Preference Tuning
 
 # DPO Preference Tuning
 
-> **Chapter code**: [0-download_model.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/0-download_model.py) · [1-generate_data.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/1-generate_data.py) · [2-test_before.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/2-test_before.py) · [3-train_dpo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/3-train_dpo.py) · [4-test_after.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter17_dpo/4-test_after.py)
+> **Chapter code**: [0-download_model.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter02_dpo/0-download_model.py) · [1-generate_data.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter02_dpo/1-generate_data.py) · [2-test_before.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter02_dpo/2-test_before.py) · [3-train_dpo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter02_dpo/3-train_dpo.py) · [4-test_after.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter02_dpo/4-test_after.py)
 
 In the previous chapter, we built the classic agent loop for traditional reinforcement learning applications, for example making CartPole balance under physics rules. That setup works well when the environment provides an unambiguous scalar feedback signal (game score, survival time, and so on).
 
@@ -49,12 +49,12 @@ That "not A, but B" structure is exactly what preference data buys you.
 
 ### Step 0: Prepare the Preference Dataset
 
-The core of preference alignment is the data. We have prepared a script that automatically generates mock data: [1-generate_data.py](../../code/chapter17_dpo/1-generate_data.py). It generates 100 preference pairs by default, each containing a user's incorrect or biased claim and two different response styles.
+The core of preference alignment is the data. We have prepared a script that automatically generates mock data: [1-generate_data.py](../../../code/chapter02_dpo/1-generate_data.py). It generates 100 preference pairs by default, each containing a user's incorrect or biased claim and two different response styles.
 
 Run it:
 
 ```bash
-python code/chapter17_dpo/1-generate_data.py
+python code/chapter02_dpo/1-generate_data.py
 ```
 
 Expected output:
@@ -78,7 +78,7 @@ Note that **chosen is a response that corrects the user's misconception**, while
 
 ### Step 1: Inspect the Raw Behavior Before Training
 
-Run the companion script: [2-test_before.py](../../code/chapter17_dpo/2-test_before.py), and test the model's raw behavior with a **new question not in the training set**:
+Run the companion script: [2-test_before.py](../../../code/chapter02_dpo/2-test_before.py), and test the model's raw behavior with a **new question not in the training set**:
 
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -120,7 +120,7 @@ The model chose to **go along with the user's view**, agreeing with the biased c
 
 ### Step 2: Run DPO Training
 
-Next, run the training script: [3-train_dpo.py](../../code/chapter17_dpo/3-train_dpo.py), using DPO to teach the model not to blindly agree:
+Next, run the training script: [3-train_dpo.py](../../../code/chapter02_dpo/3-train_dpo.py), using DPO to teach the model not to blindly agree:
 
 ```python
 import json
@@ -214,7 +214,7 @@ How to read the key signals:
 
 ### Step 3: Test the Aligned Model
 
-Now the model has been preference-tuned. Run the verification script: [4-test_after.py](../../code/chapter17_dpo/4-test_after.py), using the **same out-of-training-set question**:
+Now the model has been preference-tuned. Run the verification script: [4-test_after.py](../../../code/chapter02_dpo/4-test_after.py), using the **same out-of-training-set question**:
 
 ```python
 import os
@@ -261,7 +261,7 @@ Key observation: the model no longer blindly agrees with the user. Instead, it *
 
 ### Exploration Experiment: Custom Preference Directions
 
-Readers can open the companion script [1-generate_data.py](../../code/chapter17_dpo/1-generate_data.py) and modify the preference pairs. For example:
+Readers can open the companion script [1-generate_data.py](../../../code/chapter02_dpo/1-generate_data.py) and modify the preference pairs. For example:
 
 - Change chosen to a more direct, "sharp-tongued" correction.
 - Change rejected to a "correct but overly verbose" response.

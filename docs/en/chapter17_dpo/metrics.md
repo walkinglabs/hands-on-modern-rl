@@ -84,7 +84,7 @@ Common causes of poor margins include: ambiguous preference pairs, extreme lengt
 <details>
 <summary><strong>What happens if we change <code>beta</code> from 0.1 to 1.0?</strong></summary>
 
-`beta` is the regularization strength controlling how far the policy is allowed to drift from the reference model. In [3-train_dpo.py](../../code/chapter17_dpo/3-train_dpo.py), it is set by `DPOConfig(beta=0.1)`.
+`beta` is the regularization strength controlling how far the policy is allowed to drift from the reference model. In [3-train_dpo.py](../../../code/chapter02_dpo/3-train_dpo.py), it is set by `DPOConfig(beta=0.1)`.
 
 - if `beta` is large (e.g. 1.0): the policy is heavily constrained, so margins may grow slowly or barely grow
 - if `beta` is tiny (e.g. 0.01): the policy may drift too far, sometimes learning degenerate hacks that optimize the objective but hurt response quality

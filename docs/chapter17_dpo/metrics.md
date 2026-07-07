@@ -62,12 +62,12 @@ Margin 为正且越大，说明模型越确信"好回答比坏回答好得多"�
 <details>
 <summary><strong>如果把 <code>beta</code> 参数从 0.1 改成 1.0，Reward Margin 会怎样变化？</strong></summary>
 
-`beta` 控制模型偏离参考模型的惩罚强度——也就是 [3-train_dpo.py](../../code/chapter17_dpo/3-train_dpo.py) 中 `DPOConfig(beta=0.1)` 的那个参数。
+`beta` 控制模型偏离参考模型的惩罚强度——也就是 [3-train_dpo.py](../../code/chapter02_dpo/3-train_dpo.py) 中 `DPOConfig(beta=0.1)` 的那个参数。
 
 - `beta` 很大（如 1.0）：惩罚极强，模型几乎不敢改变原来的输出分布，Margin 增长极慢甚至不增长。
 - `beta` 很小（如 0.01）：模型为了拉大 Margin 而大幅偏离参考分布，可能输出人类无法理解的文本来迎合优化目标。
 
-> **动手实验**：打开 [3-train_dpo.py](../../code/chapter17_dpo/3-train_dpo.py)，找到 `DPOConfig` 里的 `beta` 参数，分别修改为 0.01 和 0.5，重新运行训练，观察 Margin 曲线的差异。
+> **动手实验**：打开 [3-train_dpo.py](../../code/chapter02_dpo/3-train_dpo.py)，找到 `DPOConfig` 里的 `beta` 参数，分别修改为 0.01 和 0.5，重新运行训练，观察 Margin 曲线的差异。
 
 </details>
 

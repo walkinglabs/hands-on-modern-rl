@@ -58,7 +58,7 @@ SFT 的训练信号只有一个方向——"模仿"，模型缺少关于"什么�
 - **输入**：(Prompt, Chosen, Rejected) 三元组。
 - **目标**：最大化好回答与坏回答的概率差。
 - **结果**：回答质量更高、更安全的对齐模型（Chat Model）。
-- **数据示例（偏好三元组）**——典型的偏好对比数据格式（与 [1-generate_data.py](../../code/chapter17_dpo/1-generate_data.py) 生成的格式一致）：
+- **数据示例（偏好三元组）**——典型的偏好对比数据格式（与 [1-generate_data.py](../../code/chapter02_dpo/1-generate_data.py) 生成的格式一致）：
   ```json
   {
     "prompt": "我今天心情很差，不想上班。",
@@ -67,7 +67,7 @@ SFT 的训练信号只有一个方向——"模仿"，模型缺少关于"什么�
   }
   ```
 
-回到我们在上一节中运行的 [3-train_dpo.py](../../code/chapter17_dpo/3-train_dpo.py)，代码里加载的 `preference_data.json` 正是这种格式。数据加载部分将 JSON 文件解析为 `prompt`、`chosen`、`rejected` 三个字段，分别对应符号表中的 $x$、$y_w$、$y_l$：
+回到我们在上一节中运行的 [3-train_dpo.py](../../code/chapter02_dpo/3-train_dpo.py)，代码里加载的 `preference_data.json` 正是这种格式。数据加载部分将 JSON 文件解析为 `prompt`、`chosen`、`rejected` 三个字段，分别对应符号表中的 $x$、$y_w$、$y_l$：
 
 ```python
 data_dict = {
@@ -167,7 +167,7 @@ $$ r(x, y) \propto \log \frac{\pi_{\theta}(y | x)}{\pi_{ref}(y | x)} $$
 
 基于这一洞察，DPO 的做法是：拿偏好数据（同一个问题的好回答和坏回答），直接调整模型参数，让模型提高好回答的概率、降低坏回答的概率。整个过程中只需要一个语言模型加上一份参考模型的静态备份，跳过了奖励模型训练和 PPO 的强化学习循环，将问题转化为一个对比损失函数的优化。
 
-回到 [3-train_dpo.py](../../code/chapter17_dpo/3-train_dpo.py) 的代码，`DPOTrainer` 在初始化时只接收一个 `model` 参数：
+回到 [3-train_dpo.py](../../code/chapter02_dpo/3-train_dpo.py) 的代码，`DPOTrainer` 在初始化时只接收一个 `model` 参数：
 
 ```python
 trainer = DPOTrainer(
