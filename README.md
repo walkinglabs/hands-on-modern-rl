@@ -393,6 +393,10 @@ npm run lint          # Lint VitePress theme code
 npm run verify        # Run format check, lint, build, and artifact verification
 ```
 
+## Related Frameworks
+
+- [**VeRL-Omni**](https://github.com/verl-project/verl-omni) — Easy, fast, and stable RL training for diffusion and omni-modality models; useful companion for VLM / multimodal RL practice. [[Docs](https://verl-omni.readthedocs.io/en/latest/index.html)]
+
 ## Contributing
 
 Contributions should make the course clearer, more accurate, easier to reproduce, or easier to navigate.
