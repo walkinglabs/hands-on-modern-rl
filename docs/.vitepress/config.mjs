@@ -1716,7 +1716,8 @@ const enSidebar = {
               link: '/en/chapter01_cartpole/metrics'
             },
             {
-              text: '1.3 Hands-on: PPO Training Visualization (Translation pending)'
+              text: '1.3 Hands-on: PPO Training Visualization',
+              link: '/en/chapter01_cartpole/training'
             }
           ]
         },
@@ -1733,7 +1734,8 @@ const enSidebar = {
               link: '/en/chapter03_mdp/mdp'
             },
             {
-              text: '2.3 Policy, Value & Return (Translation pending)'
+              text: '2.3 Policy, Value & Return',
+              link: '/en/chapter03_mdp/policy-value'
             },
             {
               text: '2.4 Discount, Trajectory & POMDP',
@@ -1754,7 +1756,8 @@ const enSidebar = {
               link: '/en/chapter03_mdp/value-q'
             },
             {
-              text: '3.3 Hands-on: Value Function Experiments (Translation pending)'
+              text: '3.3 Hands-on: Value Function Experiments',
+              link: '/en/chapter03_mdp/value-experiment'
             }
           ]
         },
@@ -1767,7 +1770,8 @@ const enSidebar = {
               link: '/en/chapter03_mdp/dp-mc-td'
             },
             {
-              text: '4.2 Algorithm Taxonomy: On/Off-Policy & Online/Offline (Translation pending)'
+              text: '4.2 Algorithm Taxonomy: On/Off-Policy & Online/Offline',
+              link: '/en/chapter03_mdp/algorithm-taxonomy'
             },
             {
               text: '4.3 Reward Function Design',
@@ -1898,20 +1902,24 @@ const enSidebar = {
           ]
         },
         {
-          text: '9. Continuous Control & Model-Based RL (Translation pending)',
+          text: '9. Continuous Control & Model-Based RL',
           collapsed: true,
           items: [
             {
-              text: '9.1 DDPG (pending)'
+              text: '9.1 DDPG',
+              link: '/en/chapter11_continuous_control/intro'
             },
             {
-              text: '9.2 TD3 / SAC (pending)'
+              text: '9.2 TD3 / SAC',
+              link: '/en/chapter11_continuous_control/td3-sac'
             },
             {
-              text: '9.3 Model-Based RL: Dyna / PETS / MBPO (pending)'
+              text: '9.3 Model-Based RL: Dyna / PETS / MBPO',
+              link: '/en/chapter11_continuous_control/model-based'
             },
             {
-              text: '9.4 AlphaZero, MuZero & Dreamer V3 (pending)'
+              text: '9.4 AlphaZero, MuZero & Dreamer V3',
+              link: '/en/chapter11_continuous_control/search-world-models'
             }
           ]
         }
@@ -1922,47 +1930,56 @@ const enSidebar = {
       collapsed: true,
       items: [
         {
-          text: '10. Offline Reinforcement Learning (Translation pending)',
+          text: '10. Offline Reinforcement Learning',
           collapsed: true,
           items: [
             {
-              text: '10.1 Offline RL Challenges & Classical Methods (pending)'
+              text: '10.1 Offline RL Challenges & Classical Methods',
+              link: '/en/chapter12_offline_rl/intro'
             },
             {
-              text: '10.2 Decision Transformer, Trajectory Transformer & Diffuser (pending)'
+              text: '10.2 Decision Transformer, Trajectory Transformer & Diffuser',
+              link: '/en/chapter12_offline_rl/sequence-modeling'
             },
             {
-              text: '10.3 Offline RL Experiments & LLM Perspective (pending)'
+              text: '10.3 Offline RL Experiments & LLM Perspective',
+              link: '/en/chapter12_offline_rl/experiments'
             }
           ]
         },
         {
-          text: '11. Imitation, Inverse RL & Meta-RL (Translation pending)',
+          text: '11. Imitation, Inverse RL & Meta-RL',
           collapsed: true,
           items: [
             {
-              text: '11.1 Behavioral Cloning & DAgger (pending)'
+              text: '11.1 Behavioral Cloning & DAgger',
+              link: '/en/chapter13_imitation_meta_rl/bc-dagger'
             },
             {
-              text: '11.2 Inverse RL & GAIL (pending)'
+              text: '11.2 Inverse RL & GAIL',
+              link: '/en/chapter13_imitation_meta_rl/irl-gail'
             },
             {
-              text: '11.3 Meta-RL: MAML / RL² / PEARL / In-Context RL (pending)'
+              text: '11.3 Meta-RL: MAML / RL² / PEARL / In-Context RL',
+              link: '/en/chapter13_imitation_meta_rl/meta-rl'
             }
           ]
         },
         {
-          text: '12. Exploration, MARL & Hierarchical RL (Translation pending)',
+          text: '12. Exploration, MARL & Hierarchical RL',
           collapsed: true,
           items: [
             {
-              text: '12.1 Intrinsic Motivation: ICM / RND / NGU / Agent57 (pending)'
+              text: '12.1 Intrinsic Motivation: ICM / RND / NGU / Agent57',
+              link: '/en/chapter14_exploration_marl_hierarchical/intro'
             },
             {
-              text: '12.2 Multi-Agent RL: CTDE / MADDPG / MAPPO (pending)'
+              text: '12.2 Multi-Agent RL: CTDE / MADDPG / MAPPO',
+              link: '/en/chapter14_exploration_marl_hierarchical/marl'
             },
             {
-              text: '12.3 Hierarchical RL & Generative World Models (pending)'
+              text: '12.3 Hierarchical RL & Generative World Models',
+              link: '/en/chapter14_exploration_marl_hierarchical/hierarchical'
             }
           ]
         }
@@ -2015,17 +2032,20 @@ const enSidebar = {
           collapsed: true,
           items: [
             {
-              text: '14.1 Training Frameworks & Dual-Track Rewards (Translation pending)'
+              text: '14.1 Training Frameworks & Dual-Track Rewards',
+              link: '/en/chapter16_llm_rl_industrial/intro'
             },
             {
               text: '14.2 Modern Post-Training Pipeline Paradigms',
               link: '/en/chapter16_llm_rl_industrial/industrial-post-training'
             },
             {
-              text: '14.3 Optimizers & Training Stability (Translation pending)'
+              text: '14.3 Optimizers & Training Stability',
+              link: '/en/chapter16_llm_rl_industrial/modern-industrial-practice'
             },
             {
-              text: '14.4 Distributed Sync/Async & MoE Training (Translation pending)'
+              text: '14.4 Distributed Sync/Async & MoE Training',
+              link: '/en/chapter16_llm_rl_industrial/distributed-sync'
             }
           ]
         },
@@ -2068,10 +2088,12 @@ const enSidebar = {
               link: '/en/chapter18_grpo/rlvr'
             },
             {
-              text: '16.4 GRPO Improvement Family (Translation pending)'
+              text: '16.4 GRPO Improvement Family',
+              link: '/en/chapter18_grpo/grpo-family'
             },
             {
-              text: '16.5 RL Environments & Verifier Engineering (Translation pending)'
+              text: '16.5 RL Environments & Verifier Engineering',
+              link: '/en/chapter18_grpo/rl-environments'
             },
             {
               text: '16.6 Financial API Tool-Calling GRPO Experiment',
@@ -2082,67 +2104,86 @@ const enSidebar = {
               link: '/en/chapter18_grpo/on-policy-distillation'
             },
             {
-              text: '16.8 veRL Code Generation RL Experiment (Translation pending)'
+              text: '16.8 veRL Code Generation RL Experiment',
+              link: '/en/chapter18_grpo/verl-code-sandbox'
             }
           ]
         },
         {
-          text: '17. Reasoning Models & Test-Time Scaling (Translation pending)',
+          text: '17. Reasoning Models & Test-Time Scaling',
           collapsed: true,
           items: [
             {
-              text: '17.1 Emergence of Reasoning Models (pending)'
+              text: '17.1 Emergence of Reasoning Models',
+              link: '/en/chapter19_reasoning/emergence-and-o1'
             },
             {
-              text: '17.2 R1-Zero Pure RL Training (pending)'
+              text: '17.2 R1-Zero Pure RL Training',
+              link: '/en/chapter19_reasoning/intro'
             },
             {
-              text: '17.3 Test-time Compute Scaling (pending)'
+              text: '17.3 Test-time Compute Scaling',
+              link: '/en/chapter19_reasoning/test-time-scaling'
             },
             {
-              text: '17.4 Hybrid Thinking & Thinking Budget (pending)'
+              text: '17.4 Hybrid Thinking & Thinking Budget',
+              link: '/en/chapter19_reasoning/hybrid-thinking'
             },
             {
-              text: '17.5 Adaptive Thinking (pending)'
+              text: '17.5 Adaptive Thinking',
+              link: '/en/chapter19_reasoning/adaptive-thinking'
             },
             {
-              text: '17.6 CoT Readability & Alignment (pending)'
+              text: '17.6 CoT Readability & Alignment',
+              link: '/en/chapter19_reasoning/cot-visibility-alignment'
             }
           ]
         },
         {
-          text: '18. Process Reward Models & Inference-Time Search (Translation pending)',
+          text: '18. Process Reward Models & Inference-Time Search',
           collapsed: true,
           items: [
             {
-              text: '18.1 Outcome vs Process Rewards (pending)'
+              text: '18.1 Outcome vs Process Rewards',
+              link: '/en/chapter20_prm_search/outcome-vs-process'
             },
             {
-              text: '18.2 Discriminative PRM (pending)'
+              text: '18.2 Discriminative PRM',
+              link: '/en/chapter20_prm_search/discriminative-prm'
             },
             {
-              text: '18.3 Generative PRM (pending)'
+              text: '18.3 Generative PRM',
+              link: '/en/chapter20_prm_search/generative-prm'
             },
             {
-              text: '18.4 Formal PRM Verifier (pending)'
+              text: '18.4 Formal PRM Verifier',
+              link: '/en/chapter20_prm_search/formal-prm'
             },
             {
-              text: '18.5 Inference-Time Search (pending)'
+              text: '18.5 Inference-Time Search',
+              link: '/en/chapter20_prm_search/inference-time-search'
             },
             {
-              text: '18.6 Parallel Reasoning Coordination (pending)'
+              text: '18.6 Parallel Reasoning Coordination',
+              link: '/en/chapter20_prm_search/parallel-reasoning-and-summary'
             }
           ]
         },
         {
-          text: '19. Constitutional AI & RLAIF (Translation pending)',
+          text: '19. Constitutional AI & RLAIF',
           collapsed: true,
           items: [
             {
-              text: '19.1 HHH Principles & Claude Practice (pending)'
+              text: '19.0 Chapter Overview',
+              link: '/en/chapter21_cai_rlvr/intro'
             },
             {
-              text: '19.2 RLAIF Engineering Constitution Extension (pending)'
+              text: '19.1 HHH Principles & Claude Practice',
+              link: '/en/chapter21_cai_rlvr/hhh-practice'
+            },
+            {
+              text: '19.2 RLAIF Engineering Constitution Extension',
+              link: '/en/chapter21_cai_rlvr/rlaif-engineering'
             }
           ]
         }
@@ -2161,13 +2202,16 @@ const enSidebar = {
               link: '/en/chapter22_agentic/intro'
             },
             {
-              text: '20.1 Agentic RL Overview (Translation pending)'
+              text: '20.1 Agentic RL Overview',
+              link: '/en/chapter22_agentic/overview'
             },
             {
-              text: '20.2 Multi-Turn RL Formulation (Translation pending)'
+              text: '20.2 Multi-Turn RL Formulation',
+              link: '/en/chapter22_agentic/formulation'
             },
             {
-              text: '20.3 Trajectory Credit Assignment (Translation pending)'
+              text: '20.3 Trajectory Credit Assignment',
+              link: '/en/chapter22_agentic/credit-assignment'
             },
             {
               text: '20.4 Tool-Use RL',
@@ -2182,7 +2226,8 @@ const enSidebar = {
               link: '/en/chapter22_agentic/industrial-practice'
             },
             {
-              text: '20.7 Multi-Agent Collaboration & Agent Swarm (Translation pending)'
+              text: '20.7 Multi-Agent Collaboration & Agent Swarm',
+              link: '/en/chapter22_agentic/multi-agent-swarm'
             },
             {
               text: '20.8 Hands-on: Training a DeepCoder Agent with rLLM',
@@ -2199,41 +2244,60 @@ const enSidebar = {
           ]
         },
         {
-          text: '21. RL for Code Agents (Translation pending)',
+          text: '21. RL for Code Agents',
           collapsed: true,
           items: [
             {
-              text: '21.1 SWE-RL Basics (pending)'
+              text: '21.0 Chapter Overview',
+              link: '/en/chapter23_rl_based_swe/intro'
             },
             {
-              text: '21.2 Code World Model & DeepSWE (pending)'
+              text: '21.1 SWE-RL Basics',
+              link: '/en/chapter23_rl_based_swe/swe-bench-and-rlvr'
             },
             {
-              text: '21.3 Self-Play SWE-RL Summary (pending)'
+              text: '21.2 Code World Model & DeepSWE',
+              link: '/en/chapter23_rl_based_swe/world-model-and-deep-swe'
+            },
+            {
+              text: '21.3 Self-Play SWE-RL Summary',
+              link: '/en/chapter23_rl_based_swe/self-play-ssr-and-summary'
             }
           ]
         },
         {
-          text: '22. Deep Research & Browser Agents (Translation pending)',
+          text: '22. Deep Research & Browser Agents',
           collapsed: true,
           items: [
             {
-              text: '22.1 Browser RL Harness Engineering (pending)'
+              text: '22.0 Chapter Overview',
+              link: '/en/chapter24_deep_research/intro'
             },
             {
-              text: '22.2 Evaluation Benchmarks & Open-Source Projects (pending)'
+              text: '22.1 Browser RL Harness Engineering',
+              link: '/en/chapter24_deep_research/browser-rl-harness'
+            },
+            {
+              text: '22.2 Evaluation Benchmarks & Open-Source Projects',
+              link: '/en/chapter24_deep_research/deep-research-eval'
             }
           ]
         },
         {
-          text: '23. Computer Use & GUI Agents (Translation pending)',
+          text: '23. Computer Use & GUI Agents',
           collapsed: true,
           items: [
             {
-              text: '23.1 GUI Agent Training Practice (pending)'
+              text: '23.0 Chapter Overview',
+              link: '/en/chapter25_computer_use/intro'
             },
             {
-              text: '23.2 Instruction Hierarchy & Prompt Injection Defense (pending)'
+              text: '23.1 GUI Agent Training Practice',
+              link: '/en/chapter25_computer_use/training'
+            },
+            {
+              text: '23.2 Instruction Hierarchy & Prompt Injection Defense',
+              link: '/en/chapter25_computer_use/safety-swarm'
             }
           ]
         }
@@ -2257,10 +2321,11 @@ const enSidebar = {
             },
             {
               text: '24.2 Visual Reflection RL',
-              link: '/en/chapter26_vlm/vlm-grpo-hands-on'
+              link: '/en/chapter26_vlm/qwen3-vl-reflection'
             },
             {
-              text: '24.3 Hands-on: Multimodal Frontiers (Translation pending)'
+              text: '24.3 Hands-on: Multimodal Frontiers',
+              link: '/en/chapter26_vlm/vlm-grpo-hands-on'
             },
             {
               text: '24.4 Hands-on: GeoQA Geometric Reasoning Experiment',
@@ -2269,35 +2334,44 @@ const enSidebar = {
           ]
         },
         {
-          text: '25. Audio & Speech RL (Translation pending)',
+          text: '25. Audio & Speech RL',
           collapsed: true,
           items: [
             {
-              text: '25.1 RLVR → RLHF Audio Reward Design (pending)'
+              text: '25.0 Chapter Overview',
+              link: '/en/chapter27_audio_rl/intro'
             },
             {
-              text: '25.2 Multimodal Audio Agent Future Directions (pending)'
+              text: '25.1 RLVR → RLHF Audio Reward Design',
+              link: '/en/chapter27_audio_rl/reward-design'
+            },
+            {
+              text: '25.2 Multimodal Audio Agent Future Directions',
+              link: '/en/chapter27_audio_rl/future'
             }
           ]
         },
         {
-          text: '26. Embodied Intelligence & VLA Models (Translation pending)',
+          text: '26. Embodied Intelligence & VLA Models',
           collapsed: true,
           items: [
             {
-              text: '26.1 Embodied Intelligence Overview (pending)'
+              text: '26.0 Chapter Overview',
+              link: '/en/chapter28_vla/embodied-intelligence/'
             }
           ]
         },
         {
-          text: '27. Visual Generation RL (Translation pending)',
+          text: '27. Visual Generation RL',
           collapsed: true,
           items: [
             {
-              text: '27.1 Visual Generation & DanceGRPO (pending)'
+              text: '27.1 Visual Generation & DanceGRPO',
+              link: '/en/chapter29_visual_generation/intro'
             },
             {
-              text: '27.2 Multi-Reward Video RLHF & Physics-Aware Generation (pending)'
+              text: '27.2 Multi-Reward Video RLHF & Physics-Aware Generation',
+              link: '/en/chapter29_visual_generation/video-generation-modern'
             }
           ]
         }
@@ -2308,23 +2382,32 @@ const enSidebar = {
       collapsed: true,
       items: [
         {
-          text: '28. Reward Hacking & RL Evaluation (Translation pending)',
+          text: '28. Reward Hacking & RL Evaluation',
           collapsed: true,
           items: [
             {
-              text: '28.1 Classical Failure Modes (pending)'
+              text: '28.0 Chapter Overview',
+              link: '/en/chapter30_alignment_failures/intro'
             },
             {
-              text: '28.2 RLVR Fake Gains & Industrial Failure Cases (pending)'
+              text: '28.1 Classical Failure Modes',
+              link: '/en/chapter30_alignment_failures/classical-failures'
             },
             {
-              text: '28.3 Anthropic Misalignment Research (pending)'
+              text: '28.2 RLVR Fake Gains & Industrial Failure Cases',
+              link: '/en/chapter30_alignment_failures/modern-incidents'
             },
             {
-              text: '28.4 Defense Mechanisms Summary (pending)'
+              text: '28.3 Anthropic Misalignment Research',
+              link: '/en/chapter30_alignment_failures/sleeper-and-faking'
             },
             {
-              text: '28.5 Evaluation Principles & Modern Harnesses (pending)'
+              text: '28.4 Defense Mechanisms Summary',
+              link: '/en/chapter30_alignment_failures/scaling-and-defenses'
+            },
+            {
+              text: '28.5 Evaluation Principles & Modern Harnesses',
+              link: '/en/chapter30_alignment_failures/rl-evaluation'
             }
           ]
         },
@@ -2349,7 +2432,8 @@ const enSidebar = {
               link: '/en/chapter32_selfplay/llm-multi-agent-rl/'
             },
             {
-              text: '29.4 Evolutionary LLM Search & Scientific Discovery (Translation pending)'
+              text: '29.4 Evolutionary LLM Search & Scientific Discovery',
+              link: '/en/chapter32_selfplay/alphaevolve/'
             }
           ]
         }
@@ -2368,7 +2452,8 @@ const enSidebar = {
               link: '/en/appendix_industrial_training/intro'
             },
             {
-              text: 'A.1 Training Debugging Guide (Translation pending)'
+              text: 'A.1 Training Debugging Guide',
+              link: '/en/appendix_industrial_training/training-debugging'
             },
             {
               text: 'A.2 Training Infrastructure',
@@ -2435,10 +2520,12 @@ const enSidebar = {
               link: '/en/appendix_game_projects/intro'
             },
             {
-              text: 'C.1 Paper Reading Roadmap (Translation pending)'
+              text: 'C.1 Paper Reading Roadmap',
+              link: '/en/appendix_paper_reading/intro'
             },
             {
-              text: 'C.2 GPU Hours Estimation Table (Translation pending)'
+              text: 'C.2 GPU Hours Estimation Table',
+              link: '/en/appendix_gpu_hours/intro'
             },
             {
               text: 'C.3 Metrics Glossary',

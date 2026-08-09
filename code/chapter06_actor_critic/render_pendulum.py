@@ -1,7 +1,7 @@
 """
-第6章：渲染 A2C Pendulum-v1 回放
+Chapter 6: Render an A2C Pendulum-v1 replay
 
-运行方式：
+Usage:
     python render_pendulum.py --model output/actor_critic_pendulum.zip
 """
 
@@ -15,16 +15,16 @@ from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
 
 def main():
-    parser = argparse.ArgumentParser(description="渲染 Pendulum A2C 回放")
-    parser.add_argument("--model", type=str, required=True, help="模型路径")
+    parser = argparse.ArgumentParser(description="Render a Pendulum A2C replay")
+    parser.add_argument("--model", type=str, required=True, help="Model path")
     parser.add_argument("--vecnormalize", type=str,
                         default="output/actor_critic_pendulum_vecnormalize.pkl",
-                        help="VecNormalize 统计文件")
+                        help="VecNormalize statistics file")
     parser.add_argument("--output", type=str, default="output/pendulum_actor_critic.gif",
-                        help="GIF 输出路径")
-    parser.add_argument("--seed", type=int, default=0, help="环境 seed")
-    parser.add_argument("--max-steps", type=int, default=200, help="最大步数")
-    parser.add_argument("--fps", type=int, default=30, help="GIF 帧率")
+                        help="GIF output path")
+    parser.add_argument("--seed", type=int, default=0, help="Environment seed")
+    parser.add_argument("--max-steps", type=int, default=200, help="Maximum number of steps")
+    parser.add_argument("--fps", type=int, default=30, help="GIF frame rate")
     args = parser.parse_args()
 
     model = A2C.load(args.model)
@@ -51,8 +51,8 @@ def main():
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     imageio.mimsave(output_path, frames, duration=1000 / args.fps, loop=0)
-    print(f"回报: {total_reward:.1f}")
-    print(f"GIF 已保存到 {output_path}")
+    print(f"Return: {total_reward:.1f}")
+    print(f"GIF saved to {output_path}")
 
 
 if __name__ == "__main__":

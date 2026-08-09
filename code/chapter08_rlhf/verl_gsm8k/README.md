@@ -1,18 +1,18 @@
-# 8.7 veRL + GSM8K 适配代码
+# 8.7 veRL + GSM8K Adaptation Code
 
-本目录对应教程 [8.7 动手：用 veRL 在 GSM8K 上跑 PPO 训练](../../../docs/chapter08_rlhf/verl-ppo-gsm8k.md)。
+This directory corresponds to the tutorial [8.7 Hands-on: Running PPO Training on GSM8K with veRL](../../../docs/chapter08_rlhf/verl-ppo-gsm8k.md).
 
-本仓库不复制 veRL 源码。这里仅提供课程用的 GSM8K reward 函数和启动脚本；实际训练入口仍来自外部 veRL 仓库。
+This repository does not copy the veRL source code. It only provides the GSM8K reward functions and launch scripts used in the course; the actual training entry point still comes from the external veRL repository.
 
-## 外部依赖
+## External Dependencies
 
-- veRL 官方仓库：<https://github.com/volcengine/verl>
-- veRL PPO 训练入口：`python3 -m verl.trainer.main_ppo`
-- veRL GSM8K 数据预处理：`examples/data_preprocess/gsm8k.py`
+- veRL official repository: <https://github.com/volcengine/verl>
+- veRL PPO training entry point: `python3 -m verl.trainer.main_ppo`
+- veRL GSM8K data preprocessing: `examples/data_preprocess/gsm8k.py`
 
-## 使用方式
+## Usage
 
-先按教程安装 veRL，并准备 GSM8K 数据：
+First install veRL following the tutorial, and prepare the GSM8K data:
 
 ```bash
 git clone https://github.com/volcengine/verl.git
@@ -21,7 +21,7 @@ pip install -e .
 python3 examples/data_preprocess/gsm8k.py --local_dir ~/data/gsm8k
 ```
 
-然后在 veRL 环境中使用本目录脚本：
+Then use the scripts in this directory within the veRL environment:
 
 ```bash
 cd /path/to/hands-on-modern-rl/code/chapter08_rlhf/verl_gsm8k
@@ -29,7 +29,7 @@ chmod +x run_qwen2_5_0_5b_ppo_single_gpu.sh
 ./run_qwen2_5_0_5b_ppo_single_gpu.sh
 ```
 
-如果要切换到进阶 reward：
+To switch to the advanced reward:
 
 ```bash
 ./run_qwen2_5_0_5b_ppo_single_gpu.sh \
@@ -37,11 +37,11 @@ chmod +x run_qwen2_5_0_5b_ppo_single_gpu.sh
   custom_reward_function.name=compute_score
 ```
 
-## 文件对应关系
+## File Overview
 
-| 文件                                 | 作用                            |
-| ------------------------------------ | ------------------------------- |
-| `gsm8k_reward.py`                    | 基础 0/1 accuracy reward        |
-| `gsm8k_reward_advanced.py`           | accuracy + format 的组合 reward |
-| `run_qwen2_5_0_5b_ppo_single_gpu.sh` | 单卡 0.5B PPO 启动脚本          |
-| `run_qwen2_5_0_5b_ppo_8gpu.sh`       | 单机 8 卡 PPO 启动脚本          |
+| File                                 | Purpose                             |
+| ------------------------------------ | ----------------------------------- |
+| `gsm8k_reward.py`                    | Basic 0/1 accuracy reward           |
+| `gsm8k_reward_advanced.py`           | Combined accuracy + format reward   |
+| `run_qwen2_5_0_5b_ppo_single_gpu.sh` | Single-GPU 0.5B PPO launch script   |
+| `run_qwen2_5_0_5b_ppo_8gpu.sh`       | Single-node 8-GPU PPO launch script |

@@ -1,21 +1,22 @@
 """
-第11章：多模态奖励函数设计
+Chapter 11: Multi-Modal Reward Function Design
 ==========================================================
 
-本脚本演示为 VLM（视觉语言模型）强化学习设计多模态奖励函数：
-  1. reward_correctness:       答案正确性奖励（0.0 或 1.0）
-  2. reward_reasoning_quality: 推理质量奖励（0.0~0.5）
-  3. reward_format:            格式规范奖励（0.0~0.2）
-  4. reward_visual_grounding:  视觉定位奖励（0.0~0.3）
-  5. compute_total_reward:     加权总分
+This script demonstrates designing a multi-modal reward function for VLM
+(Vision-Language Model) reinforcement learning:
+  1. reward_correctness:       answer correctness reward (0.0 or 1.0)
+  2. reward_reasoning_quality: reasoning quality reward (0.0~0.5)
+  3. reward_format:            format compliance reward (0.0~0.2)
+  4. reward_visual_grounding:  visual grounding reward (0.0~0.3)
+  5. compute_total_reward:     weighted total score
 
-奖励设计原则：
-  - 正确性是核心，权重最高
-  - 推理质量鼓励"展示思考过程"
-  - 格式规范确保输出可解析
-  - 视觉定位鼓励模型真正"看懂"图片
+Reward design principles:
+  - Correctness is the core signal and carries the highest weight
+  - Reasoning quality encourages "showing your work"
+  - Format compliance ensures the output can be parsed
+  - Visual grounding encourages the model to genuinely "look at" the image
 
-运行方式：
+How to run:
   python multi_modal_reward.py
 """
 
@@ -24,38 +25,38 @@ import re
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 创建输出目录
+# Create output directory
 os.makedirs("output", exist_ok=True)
 
-# 设置中文字体，确保图表标题和标签正常显示
+# Set a CJK-capable font to ensure chart titles and labels render correctly
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 
 
 # ==========================================
-# 第一部分：奖励函数定义
+# Part 1: Reward function definitions
 # ==========================================
 
 def reward_correctness(response, ground_truth):
     """
-    正确性奖励：检查回答中的数字是否与标注一致
+    Correctness reward: check whether the numbers in the response match the annotations
 
-    逻辑：
-      1. 从回答中提取每种形状对应的数量
-      2. 与 ground_truth 逐个比较
-      3. 全部正确得 1.0，否则得 0.0
+    Logic:
+      1. Extract the count for each shape from the response
+      2. Compare each against ground_truth
+      3. 1.0 if all correct, otherwise 0.0
 
-    参数：
-        response: 模型的文本回答
-        ground_truth: dict，{'三角形': int, '圆形': int, '正方形': int}
-    返回：
-        float: 0.0（错误）或 1.0（正确）
+    Args:
+        response: the model's text response
+        ground_truth: dict, {'三角形': int, '圆形': int, '正方形': int}
+    Returns:
+        float: 0.0 (incorrect) or 1.0 (correct)
     """
-    # 尝试从回答中提取每种形状对应的数字
+    # Try to extract the number corresponding to each shape from the response
     extracted = {}
 
     for shape_name in ['三角形', '圆形', '正方形']:
-        # 模式1：形状名 + 数字，如 "三角形3个" 或 "三角形：3" 或 "三角形有3个"
+        # Pattern 1: shape name + number, e.g. "三角形3个" or "三角形：3" or "三角形有3个"
         patterns = [
             rf'{shape_name}[^0-9]*?(\d+)',
             rf'(\d+)\s*个\s*{shape_name}',
@@ -63,16 +64,16 @@ def reward_correctness(response, ground_truth):
         for pattern in patterns:
             matches = re.findall(pattern, response)
             if matches:
-                # 取最后一个匹配（通常是最终结论）
+                # Take the last match (usually the final conclusion)
                 extracted[shape_name] = int(matches[-1])
                 break
 
-    # 如果未能提取到所有形状的数量，直接返回 0
+    # If not all shape counts could be extracted, return 0 directly
     for shape_name in ground_truth:
         if shape_name not in extracted:
             return 0.0
 
-    # 逐个比较
+    # Compare each one
     for shape_name, expected_count in ground_truth.items():
         if extracted.get(shape_name, -1) != expected_count:
             return 0.0
@@ -82,27 +83,27 @@ def reward_correctness(response, ground_truth):
 
 def reward_reasoning_quality(response):
     """
-    推理质量奖励：检查回答是否包含逐步推理过程
+    Reasoning quality reward: check whether the response includes step-by-step reasoning
 
-    评分标准（0.0~0.5）：
-      - 0.0: 没有任何推理步骤，直接给答案
-      - 0.1~0.2: 简单提及过程
-      - 0.3~0.4: 包含明确的分步骤推理
-      - 0.5: 完整的逐步推理，有分析过程
+    Scoring criteria (0.0~0.5):
+      - 0.0: no reasoning steps at all, answer given directly
+      - 0.1~0.2: briefly mentions the process
+      - 0.3~0.4: contains clear step-by-step reasoning
+      - 0.5: complete step-by-step reasoning with analysis
 
-    判断依据：
-      - 是否包含序号标记（"第一步"、"Step 1"、"1." 等）
-      - 是否包含推理关键词（"因为"、"所以"、"因此"、"分析"、"计算"）
-      - 回答长度是否足以容纳推理过程
+    Judged by:
+      - Whether it contains step markers ("第一步", "Step 1", "1.", etc.)
+      - Whether it contains reasoning keywords ("因为", "所以", "因此", "分析", "计算")
+      - Whether the response is long enough to contain reasoning
 
-    参数：
-        response: 模型的文本回答
-    返回：
+    Args:
+        response: the model's text response
+    Returns:
         float: 0.0~0.5
     """
     score = 0.0
 
-    # 检查是否有分步骤标记（0.2 分）
+    # Check for step markers (0.2 points)
     step_markers = [
         r'第[一二三四五六七八九十\d]+步',
         r'[Ss]tep\s*\d+',
@@ -117,7 +118,7 @@ def reward_reasoning_quality(response):
     elif step_count >= 1:
         score += 0.1
 
-    # 检查是否有推理关键词（0.2 分）
+    # Check for reasoning keywords (0.2 points)
     reasoning_keywords = [
         '因为', '所以', '因此', '分析', '计算',
         '可以', '发现', '观察', '总共', '合计',
@@ -128,7 +129,7 @@ def reward_reasoning_quality(response):
     elif keyword_count >= 1:
         score += 0.1
 
-    # 检查回答长度（0.1 分）——足够长才可能包含推理
+    # Check response length (0.1 points) — must be long enough to plausibly contain reasoning
     if len(response) >= 50:
         score += 0.1
 
@@ -137,33 +138,33 @@ def reward_reasoning_quality(response):
 
 def reward_format(response):
     """
-    格式规范奖励：检查回答是否遵循预期的输出格式
+    Format compliance reward: check whether the response follows the expected output format
 
-    评分标准（0.0~0.2）：
-      - 0.0: 完全没有格式
-      - 0.05: 有部分格式（如列出了一些形状名）
-      - 0.1: 格式基本正确（提到了三种形状）
-      - 0.15: 格式良好（三种形状都有对应的数量）
-      - 0.2: 格式完美（有总结性结论 + 三种形状数量齐全）
+    Scoring criteria (0.0~0.2):
+      - 0.0: no formatting at all
+      - 0.05: partial formatting (e.g. lists some shape names)
+      - 0.1: format is roughly correct (mentions all three shapes)
+      - 0.15: good formatting (all three shapes have corresponding counts)
+      - 0.2: perfect formatting (summary conclusion + all three shape counts present)
 
-    期望格式示例：
+    Expected format example:
       "图片中有 X 个三角形、Y 个圆形和 Z 个正方形，总共 N 个形状。"
 
-    参数：
-        response: 模型的文本回答
-    返回：
+    Args:
+        response: the model's text response
+    Returns:
         float: 0.0~0.2
     """
     score = 0.0
 
-    # 检查是否提到了所有三种形状（0.1 分）
+    # Check whether all three shapes are mentioned (0.1 points)
     shapes_mentioned = sum(1 for s in ['三角形', '圆形', '正方形'] if s in response)
     if shapes_mentioned == 3:
         score += 0.1
     elif shapes_mentioned >= 2:
         score += 0.05
 
-    # 检查是否有总结性表述（0.05 分）
+    # Check for a summary statement (0.05 points)
     summary_patterns = [
         r'总共\s*\d+',
         r'合计\s*\d+',
@@ -174,7 +175,7 @@ def reward_format(response):
     if any(re.search(p, response) for p in summary_patterns):
         score += 0.05
 
-    # 检查是否有数字和形状的对应关系（0.05 分）
+    # Check for a number-shape pairing (0.05 points)
     has_number_shape_pair = bool(re.search(r'\d+\s*个', response))
     if has_number_shape_pair:
         score += 0.05
@@ -184,23 +185,24 @@ def reward_format(response):
 
 def reward_visual_grounding(response, image_info):
     """
-    视觉定位奖励：检查回答是否正确引用了图片中的视觉特征
+    Visual grounding reward: check whether the response correctly references
+    the visual features actually present in the image
 
-    评分标准（0.0~0.3）：
-      - 检查回答中是否提及了图片中实际存在的形状
-      - 对于提及的形状，是否给出了视觉描述（颜色、位置等）
-      - 模型是否表现出"真正在看图"的迹象
+    Scoring criteria (0.0~0.3):
+      - Check whether the response mentions shapes that are actually present in the image
+      - For mentioned shapes, whether a visual description is given (color, position, etc.)
+      - Whether the model shows signs of "actually looking at the image"
 
-    image_info 示例：
+    image_info example:
       {
-        'present_shapes': ['三角形', '圆形'],  # 图片中实际存在的形状
-        'absent_shapes': ['正方形'],             # 图片中不存在的形状
+        'present_shapes': ['三角形', '圆形'],  # shapes actually present in the image
+        'absent_shapes': ['正方形'],             # shapes not present in the image
       }
 
-    参数：
-        response: 模型的文本回答
-        image_info: dict，包含图片中的形状信息
-    返回：
+    Args:
+        response: the model's text response
+        image_info: dict containing the shape information for the image
+    Returns:
         float: 0.0~0.3
     """
     score = 0.0
@@ -208,17 +210,17 @@ def reward_visual_grounding(response, image_info):
     present_shapes = image_info.get('present_shapes', [])
     absent_shapes = image_info.get('absent_shapes', [])
 
-    # 检查是否提到了存在的形状（0.15 分）
+    # Check whether the present shapes are mentioned (0.15 points)
     mentioned_present = sum(1 for s in present_shapes if s in response)
     if len(present_shapes) > 0:
         ratio = mentioned_present / len(present_shapes)
         score += 0.15 * ratio
 
-    # 检查是否正确说明不存在的形状（0.1 分）
-    # 如果某种形状不存在，模型说"0 个"或"没有"，这是正确的视觉定位
+    # Check whether absent shapes are correctly reported as absent (0.1 points)
+    # If a shape is absent and the model says "0 个" or "没有", that is correct visual grounding
     for shape in absent_shapes:
         if shape in response:
-            # 检查是否正确标注为 0
+            # Check whether it's correctly labeled as 0
             zero_patterns = [
                 rf'{shape}[^0-9]*?0',
                 rf'0\s*个\s*{shape}',
@@ -226,9 +228,9 @@ def reward_visual_grounding(response, image_info):
             ]
             if any(re.search(p, response) for p in zero_patterns):
                 score += 0.05
-                break  # 最多加 0.05
+                break  # cap the bonus at 0.05
 
-    # 检查是否有视觉描述性语言（0.05 分）
+    # Check for visually descriptive language (0.05 points)
     visual_keywords = [
         '颜色', '红色', '蓝色', '绿色', '橙色', '紫色',
         '位置', '左边', '右边', '上方', '下方',
@@ -244,22 +246,22 @@ def reward_visual_grounding(response, image_info):
 
 def compute_total_reward(response, ground_truth, image_info):
     """
-    计算加权总奖励
+    Compute the weighted total reward
 
-    权重分配：
-      - 正确性（correctness）:       × 1.0  → 满分 1.0
-      - 推理质量（reasoning）:        × 1.0  → 满分 0.5
-      - 格式规范（format）:           × 1.0  → 满分 0.2
-      - 视觉定位（visual_grounding）: × 1.0  → 满分 0.3
+    Weight distribution:
+      - Correctness:        × 1.0  → max 1.0
+      - Reasoning quality:   × 1.0  → max 0.5
+      - Format compliance:   × 1.0  → max 0.2
+      - Visual grounding:    × 1.0  → max 0.3
       ---------------------------------------------
-      理论最高总分: 2.0
+      Theoretical max total score: 2.0
 
-    参数：
-        response: 模型的文本回答
-        ground_truth: dict，标注数据
-        image_info: dict，图片信息
-    返回：
-        dict，包含各分项奖励和总奖励
+    Args:
+        response: the model's text response
+        ground_truth: dict, annotation data
+        image_info: dict, image information
+    Returns:
+        dict containing each component reward and the total reward
     """
     r_correct = reward_correctness(response, ground_truth)
     r_reasoning = reward_reasoning_quality(response)
@@ -278,15 +280,15 @@ def compute_total_reward(response, ground_truth, image_info):
 
 
 # ==========================================
-# 第二部分：测试用例定义
+# Part 2: Test case definitions
 # ==========================================
-# 8 个测试用例，覆盖不同质量水平的回答：
-#   完美回答、正确但简短、错误但有推理、错误且混乱、
-#   部分正确、格式好但内容错、有视觉描述、无格式无推理
+# 8 test cases covering responses of varying quality:
+#   perfect response, correct but short, wrong but with reasoning, wrong and confused,
+#   partially correct, well-formatted but wrong content, has visual description, no format no reasoning
 
 test_cases = [
     {
-        'name': '完美回答（正确 + 推理 + 格式 + 视觉定位）',
+        'name': 'Perfect response (correct + reasoning + format + visual grounding)',
         'response': (
             '我仔细观察了图片。\n'
             '首先，分析图中的三角形：我数到了 3 个三角形，分别在左上方和右侧。\n'
@@ -302,7 +304,7 @@ test_cases = [
         },
     },
     {
-        'name': '正确但简短（无推理过程）',
+        'name': 'Correct but short (no reasoning process)',
         'response': '三角形3个，圆形1个，正方形2个。',
         'ground_truth': {'三角形': 3, '圆形': 1, '正方形': 2},
         'image_info': {
@@ -311,7 +313,7 @@ test_cases = [
         },
     },
     {
-        'name': '错误但有推理过程',
+        'name': 'Wrong but with reasoning process',
         'response': (
             '让我一步步来分析。\n'
             '首先，观察图片中的三角形。可以看到有 2 个三角形。\n'
@@ -327,7 +329,7 @@ test_cases = [
         },
     },
     {
-        'name': '错误且混乱',
+        'name': 'Wrong and confused',
         'response': '图里有好多形状，大概是三角形2个圆形3个正方形5个吧。',
         'ground_truth': {'三角形': 3, '圆形': 1, '正方形': 2},
         'image_info': {
@@ -336,7 +338,7 @@ test_cases = [
         },
     },
     {
-        'name': '部分正确（只数对了一种）',
+        'name': 'Partially correct (only one shape counted correctly)',
         'response': (
             '我来看一下图片中的形状。\n'
             '三角形有 3 个，这个我数对了。\n'
@@ -350,7 +352,7 @@ test_cases = [
         },
     },
     {
-        'name': '格式好但内容错',
+        'name': 'Well-formatted but wrong content',
         'response': (
             '答：经过分析，图片中包含以下形状：\n'
             '三角形0个，圆形5个，正方形5个，总共10个。'
@@ -362,7 +364,7 @@ test_cases = [
         },
     },
     {
-        'name': '有视觉描述但答案有误',
+        'name': 'Has visual description but the answer is wrong',
         'response': (
             '观察图片，可以看到图片中左侧有一个蓝色的圆形，'
             '右边有一个红色的三角形，下方有两个绿色的正方形。\n'
@@ -375,7 +377,7 @@ test_cases = [
         },
     },
     {
-        'name': '某些形状不存在的情况（正确处理）',
+        'name': 'Case where some shapes are absent (handled correctly)',
         'response': (
             '首先，分析图中的三角形：有 2 个三角形。\n'
             '然后，分析圆形：有 3 个圆形。\n'
@@ -393,34 +395,34 @@ test_cases = [
 
 
 # ==========================================
-# 第三部分：测试奖励函数并打印详细结果
+# Part 3: Test the reward function and print detailed results
 # ==========================================
 def run_reward_tests():
     """
-    在所有测试用例上运行奖励函数，打印详细的奖励分解表
+    Run the reward function on all test cases and print a detailed reward breakdown table
     """
     print("=" * 80)
-    print("  多模态奖励函数测试 — 详细分解表")
+    print("  Multi-Modal Reward Function Tests — Detailed Breakdown")
     print("=" * 80)
     print()
-    print("奖励组成：")
-    print("  正确性（correctness）:       0.0 ~ 1.0   答案是否完全正确")
-    print("  推理质量（reasoning）:        0.0 ~ 0.5   是否有逐步推理过程")
-    print("  格式规范（format）:           0.0 ~ 0.2   输出格式是否规范")
-    print("  视觉定位（visual_grounding）: 0.0 ~ 0.3   是否引用了正确的视觉特征")
+    print("Reward components:")
+    print("  Correctness:       0.0 ~ 1.0   whether the answer is fully correct")
+    print("  Reasoning quality:  0.0 ~ 0.5   whether there is step-by-step reasoning")
+    print("  Format compliance:  0.0 ~ 0.2   whether the output format is compliant")
+    print("  Visual grounding:   0.0 ~ 0.3   whether the correct visual features are referenced")
     print("  ----------------------------------------------")
-    print("  总计:                        0.0 ~ 2.0")
+    print("  Total:              0.0 ~ 2.0")
     print()
 
-    # 表头
+    # Header
     header = (
-        f"{'编号':>4s}  "
-        f"{'正确性':>6s}  "
-        f"{'推理':>4s}  "
-        f"{'格式':>4s}  "
-        f"{'视觉':>4s}  "
-        f"{'总分':>5s}  "
-        f"{'说明'}"
+        f"{'ID':>4s}  "
+        f"{'Correct':>6s}  "
+        f"{'Reason':>4s}  "
+        f"{'Format':>4s}  "
+        f"{'Visual':>4s}  "
+        f"{'Total':>5s}  "
+        f"{'Description'}"
     )
     separator = "-" * 80
     print(header)
@@ -449,51 +451,51 @@ def run_reward_tests():
     print(separator)
     print()
 
-    # 统计摘要
+    # Summary statistics
     totals = [r['total'] for r in all_rewards]
-    print(f"奖励统计：")
-    print(f"  最高总分: {max(totals):.2f}")
-    print(f"  最低总分: {min(totals):.2f}")
-    print(f"  平均总分: {np.mean(totals):.2f}")
+    print(f"Reward statistics:")
+    print(f"  Max total: {max(totals):.2f}")
+    print(f"  Min total: {min(totals):.2f}")
+    print(f"  Avg total: {np.mean(totals):.2f}")
     print()
 
-    # 打印每个测试用例的详细分析
+    # Print a detailed analysis for each test case
     print("=" * 80)
-    print("  逐条详细分析")
+    print("  Detailed Analysis Per Case")
     print("=" * 80)
     for i, (tc, rewards) in enumerate(zip(test_cases, all_rewards)):
         gt = tc['ground_truth']
-        print(f"\n--- 测试用例 {i+1}: {tc['name']} ---")
-        print(f"  标注: 三角形={gt['三角形']}, 圆形={gt['圆形']}, 正方形={gt['正方形']}")
-        print(f"  回答: {tc['response'][:80]}...")
-        print(f"  奖励分解:")
-        print(f"    正确性:   {rewards['correctness']:.2f}  {'[满分]' if rewards['correctness'] == 1.0 else '[未得分]'}")
-        print(f"    推理质量: {rewards['reasoning']:.2f}  {'[满分]' if rewards['reasoning'] == 0.5 else ''}")
-        print(f"    格式规范: {rewards['format']:.2f}  {'[满分]' if rewards['format'] == 0.2 else ''}")
-        print(f"    视觉定位: {rewards['visual_grounding']:.2f}  {'[满分]' if rewards['visual_grounding'] == 0.3 else ''}")
-        print(f"    加权总分: {rewards['total']:.2f}")
+        print(f"\n--- Test case {i+1}: {tc['name']} ---")
+        print(f"  Annotation: triangles={gt['三角形']}, circles={gt['圆形']}, squares={gt['正方形']}")
+        print(f"  Response: {tc['response'][:80]}...")
+        print(f"  Reward breakdown:")
+        print(f"    Correctness:       {rewards['correctness']:.2f}  {'[max]' if rewards['correctness'] == 1.0 else '[no score]'}")
+        print(f"    Reasoning quality: {rewards['reasoning']:.2f}  {'[max]' if rewards['reasoning'] == 0.5 else ''}")
+        print(f"    Format compliance: {rewards['format']:.2f}  {'[max]' if rewards['format'] == 0.2 else ''}")
+        print(f"    Visual grounding:  {rewards['visual_grounding']:.2f}  {'[max]' if rewards['visual_grounding'] == 0.3 else ''}")
+        print(f"    Weighted total:    {rewards['total']:.2f}")
 
     return all_rewards
 
 
 # ==========================================
-# 第四部分：可视化奖励权重分布
+# Part 4: Visualize the reward weight distribution
 # ==========================================
 def plot_reward_weights(all_rewards):
     """
-    绘制奖励分量权重的饼图和各测试用例的堆叠柱状图
+    Plot a pie chart of reward component weights and a stacked bar chart per test case
 
-    左图：奖励理论满分占比（饼图）
-    右图：各测试用例的奖励分量堆叠柱状图
+    Left: theoretical max score share (pie chart)
+    Right: stacked bar chart of reward components per test case
     """
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
 
-    # ---------- 左图：理论满分占比饼图 ----------
+    # ---------- Left: theoretical max score share pie chart ----------
     ax1 = axes[0]
 
-    # 各分量的理论满分
+    # Theoretical max score for each component
     max_scores = [1.0, 0.5, 0.2, 0.3]  # correctness, reasoning, format, visual
-    labels = ['正确性\n(满分1.0)', '推理质量\n(满分0.5)', '格式规范\n(满分0.2)', '视觉定位\n(满分0.3)']
+    labels = ['Correctness\n(max 1.0)', 'Reasoning Quality\n(max 0.5)', 'Format\n(max 0.2)', 'Visual Grounding\n(max 0.3)']
     colors = ['#e74c3c', '#3498db', '#f39c12', '#2ecc71']
     explode = (0.05, 0.02, 0.02, 0.02)
 
@@ -508,9 +510,9 @@ def plot_reward_weights(all_rewards):
     )
     for autotext in autotexts:
         autotext.set_fontsize(10)
-    ax1.set_title('奖励分量理论满分占比', fontsize=14, fontweight='bold')
+    ax1.set_title('Reward Component Theoretical Max Score Share', fontsize=14, fontweight='bold')
 
-    # ---------- 右图：堆叠柱状图 ----------
+    # ---------- Right: stacked bar chart ----------
     ax2 = axes[1]
 
     n_cases = len(all_rewards)
@@ -522,24 +524,24 @@ def plot_reward_weights(all_rewards):
     visual_vals = [r['visual_grounding'] for r in all_rewards]
 
     bar_width = 0.6
-    ax2.bar(x, correctness_vals, bar_width, label='正确性', color='#e74c3c')
+    ax2.bar(x, correctness_vals, bar_width, label='Correctness', color='#e74c3c')
     ax2.bar(x, reasoning_vals, bar_width, bottom=correctness_vals,
-            label='推理质量', color='#3498db')
+            label='Reasoning Quality', color='#3498db')
     bottom2 = [c + r for c, r in zip(correctness_vals, reasoning_vals)]
     ax2.bar(x, format_vals, bar_width, bottom=bottom2,
-            label='格式规范', color='#f39c12')
+            label='Format Compliance', color='#f39c12')
     bottom3 = [b + f for b, f in zip(bottom2, format_vals)]
     ax2.bar(x, visual_vals, bar_width, bottom=bottom3,
-            label='视觉定位', color='#2ecc71')
+            label='Visual Grounding', color='#2ecc71')
 
-    # 在柱顶标注总分
+    # Annotate the total score above each bar
     for i, r in enumerate(all_rewards):
         ax2.text(i, r['total'] + 0.05, f"{r['total']:.2f}",
                  ha='center', va='bottom', fontsize=9, fontweight='bold')
 
-    ax2.set_xlabel('测试用例编号', fontsize=12)
-    ax2.set_ylabel('奖励分数', fontsize=12)
-    ax2.set_title('各测试用例的奖励分量分解', fontsize=14, fontweight='bold')
+    ax2.set_xlabel('Test Case Number', fontsize=12)
+    ax2.set_ylabel('Reward Score', fontsize=12)
+    ax2.set_title('Reward Component Breakdown per Test Case', fontsize=14, fontweight='bold')
     ax2.set_xticks(x)
     ax2.set_xticklabels([f'#{i+1}' for i in range(n_cases)])
     ax2.legend(fontsize=10, loc='upper right')
@@ -548,57 +550,57 @@ def plot_reward_weights(all_rewards):
 
     plt.tight_layout()
     plt.savefig('output/multi_modal_reward_breakdown.png', dpi=150, bbox_inches='tight')
-    print("\n  奖励分解图已保存为 output/multi_modal_reward_breakdown.png")
+    print("\n  Reward breakdown chart saved as output/multi_modal_reward_breakdown.png")
     plt.show()
 
 
 # ==========================================
-# 程序入口
+# Entry point
 # ==========================================
 if __name__ == "__main__":
-    # 第一步：运行奖励函数测试
+    # Step 1: run the reward function tests
     all_rewards = run_reward_tests()
 
-    # 第二步：可视化奖励权重
+    # Step 2: visualize the reward weights
     print("\n" + "=" * 80)
-    print("  开始生成可视化图表...")
+    print("  Generating Visualization Charts...")
     print("=" * 80)
     plot_reward_weights(all_rewards)
 
-    # 最终总结
+    # Final summary
     print("\n" + "=" * 80)
-    print("  多模态奖励函数设计总结")
+    print("  Multi-Modal Reward Function Design Summary")
     print("=" * 80)
     print("""
-  奖励函数设计要点：
+  Reward function design highlights:
 
-    1. 正确性（权重最高，满分 1.0）
-       - 只有全部正确才得满分，任何错误都得 0 分
-       - 这种"全对或全错"的设计鼓励模型追求完美
-       - 在 GRPO 训练中，组内正确响应会获得正优势
+    1. Correctness (highest weight, max score 1.0)
+       - Only fully correct answers get the max score; any error scores 0
+       - This "all-or-nothing" design pushes the model to strive for perfection
+       - In GRPO training, correct responses within a group receive positive advantage
 
-    2. 推理质量（满分 0.5）
-       - 鼓励模型展示思考过程，而非直接给出答案
-       - 通过检测步骤标记和推理关键词来评分
-       - 有助于 Chain-of-Thought 推理能力的培养
+    2. Reasoning quality (max score 0.5)
+       - Encourages the model to show its thinking process rather than jumping to the answer
+       - Scored by detecting step markers and reasoning keywords
+       - Helps cultivate Chain-of-Thought reasoning ability
 
-    3. 格式规范（满分 0.2）
-       - 确保输出可被自动解析
-       - 要求包含所有三种形状和总结性表述
-       - 降低后续评估的复杂度
+    3. Format compliance (max score 0.2)
+       - Ensures the output can be parsed automatically
+       - Requires mentioning all three shapes and a summary statement
+       - Reduces the complexity of downstream evaluation
 
-    4. 视觉定位（满分 0.3）
-       - 鼓励模型真正"看懂"图片内容
-       - 检查是否正确引用存在的形状和说明不存在的形状
-       - 对于 VLM 训练尤为重要，避免模型"猜答案"
+    4. Visual grounding (max score 0.3)
+       - Encourages the model to genuinely "understand" the image content
+       - Checks whether present shapes are correctly referenced and absent shapes correctly noted
+       - Especially important for VLM training, to prevent the model from "guessing" answers
 
-  与纯文本 RL 的区别：
-    - 纯文本 RL 的奖励只关注文本质量
-    - VLM RL 的奖励需要额外考虑视觉定位能力
-    - 模型不仅要回答正确，还要"看着图片"回答
+  Differences from text-only RL:
+    - Text-only RL rewards focus only on text quality
+    - VLM RL rewards must additionally account for visual grounding ability
+    - The model must not only answer correctly, but do so by "looking at the image"
 
-  实际应用中的扩展：
-    - 可加入 OCR 奖励（检查模型是否正确读取图中文本）
-    - 可加入空间关系奖励（检查对物体位置关系的理解）
-    - 可使用 LLM-as-Judge 代替规则奖励，获得更细腻的评分
+  Extensions for real-world use:
+    - Could add an OCR reward (checking whether the model correctly reads text in the image)
+    - Could add a spatial relationship reward (checking understanding of object positional relationships)
+    - Could use LLM-as-Judge instead of rule-based rewards for finer-grained scoring
     """)

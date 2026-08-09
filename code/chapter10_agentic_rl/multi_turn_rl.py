@@ -1,22 +1,22 @@
 """
-第12章：多轮对话 RL —— ORM 与 PRM 的信用分配对比
+Chapter 12: Multi-Turn Dialogue RL -- ORM vs. PRM Credit Assignment Comparison
 ==========================================================
 
-本脚本模拟一个多轮工具调用 Agent（每回合 3~5 轮对话），
-对比两种奖励分配策略：
+This script simulates a multi-turn tool-calling Agent (3~5 turns per episode),
+comparing two reward-assignment strategies:
 
-  1. ORM（Outcome Reward Model）：
-     只有最终结果获得奖励（1.0 或 0.0），中间步骤无信号
+  1. ORM (Outcome Reward Model):
+     Only the final result receives a reward (1.0 or 0.0); intermediate steps get no signal
 
-  2. PRM（Process Reward Model）：
-     每一步都获得部分奖励（0.0~1.0），及时提供学习信号
+  2. PRM (Process Reward Model):
+     Every step receives a partial reward (0.0~1.0), providing a timely learning signal
 
-核心概念：
-  - 信用分配问题（Credit Assignment）：如何将最终奖励归因到每一步？
-  - 折扣回报：G_t = r_t + γ * G_{t+1}，γ 控制信用传播范围
-  - γ 越大 → 远期信用传播越远；γ 越小 → 只关注近期步骤
+Core concepts:
+  - Credit assignment problem: how do you attribute the final reward to each individual step?
+  - Discounted return: G_t = r_t + gamma * G_{t+1}, where gamma controls how far credit propagates
+  - Larger gamma -> credit propagates further back in time; smaller gamma -> only recent steps matter
 
-运行方式：
+How to run:
     python multi_turn_rl.py
 """
 
@@ -24,29 +24,29 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 创建输出目录
+# Create the output directory
 os.makedirs("output", exist_ok=True)
 
-# 设置中文字体，确保图表标题和标签正常显示
+# Configure a CJK-capable font so chart titles and labels render correctly
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 
 
 # ==========================================
-# 第一部分：定义模拟工具
+# Part 1: Define the simulated tools
 # ==========================================
-# Agent 可以调用三个工具来完成用户任务：
-#   - calculator: 数学计算器
-#   - search:      知识搜索
-#   - code_executor: 代码执行器
-# 每个工具返回一个模拟结果和正确性分数
+# The Agent can call three tools to complete a user task:
+#   - calculator: math calculator
+#   - search:      knowledge search
+#   - code_executor: code executor
+# Each tool returns a simulated result and a correctness score
 
 def tool_calculator(query):
     """
-    模拟计算器工具
-    正确处理数学表达式，偶尔模拟计算错误（增加真实性）
+    Simulated calculator tool
+    Correctly handles math expressions, occasionally simulates a computation error (for realism)
     """
-    # 简单模拟：对常见数学问题返回结果
+    # Simple simulation: return a result for common math problems
     if "123 + 456" in query:
         return {"result": "579", "correct": True}
     elif "25 * 4" in query:
@@ -54,122 +54,122 @@ def tool_calculator(query):
     elif "sqrt(144)" in query or "144" in query:
         return {"result": "12", "correct": True}
     else:
-        # 未知计算，模拟 70% 正确率
+        # Unknown computation, simulate a 70% success rate
         correct = np.random.random() < 0.7
-        return {"result": "模拟结果", "correct": correct}
+        return {"result": "simulated result", "correct": correct}
 
 
 def tool_search(query):
     """
-    模拟搜索工具
-    返回知识检索结果
+    Simulated search tool
+    Returns a knowledge retrieval result
     """
-    # 模拟搜索质量
+    # Simulate search quality
     if "Python" in query or "python" in query:
-        return {"result": "Python 是一种广泛使用的高级编程语言...", "correct": True}
+        return {"result": "Python is a widely used high-level programming language...", "correct": True}
     elif "RL" in query or "强化学习" in query:
-        return {"result": "强化学习是机器学习的一个分支...", "correct": True}
+        return {"result": "Reinforcement learning is a branch of machine learning...", "correct": True}
     else:
         correct = np.random.random() < 0.7
-        return {"result": "搜索到相关内容...", "correct": correct}
+        return {"result": "found related content...", "correct": correct}
 
 
 def tool_code_executor(code):
     """
-    模拟代码执行器
-    执行代码并返回运行结果
+    Simulated code executor
+    Executes code and returns the run result
     """
-    # 模拟代码执行成功率
+    # Simulate code execution success rate
     if "print" in code or "def " in code:
-        return {"result": "代码执行成功", "correct": True}
+        return {"result": "code executed successfully", "correct": True}
     elif "import" in code:
-        return {"result": "模块导入成功", "correct": True}
+        return {"result": "module imported successfully", "correct": True}
     else:
         correct = np.random.random() < 0.6
-        return {"result": "模拟执行结果", "correct": correct}
+        return {"result": "simulated execution result", "correct": correct}
 
 
-# 工具注册表：工具名 → (调用函数, 工具描述)
+# Tool registry: tool name -> (call function, tool description)
 TOOLS = {
-    "calculator": (tool_calculator, "数学计算器，用于数值运算"),
-    "search": (tool_search, "知识搜索引擎，用于事实查询"),
-    "code_executor": (tool_code_executor, "代码执行器，用于运行代码片段"),
+    "calculator": (tool_calculator, "Math calculator, used for numerical operations"),
+    "search": (tool_search, "Knowledge search engine, used for factual lookups"),
+    "code_executor": (tool_code_executor, "Code executor, used to run code snippets"),
 }
 
 
 # ==========================================
-# 第二部分：模拟多轮对话场景
+# Part 2: Simulate multi-turn dialogue scenarios
 # ==========================================
-# 预定义若干多轮任务，每个任务包含 3~5 轮工具调用
+# Predefine several multi-turn tasks, each containing 3~5 rounds of tool calls
 
 SCENARIOS = [
     {
-        "task": "计算 123 + 456 的结果，然后搜索 Python 相关知识，最后写代码打印结果",
+        "task": "Compute 123 + 456, then search for Python-related knowledge, then write code to print the result",
         "turns": [
-            {"tool": "calculator",  "query": "123 + 456",   "description": "第一步：调用计算器进行加法运算"},
-            {"tool": "search",      "query": "Python 编程",  "description": "第二步：搜索 Python 相关知识"},
-            {"tool": "code_executor","query": "print(579)",  "description": "第三步：执行代码打印结果"},
+            {"tool": "calculator",  "query": "123 + 456",   "description": "Step 1: call the calculator to perform the addition"},
+            {"tool": "search",      "query": "Python 编程",  "description": "Step 2: search for Python-related knowledge"},
+            {"tool": "code_executor","query": "print(579)",  "description": "Step 3: execute code to print the result"},
         ],
     },
     {
-        "task": "搜索强化学习资料，计算 25*4，然后执行一个简单程序",
+        "task": "Search for reinforcement learning material, compute 25*4, then run a simple program",
         "turns": [
-            {"tool": "search",       "query": "强化学习入门",       "description": "第一步：搜索强化学习资料"},
-            {"tool": "calculator",   "query": "25 * 4",            "description": "第二步：计算乘法"},
-            {"tool": "code_executor","query": "def hello(): pass",  "description": "第三步：执行简单程序"},
+            {"tool": "search",       "query": "强化学习入门",       "description": "Step 1: search for reinforcement learning material"},
+            {"tool": "calculator",   "query": "25 * 4",            "description": "Step 2: compute the multiplication"},
+            {"tool": "code_executor","query": "def hello(): pass",  "description": "Step 3: run a simple program"},
         ],
     },
     {
-        "task": "计算平方根，搜索算法资料，执行代码，再搜索深度学习",
+        "task": "Compute a square root, search for algorithm material, execute code, then search for deep learning",
         "turns": [
-            {"tool": "calculator",    "query": "sqrt(144)",         "description": "第一步：计算平方根"},
-            {"tool": "search",        "query": "排序算法比较",       "description": "第二步：搜索算法资料"},
-            {"tool": "code_executor", "query": "import numpy",       "description": "第三步：导入模块"},
-            {"tool": "search",        "query": "深度学习框架",       "description": "第四步：搜索深度学习资料"},
+            {"tool": "calculator",    "query": "sqrt(144)",         "description": "Step 1: compute the square root"},
+            {"tool": "search",        "query": "排序算法比较",       "description": "Step 2: search for algorithm material"},
+            {"tool": "code_executor", "query": "import numpy",       "description": "Step 3: import a module"},
+            {"tool": "search",        "query": "深度学习框架",       "description": "Step 4: search for deep learning material"},
         ],
     },
     {
-        "task": "搜索数学公式，执行计算脚本，验证结果",
+        "task": "Search for a math formula, run a computation script, verify the result",
         "turns": [
-            {"tool": "search",        "query": "欧拉公式推导",       "description": "第一步：搜索数学公式"},
-            {"tool": "code_executor", "query": "import math",        "description": "第二步：执行计算脚本"},
-            {"tool": "calculator",    "query": "圆周率计算",         "description": "第三步：数值计算"},
+            {"tool": "search",        "query": "欧拉公式推导",       "description": "Step 1: search for the math formula"},
+            {"tool": "code_executor", "query": "import math",        "description": "Step 2: run the computation script"},
+            {"tool": "calculator",    "query": "圆周率计算",         "description": "Step 3: numerical computation"},
         ],
     },
     {
-        "task": "搜索 RL 策略梯度，执行训练代码，计算奖励，搜索 PPO",
+        "task": "Search for RL policy gradients, run training code, compute the reward, search for PPO",
         "turns": [
-            {"tool": "search",        "query": "RL 策略梯度",        "description": "第一步：搜索策略梯度"},
-            {"tool": "code_executor", "query": "def train(): pass",   "description": "第二步：执行训练代码"},
-            {"tool": "calculator",    "query": "计算累积奖励",        "description": "第三步：计算奖励"},
-            {"tool": "search",        "query": "PPO 算法详解",       "description": "第四步：搜索 PPO"},
-            {"tool": "code_executor", "query": "print('done')",       "description": "第五步：执行收尾代码"},
+            {"tool": "search",        "query": "RL 策略梯度",        "description": "Step 1: search for policy gradients"},
+            {"tool": "code_executor", "query": "def train(): pass",   "description": "Step 2: run the training code"},
+            {"tool": "calculator",    "query": "计算累积奖励",        "description": "Step 3: compute the reward"},
+            {"tool": "search",        "query": "PPO 算法详解",       "description": "Step 4: search for PPO"},
+            {"tool": "code_executor", "query": "print('done')",       "description": "Step 5: run the wrap-up code"},
         ],
     },
 ]
 
 
 # ==========================================
-# 第三部分：ORM 和 PRM 奖励计算
+# Part 3: ORM and PRM reward computation
 # ==========================================
 
 def compute_orm_rewards(turns):
     """
-    ORM（Outcome Reward Model）：只有最终结果获得奖励
+    ORM (Outcome Reward Model): only the final result receives a reward
 
-    如果任务最终成功，所有步骤共享奖励 1.0；
-    如果任务最终失败，所有步骤获得 0.0。
+    If the task ultimately succeeds, all steps share a reward of 1.0;
+    if the task ultimately fails, all steps receive 0.0.
 
-    这就像考试只看最终答案——过程不给分。
+    It's like an exam that only grades the final answer -- no credit for the process.
     """
     n = len(turns)
-    rewards = [0.0] * n  # 初始化：所有步骤奖励为 0
+    rewards = [0.0] * n  # Initialize: every step's reward is 0
 
-    # 模拟最终结果：所有步骤都正确则任务成功
+    # Simulate the final outcome: the task succeeds only if every step is correct
     all_correct = all(turn.get("correct", False) for turn in turns)
     final_reward = 1.0 if all_correct else 0.0
 
-    # 只有最后一步获得奖励
+    # Only the last step receives a reward
     rewards[-1] = final_reward
 
     return rewards
@@ -177,25 +177,25 @@ def compute_orm_rewards(turns):
 
 def compute_prm_rewards(turns):
     """
-    PRM（Process Reward Model）：每一步都获得部分奖励
+    PRM (Process Reward Model): every step receives a partial reward
 
-    每一步独立评估正确性，获得 0.0~1.0 的奖励。
-    这就像考试每道题单独打分——过程也给分。
+    Each step is evaluated independently for correctness, receiving a reward between 0.0 and 1.0.
+    It's like an exam that grades each question separately -- credit is given for the process too.
 
-    奖励策略：
-    - 工具调用正确：获得基础奖励 + 工具选择正确加成
-    - 工具调用错误：获得较低奖励
+    Reward strategy:
+    - Correct tool call: base reward + bonus for a sensible tool choice
+    - Incorrect tool call: a lower reward
     """
     rewards = []
     for turn in turns:
         correct = turn.get("correct", False)
 
         if correct:
-            # 正确的步骤：获得较高奖励
-            # 额外考虑工具选择是否合理
+            # Correct step: higher reward
+            # Also factors in whether the tool choice was reasonable
             base_reward = 0.7 + np.random.uniform(0, 0.3)  # 0.7 ~ 1.0
         else:
-            # 错误的步骤：仍然有少量奖励（鼓励探索）
+            # Incorrect step: still gets a small reward (to encourage exploration)
             base_reward = np.random.uniform(0.0, 0.3)  # 0.0 ~ 0.3
 
         rewards.append(round(base_reward, 3))
@@ -205,18 +205,18 @@ def compute_prm_rewards(turns):
 
 def compute_discounted_returns(rewards, gamma=0.99):
     """
-    计算折扣回报：G_t = r_t + γ * G_{t+1}
+    Compute the discounted return: G_t = r_t + gamma * G_{t+1}
 
-    从后往前递推计算每一步的折扣累计回报。
-    γ（折扣因子）控制信用的传播范围：
-      - γ 接近 1.0：信用传播得更远（远视）
-      - γ 接近 0.0：信用只影响当前步（短视）
+    Recurses backward to compute the discounted cumulative return at each step.
+    gamma (the discount factor) controls how far credit propagates:
+      - gamma close to 1.0: credit propagates further back (far-sighted)
+      - gamma close to 0.0: credit only affects the current step (short-sighted)
 
-    参数：
-        rewards: 每一步的即时奖励列表
-        gamma:   折扣因子
-    返回：
-        returns: 每一步的折扣累计回报列表
+    Args:
+        rewards: list of immediate rewards for each step
+        gamma:   discount factor
+    Returns:
+        returns: list of discounted cumulative returns for each step
     """
     returns = []
     G = 0.0
@@ -227,150 +227,150 @@ def compute_discounted_returns(rewards, gamma=0.99):
 
 
 # ==========================================
-# 第四部分：运行模拟实验
+# Part 4: Run the simulation experiment
 # ==========================================
 print("=" * 70)
-print("  第12章：多轮对话 RL —— ORM vs PRM 信用分配对比")
+print("  Chapter 12: Multi-Turn Dialogue RL -- ORM vs PRM Credit Assignment Comparison")
 print("=" * 70)
 
-np.random.seed(42)  # 固定随机种子，确保结果可复现
+np.random.seed(42)  # Fix the random seed for reproducibility
 
-# 存储所有场景的结果
-all_orm_rewards = []   # ORM 每步奖励
-all_prm_rewards = []   # PRM 每步奖励
-all_orm_returns = {}   # ORM 折扣回报（不同 gamma）
-all_prm_returns = {}   # PRM 折扣回报（不同 gamma）
-gamma_values = [0.5, 0.9, 0.99]  # 测试不同折扣因子
+# Store the results for every scenario
+all_orm_rewards = []   # Per-step ORM rewards
+all_prm_rewards = []   # Per-step PRM rewards
+all_orm_returns = {}   # ORM discounted returns (per gamma)
+all_prm_returns = {}   # PRM discounted returns (per gamma)
+gamma_values = [0.5, 0.9, 0.99]  # Test different discount factors
 
 for gamma in gamma_values:
     all_orm_returns[gamma] = []
     all_prm_returns[gamma] = []
 
-# 遍历每个场景进行模拟
+# Iterate over each scenario and run the simulation
 for idx, scenario in enumerate(SCENARIOS):
     print(f"\n{'─' * 70}")
-    print(f"  场景 {idx + 1}：{scenario['task']}")
-    print(f"  总共 {len(scenario['turns'])} 轮工具调用")
+    print(f"  Scenario {idx + 1}: {scenario['task']}")
+    print(f"  {len(scenario['turns'])} tool calls total")
     print(f"{'─' * 70}")
 
-    # 模拟每一步的工具调用结果
+    # Simulate the tool-call result for each step
     turns = scenario["turns"]
     for t, turn in enumerate(turns):
         tool_name = turn["tool"]
         query = turn["query"]
 
-        # 调用对应工具
+        # Call the corresponding tool
         tool_func, _ = TOOLS[tool_name]
         result = tool_func(query)
         turn["correct"] = result["correct"]
 
-        status = "正确" if result["correct"] else "错误"
-        print(f"  第 {t+1} 轮：{turn['description']}")
-        print(f"         调用 {tool_name}({query}) → {status}")
+        status = "correct" if result["correct"] else "incorrect"
+        print(f"  Turn {t+1}: {turn['description']}")
+        print(f"         calling {tool_name}({query}) -> {status}")
 
-    # ---- ORM 奖励计算 ----
+    # ---- ORM reward computation ----
     orm_rewards = compute_orm_rewards(turns)
     all_orm_rewards.append(orm_rewards)
 
-    print(f"\n  [ORM 奖励] 只有最终结果有信号:")
+    print(f"\n  [ORM rewards] only the final result carries a signal:")
     for t, r in enumerate(orm_rewards):
         bar = "█" * int(r * 20)
-        print(f"    第 {t+1} 轮奖励: {r:.1f}  {bar}")
+        print(f"    turn {t+1} reward: {r:.1f}  {bar}")
 
-    # ---- PRM 奖励计算 ----
+    # ---- PRM reward computation ----
     prm_rewards = compute_prm_rewards(turns)
     all_prm_rewards.append(prm_rewards)
 
-    print(f"\n  [PRM 奖励] 每一步都有学习信号:")
+    print(f"\n  [PRM rewards] every step carries a learning signal:")
     for t, r in enumerate(prm_rewards):
         bar = "█" * int(r * 20)
-        print(f"    第 {t+1} 轮奖励: {r:.3f}  {bar}")
+        print(f"    turn {t+1} reward: {r:.3f}  {bar}")
 
-    # ---- 折扣回报对比（多个 gamma 值）----
+    # ---- Discounted return comparison (across multiple gamma values) ----
     for gamma in gamma_values:
         orm_returns = compute_discounted_returns(orm_rewards, gamma=gamma)
         prm_returns = compute_discounted_returns(prm_rewards, gamma=gamma)
         all_orm_returns[gamma].append(orm_returns)
         all_prm_returns[gamma].append(prm_returns)
 
-    # 详细展示 gamma=0.99 的折扣回报计算过程
+    # Walk through the discounted-return computation in detail for gamma=0.99
     gamma_demo = 0.99
     orm_ret_demo = compute_discounted_returns(orm_rewards, gamma=gamma_demo)
     prm_ret_demo = compute_discounted_returns(prm_rewards, gamma=gamma_demo)
 
-    print(f"\n  折扣回报计算过程（γ = {gamma_demo}）:")
-    print(f"    {'轮次':<6} {'即时奖励':<12} {'折扣回报 G_t':<16} {'计算过程'}")
+    print(f"\n  Discounted return computation (gamma = {gamma_demo}):")
+    print(f"    {'Turn':<6} {'Immediate reward':<12} {'Discounted return G_t':<16} {'Computation'}")
     print(f"    {'─' * 60}")
 
-    # ORM 折扣回报逐步展示
-    print(f"    [ORM 模式]")
+    # Step through the ORM discounted returns
+    print(f"    [ORM mode]")
     G = 0.0
     for t in reversed(range(len(orm_rewards))):
         old_G = G
         G = orm_rewards[t] + gamma_demo * old_G
         formula = f"G_{t} = {orm_rewards[t]:.1f} + {gamma_demo} * {old_G:.4f} = {G:.4f}"
-        print(f"    第 {t+1} 轮  r={orm_rewards[t]:<8.1f}  G={G:<12.4f}  {formula}")
+        print(f"    turn {t+1}  r={orm_rewards[t]:<8.1f}  G={G:<12.4f}  {formula}")
 
-    # PRM 折扣回报逐步展示
-    print(f"    [PRM 模式]")
+    # Step through the PRM discounted returns
+    print(f"    [PRM mode]")
     G = 0.0
     for t in reversed(range(len(prm_rewards))):
         old_G = G
         G = prm_rewards[t] + gamma_demo * old_G
         formula = f"G_{t} = {prm_rewards[t]:.3f} + {gamma_demo} * {old_G:.4f} = {G:.4f}"
-        print(f"    第 {t+1} 轮  r={prm_rewards[t]:<8.3f}  G={G:<12.4f}  {formula}")
+        print(f"    turn {t+1}  r={prm_rewards[t]:<8.3f}  G={G:<12.4f}  {formula}")
 
 
 # ==========================================
-# 第五部分：ORM vs PRM 综合对比分析
+# Part 5: Comprehensive ORM vs. PRM analysis
 # ==========================================
 print("\n" + "=" * 70)
-print("  ORM vs PRM 综合对比分析")
+print("  Comprehensive ORM vs PRM Analysis")
 print("=" * 70)
 
-print("\n  【奖励信号密度对比】")
+print("\n  [Reward signal density comparison]")
 for idx in range(len(SCENARIOS)):
     n_turns = len(SCENARIOS[idx]["turns"])
     orm_nonzero = sum(1 for r in all_orm_rewards[idx] if r > 0)
     prm_nonzero = sum(1 for r in all_prm_rewards[idx] if r > 0)
-    print(f"    场景 {idx+1}（{n_turns} 轮）:"
-          f" ORM 有信号步数 = {orm_nonzero}/{n_turns},"
-          f" PRM 有信号步数 = {prm_nonzero}/{n_turns}")
+    print(f"    Scenario {idx+1} ({n_turns} turns):"
+          f" ORM steps with signal = {orm_nonzero}/{n_turns},"
+          f" PRM steps with signal = {prm_nonzero}/{n_turns}")
 
-print(f"\n  关键结论:")
-print(f"    - ORM 信号稀疏：只有最后一步有奖励，中间步骤缺乏信号")
-print(f"    - PRM 信号密集：每一步都有反馈，学习效率更高")
-print(f"    - 对于多轮 Agent，PRM 能显著加速策略学习")
+print(f"\n  Key takeaways:")
+print(f"    - ORM signal is sparse: only the last step has a reward, intermediate steps lack any signal")
+print(f"    - PRM signal is dense: every step has feedback, so learning is more efficient")
+print(f"    - For multi-turn Agents, PRM can significantly speed up policy learning")
 
-print("\n  【折扣因子 γ 对信用传播的影响】")
+print("\n  [Effect of the discount factor gamma on credit propagation]")
 for gamma in gamma_values:
-    print(f"\n    γ = {gamma}:")
+    print(f"\n    gamma = {gamma}:")
     for idx in range(len(SCENARIOS)):
         orm_ret = all_orm_returns[gamma][idx]
         prm_ret = all_prm_returns[gamma][idx]
         n = len(orm_ret)
-        print(f"      场景 {idx+1}（{n} 轮）:")
-        print(f"        ORM 折扣回报: {[f'{v:.4f}' for v in orm_ret]}")
-        print(f"        PRM 折扣回报: {[f'{v:.4f}' for v in prm_ret]}")
+        print(f"      Scenario {idx+1} ({n} turns):")
+        print(f"        ORM discounted returns: {[f'{v:.4f}' for v in orm_ret]}")
+        print(f"        PRM discounted returns: {[f'{v:.4f}' for v in prm_ret]}")
 
-print(f"\n  γ 的影响总结:")
-print(f"    - γ=0.5: 信用衰减很快，只有最后几步能感受到最终奖励")
-print(f"    - γ=0.9: 信用传播适中，平衡近期和远期信号")
-print(f"    - γ=0.99: 信用传播很远，早期步骤也能获得可观的回报信号")
+print(f"\n  Summary of gamma's effect:")
+print(f"    - gamma=0.5: credit decays quickly, only the last few steps feel the final reward")
+print(f"    - gamma=0.9: credit propagates moderately, balancing near-term and long-term signals")
+print(f"    - gamma=0.99: credit propagates far, even early steps receive a meaningful return signal")
 
 
 # ==========================================
-# 第六部分：可视化图表
+# Part 6: Visualization charts
 # ==========================================
-print("\n正在生成可视化图表...")
+print("\nGenerating visualization charts...")
 
 fig, axes = plt.subplots(2, 2, figsize=(18, 14))
-fig.suptitle("多轮对话 RL —— ORM vs PRM 信用分配对比", fontsize=18, fontweight="bold")
+fig.suptitle("Multi-Turn Dialogue RL -- ORM vs PRM Credit Assignment Comparison", fontsize=18, fontweight="bold")
 
-# ---- 子图1：Turn 级奖励热力图 ----
+# ---- Subplot 1: turn-level reward heatmap ----
 ax1 = axes[0, 0]
 
-# 构造热力图数据矩阵
+# Build the heatmap data matrix
 max_turns = max(len(r) for r in all_orm_rewards)
 n_scenarios = len(SCENARIOS)
 
@@ -382,25 +382,25 @@ for i in range(n_scenarios):
         heatmap_orm[i, j] = all_orm_rewards[i][j]
         heatmap_prm[i, j] = all_prm_rewards[i][j]
 
-# 绘制 PRM 热力图（更有教育意义）
+# Plot the PRM heatmap (more instructive)
 im = ax1.imshow(heatmap_prm, cmap='YlOrRd', aspect='auto', vmin=0, vmax=1)
 ax1.set_xticks(range(max_turns))
-ax1.set_xticklabels([f"第 {i+1} 轮" for i in range(max_turns)])
+ax1.set_xticklabels([f"Turn {i+1}" for i in range(max_turns)])
 ax1.set_yticks(range(n_scenarios))
-ax1.set_yticklabels([f"场景 {i+1}" for i in range(n_scenarios)])
-ax1.set_title("PRM 每步奖励热力图", fontsize=14, fontweight="bold")
-ax1.set_xlabel("对话轮次", fontsize=12)
-ax1.set_ylabel("场景", fontsize=12)
+ax1.set_yticklabels([f"Scenario {i+1}" for i in range(n_scenarios)])
+ax1.set_title("PRM Per-Step Reward Heatmap", fontsize=14, fontweight="bold")
+ax1.set_xlabel("Dialogue turn", fontsize=12)
+ax1.set_ylabel("Scenario", fontsize=12)
 
-# 在热力图上标注数值
+# Annotate the heatmap cells with values
 for i in range(n_scenarios):
     for j in range(len(all_prm_rewards[i])):
         ax1.text(j, i, f"{heatmap_prm[i, j]:.2f}",
                  ha="center", va="center", fontsize=10, fontweight="bold")
 
-fig.colorbar(im, ax=ax1, label="奖励值")
+fig.colorbar(im, ax=ax1, label="Reward value")
 
-# ---- 子图2：ORM vs PRM 折扣回报对比（gamma=0.99）----
+# ---- Subplot 2: ORM vs PRM discounted return comparison (gamma=0.99) ----
 ax2 = axes[0, 1]
 
 gamma_plot = 0.99
@@ -411,64 +411,64 @@ for i in range(n_scenarios):
     n = len(all_orm_returns[gamma_plot][i])
     x = np.arange(n)
 
-    # ORM 用虚线，PRM 用实线
+    # ORM uses a dashed line, PRM uses a solid line
     ax2.plot(x, all_orm_returns[gamma_plot][i],
              marker="o", linestyle="--", linewidth=2, markersize=6,
              color=colors_orm[i],
-             label=f"场景{i+1} ORM" if i == 0 else None)
+             label=f"Scenario {i+1} ORM" if i == 0 else None)
     ax2.plot(x, all_prm_returns[gamma_plot][i],
              marker="s", linestyle="-", linewidth=2, markersize=6,
              color=colors_prm[i],
-             label=f"场景{i+1} PRM" if i == 0 else None)
+             label=f"Scenario {i+1} PRM" if i == 0 else None)
 
-# 只画两根示意线（避免图例太拥挤）
-ax2.plot([], [], marker="o", linestyle="--", color="steelblue", linewidth=2, label="ORM 折扣回报")
-ax2.plot([], [], marker="s", linestyle="-", color="crimson", linewidth=2, label="PRM 折扣回报")
+# Just draw two representative lines (to avoid a cluttered legend)
+ax2.plot([], [], marker="o", linestyle="--", color="steelblue", linewidth=2, label="ORM discounted return")
+ax2.plot([], [], marker="s", linestyle="-", color="crimson", linewidth=2, label="PRM discounted return")
 
-ax2.set_title(f"ORM vs PRM 折扣回报（γ={gamma_plot}）", fontsize=14, fontweight="bold")
-ax2.set_xlabel("对话轮次", fontsize=12)
-ax2.set_ylabel("折扣回报 G_t", fontsize=12)
+ax2.set_title(f"ORM vs PRM Discounted Return (gamma={gamma_plot})", fontsize=14, fontweight="bold")
+ax2.set_xlabel("Dialogue turn", fontsize=12)
+ax2.set_ylabel("Discounted return G_t", fontsize=12)
 ax2.legend(fontsize=11)
 ax2.grid(True, alpha=0.3)
 
-# 添加注释
-ax2.annotate("ORM: 只有最后一步有信号\n→ 中间步骤梯度 ≈ 0",
+# Add annotations
+ax2.annotate("ORM: only the last step has a signal\n-> intermediate step gradient is ~0",
              xy=(0.02, 0.95), xycoords="axes fraction",
              fontsize=10, color="steelblue", va="top",
              bbox=dict(boxstyle="round,pad=0.3", facecolor="lightblue", alpha=0.3))
-ax2.annotate("PRM: 每步都有信号\n→ 梯度信号密集",
+ax2.annotate("PRM: every step has a signal\n-> dense gradient signal",
              xy=(0.02, 0.75), xycoords="axes fraction",
              fontsize=10, color="crimson", va="top",
              bbox=dict(boxstyle="round,pad=0.3", facecolor="lightyellow", alpha=0.3))
 
-# ---- 子图3：不同 gamma 对信用传播的影响（场景5，PRM）----
+# ---- Subplot 3: effect of different gamma values on credit propagation (scenario 5, PRM) ----
 ax3 = axes[1, 0]
 
-# 选择最长的场景（场景5有5轮）
-demo_idx = 4  # 场景5（索引4）
+# Choose the longest scenario (scenario 5 has 5 turns)
+demo_idx = 4  # scenario 5 (index 4)
 colors_gamma = ["#E91E63", "#FF9800", "#4CAF50"]
 
 for gi, gamma in enumerate(gamma_values):
     ret = all_prm_returns[gamma][demo_idx]
     x = np.arange(len(ret))
     ax3.plot(x, ret, marker="o", linewidth=2.5, markersize=8,
-             color=colors_gamma[gi], label=f"γ = {gamma}")
+             color=colors_gamma[gi], label=f"gamma = {gamma}")
 
-ax3.set_title(f"折扣因子 γ 对信用传播的影响（场景5，PRM）", fontsize=14, fontweight="bold")
-ax3.set_xlabel("对话轮次", fontsize=12)
-ax3.set_ylabel("折扣回报 G_t", fontsize=12)
+ax3.set_title(f"Effect of Discount Factor gamma on Credit Propagation (Scenario 5, PRM)", fontsize=14, fontweight="bold")
+ax3.set_xlabel("Dialogue turn", fontsize=12)
+ax3.set_ylabel("Discounted return G_t", fontsize=12)
 ax3.legend(fontsize=12)
 ax3.grid(True, alpha=0.3)
 ax3.set_xticks(range(len(all_prm_returns[0.99][demo_idx])))
-ax3.set_xticklabels([f"第{i+1}轮" for i in range(len(all_prm_returns[0.99][demo_idx]))])
+ax3.set_xticklabels([f"Turn {i+1}" for i in range(len(all_prm_returns[0.99][demo_idx]))])
 
-# ---- 子图4：ORM vs PRM 奖励信号密度对比柱状图 ----
+# ---- Subplot 4: ORM vs PRM reward signal density bar chart ----
 ax4 = axes[1, 1]
 
 x_pos = np.arange(n_scenarios)
 bar_width = 0.35
 
-# 计算每个场景的非零奖励步数占比
+# Compute the fraction of nonzero-reward steps for each scenario
 orm_density = []
 prm_density = []
 for i in range(n_scenarios):
@@ -477,20 +477,20 @@ for i in range(n_scenarios):
     prm_density.append(sum(1 for r in all_prm_rewards[i] if r > 0) / n * 100)
 
 bars1 = ax4.bar(x_pos - bar_width/2, orm_density, bar_width,
-                label='ORM（结果奖励）', color='steelblue', alpha=0.8)
+                label='ORM (outcome reward)', color='steelblue', alpha=0.8)
 bars2 = ax4.bar(x_pos + bar_width/2, prm_density, bar_width,
-                label='PRM（过程奖励）', color='crimson', alpha=0.8)
+                label='PRM (process reward)', color='crimson', alpha=0.8)
 
-ax4.set_title("奖励信号密度对比（非零奖励步数占比）", fontsize=14, fontweight="bold")
-ax4.set_xlabel("场景", fontsize=12)
-ax4.set_ylabel("有信号的步骤占比 (%)", fontsize=12)
+ax4.set_title("Reward Signal Density Comparison (Share of Nonzero-Reward Steps)", fontsize=14, fontweight="bold")
+ax4.set_xlabel("Scenario", fontsize=12)
+ax4.set_ylabel("Share of steps with a signal (%)", fontsize=12)
 ax4.set_xticks(x_pos)
-ax4.set_xticklabels([f"场景{i+1}" for i in range(n_scenarios)])
+ax4.set_xticklabels([f"Scenario {i+1}" for i in range(n_scenarios)])
 ax4.legend(fontsize=11)
 ax4.grid(True, alpha=0.3, axis='y')
 ax4.set_ylim(0, 110)
 
-# 在柱状图上标注百分比
+# Annotate the bars with their percentages
 for bar in bars1:
     height = bar.get_height()
     ax4.text(bar.get_x() + bar.get_width()/2., height + 1,
@@ -502,40 +502,40 @@ for bar in bars2:
 
 plt.tight_layout()
 plt.savefig("output/multi_turn_orm_vs_prm.png", dpi=150, bbox_inches="tight")
-print("图表已保存至: output/multi_turn_orm_vs_prm.png")
+print("Chart saved to: output/multi_turn_orm_vs_prm.png")
 plt.show()
 
 
 # ==========================================
-# 第七部分：总结
+# Part 7: Summary
 # ==========================================
 print("\n" + "=" * 70)
-print("  关键结论")
+print("  Key Takeaways")
 print("=" * 70)
 print("""
-  1. 信用分配是多轮 Agent RL 的核心挑战
-     - Agent 需要经历多轮交互才能完成任务
-     - 如何将最终成功/失败归因到每一步？
+  1. Credit assignment is the core challenge of multi-turn Agent RL
+     - An Agent needs multiple rounds of interaction to complete a task
+     - How do you attribute the final success/failure to each individual step?
 
-  2. ORM 的优缺点：
-     ✓ 实现简单，只需标注最终结果
-     ✗ 信号稀疏，中间步骤"盲飞"
-     ✗ 信用传播依赖折扣因子，可能衰减过快
+  2. ORM's pros and cons:
+     + Simple to implement, only requires labeling the final outcome
+     - Sparse signal, intermediate steps "fly blind"
+     - Credit propagation relies on the discount factor, which may decay too fast
 
-  3. PRM 的优缺点：
-     ✓ 信号密集，每步都有学习信号
-     ✓ 能区分"好的中间步骤"和"坏的中间步骤"
-     ✗ 标注成本高，需要为每步打分
-     ✗ 奖励模型可能引入噪声
+  3. PRM's pros and cons:
+     + Dense signal, every step has a learning signal
+     + Can distinguish "good intermediate steps" from "bad intermediate steps"
+     - High labeling cost, requires scoring every step
+     - The reward model may introduce noise
 
-  4. 折扣因子 γ 的作用：
-     - γ 越大，信用传播越远（远期奖励也被考虑）
-     - γ 越小，信用衰减越快（只关注近期步骤）
-     - 多轮对话中建议 γ ≥ 0.9
+  4. The role of the discount factor gamma:
+     - The larger gamma is, the further credit propagates (long-term rewards are also considered)
+     - The smaller gamma is, the faster credit decays (only recent steps matter)
+     - For multi-turn dialogue, gamma >= 0.9 is recommended
 
-  5. 实际应用建议：
-     - 简单任务：ORM 足够（如单轮问答）
-     - 复杂多步推理：PRM 更优（如数学证明、代码生成）
-     - 混合方案：PRM 过程奖励 + ORM 结果验证
+  5. Practical recommendations:
+     - Simple tasks: ORM is sufficient (e.g. single-turn QA)
+     - Complex multi-step reasoning: PRM works better (e.g. math proofs, code generation)
+     - Hybrid approach: PRM process reward + ORM outcome verification
 """)
 print("=" * 70)

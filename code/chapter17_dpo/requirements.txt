@@ -1,4 +1,4 @@
-# 第2章：DPO 偏好微调实验依赖
+# Chapter 2: dependencies for the DPO preference fine-tuning experiment
 transformers==4.57.3
 trl==0.24.0
 torch>=2.0.0

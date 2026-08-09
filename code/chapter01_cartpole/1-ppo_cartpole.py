@@ -1,21 +1,26 @@
 """
-第1章：使用 Stable-Baselines3 的 PPO 训练 CartPole
+Chapter 1: Training CartPole with PPO from Stable-Baselines3
 
-训练过程通过 SwanLab 记录指标（奖励曲线、损失等），
-训练结束后可选弹出 GUI 窗口展示学习成果。
+Training progress is logged via SwanLab (reward curve, losses, etc.), and
+a GUI window can optionally pop up after training to show off what the
+agent learned.
 
-运行方式：
-    # 默认：训练 + SwanLab 曲线（不开 GUI，速度快）
+Usage:
+    # Default: train + SwanLab curves (no GUI, fast)
     python 1-ppo_cartpole.py
 
-    # 打开 GUI 演示（训练完弹出小车动画窗口）
+    # Show the GUI demo (pops up the cart animation window after training)
     python 1-ppo_cartpole.py --gui
 
-关于 --gui 参数：
-    训练阶段始终是 headless（无渲染），速度不受 GUI 影响。
-    --gui 只控制训练结束后的演示环节是否弹出 CartPole 动画窗口。
-    开启 GUI 时，演示环节每帧需要等待屏幕刷新（~16ms），会明显变慢；
-    关闭 GUI 时，演示环节纯计算，几秒内跑完。
+About the --gui flag:
+    Training is always headless (no rendering), so its speed is unaffected
+    by the GUI setting.
+    --gui only controls whether the CartPole animation window pops up
+    during the demo stage after training finishes.
+    With the GUI on, the demo stage has to wait for a screen refresh
+    (~16ms) each frame, so it runs noticeably slower;
+    with the GUI off, the demo stage is pure computation and finishes in
+    a few seconds.
 """
 
 import argparse
@@ -32,23 +37,26 @@ import swanlab
 
 
 class LogApproxKL(BaseCallback):
-    """补录 train/approx_kl 到 SwanLab。
+    """Backfills train/approx_kl into SwanLab.
 
-    SB3 的 PPO.train() 内部通过 logger.record("train/approx_kl", ...) 记录了该指标，
-    但值为 numpy.float32 类型。SwanLab 的 SB3 回调在 write() 中使用
-    isinstance(value, (int, float)) 做类型检查，而 numpy.float32 不通过该检查
-    （numpy.float64 和 Python float 可以通过），导致 approx_kl 被静默跳过。
+    SB3's PPO.train() records this metric internally via
+    logger.record("train/approx_kl", ...), but the value is a
+    numpy.float32. SwanLab's SB3 callback does a type check in write()
+    using isinstance(value, (int, float)), which numpy.float32 fails
+    (numpy.float64 and Python float pass), so approx_kl gets silently
+    skipped.
 
-    本回调在每次 train() 执行完毕后，从 logger 缓存中取出 approx_kl 值，
-    转为 Python float 后直接通过 swanlab.log 补录。
+    This callback runs after every train() call, pulls the approx_kl
+    value out of the logger's cache, converts it to a Python float, and
+    logs it directly via swanlab.log to backfill it.
     """
 
     def _on_step(self) -> bool:
         return True
 
     def _on_rollout_end(self) -> None:
-        # train() 已在 _on_rollout_end 触发前执行完毕，
-        # logger 缓存中包含本轮 train 的所有指标。
+        # train() has already finished running by the time _on_rollout_end
+        # fires, so the logger's cache contains all of this round's metrics.
         logger = self.model.logger
         if hasattr(logger, "name_to_value") and "train/approx_kl" in logger.name_to_value:
             value = float(logger.name_to_value["train/approx_kl"])
@@ -56,21 +64,26 @@ class LogApproxKL(BaseCallback):
 
 
 class RestoreStdoutLog(BaseCallback):
-    """把 SB3 往终端打印的滚动日志表格加回来。
+    """Adds back the scrolling log table SB3 normally prints to the terminal.
 
-    SwanLabCallback._init_callback() 内部会调用 self.model.set_logger(...)，
-    用一个"只写 SwanLab"的 logger 整体替换掉 SB3 默认 logger，
-    顺带删掉了负责往 stdout 打印 ep_rew_mean / fps / approx_kl 表格的
-    HumanOutputFormat（即 verbose=1 的滚动日志）。
+    SwanLabCallback._init_callback() internally calls
+    self.model.set_logger(...), which wholesale-replaces SB3's default
+    logger with a "SwanLab-only" logger, incidentally removing the
+    HumanOutputFormat that's responsible for printing the
+    ep_rew_mean / fps / approx_kl table to stdout (i.e. the verbose=1
+    scrolling log).
 
-    本回调在 _init_callback 阶段执行（此时 SwanLabCallback 已替换完 logger），
-    向当前 logger 补回一个 stdout 输出端，于是终端重新滚动打印，
-    同时 SwanLab 记录不受影响。需放在 callback 列表中 SwanLabCallback 之后。
+    This callback runs during the _init_callback phase (by which point
+    SwanLabCallback has already swapped the logger out), and adds a
+    stdout output sink back onto the current logger, so the terminal
+    starts scrolling again while SwanLab logging is unaffected. It needs
+    to come after SwanLabCallback in the callback list.
     """
 
     def _init_callback(self) -> None:
-        # SwanLabCallback 已把 logger 换成只含 SwanLabOutputFormat，
-        # 这里补回一个 stdout 输出端，即可恢复 verbose=1 的滚动表格。
+        # SwanLabCallback has already replaced the logger with one that
+        # only contains SwanLabOutputFormat; here we add back a stdout
+        # output sink to restore the verbose=1 scrolling table.
         self.model.logger.output_formats.append(HumanOutputFormat(sys.stdout))
 
     def _on_step(self) -> bool:
@@ -78,10 +91,10 @@ class RestoreStdoutLog(BaseCallback):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="SB3 PPO CartPole 训练")
+    parser = argparse.ArgumentParser(description="SB3 PPO CartPole training")
     parser.add_argument(
         "--gui", action="store_true",
-        help="训练结束后弹出 GUI 窗口演示智能体（默认关闭，仅输出得分）",
+        help="Pop up a GUI window to demo the agent after training finishes (off by default, only prints scores)",
     )
     return parser.parse_args()
 
@@ -91,26 +104,26 @@ def main():
     os.makedirs("output", exist_ok=True)
 
     # ==========================================
-    # 第一阶段：训练
+    # Stage 1: Training
     # ==========================================
     env = gym.make("CartPole-v1")
 
-    # 打印环境信息（状态空间、动作空间、边界阈值）
+    # Print environment info (observation space, action space, termination thresholds)
     print("=" * 50)
-    print("CartPole-v1 环境信息")
+    print("CartPole-v1 environment info")
     print("=" * 50)
-    print(f"  观测空间:  {env.observation_space}")
-    print(f"  动作空间:  {env.action_space}")
-    print(f"  观测上限:  {env.observation_space.high}")
-    print(f"  观测下限:  {env.observation_space.low}")
-    print(f"  终止条件:  位置 > ±{env.unwrapped.x_threshold}, "
-          f"角度 > ±{env.unwrapped.theta_threshold_radians:.4f} rad "
+    print(f"  Observation space:  {env.observation_space}")
+    print(f"  Action space:  {env.action_space}")
+    print(f"  Observation upper bound:  {env.observation_space.high}")
+    print(f"  Observation lower bound:  {env.observation_space.low}")
+    print(f"  Termination condition:  position > ±{env.unwrapped.x_threshold}, "
+          f"angle > ±{env.unwrapped.theta_threshold_radians:.4f} rad "
           f"(≈ ±{np.degrees(env.unwrapped.theta_threshold_radians):.0f}°)")
     print("=" * 50)
 
     model = PPO("MlpPolicy", env, verbose=1)
 
-    print("开始训练（带 SwanLab 日志）...")
+    print("Starting training (with SwanLab logging)...")
     swanlab_cb = SwanLabCallback(
         project="cartpole-ppo",
         experiment_name="PPO-CartPole-v1",
@@ -121,17 +134,17 @@ def main():
         callback=[swanlab_cb, RestoreStdoutLog(), LogApproxKL()],
     )
 
-    # 评估
+    # Evaluate
     mean_reward, std_reward = evaluate_policy(model, env, n_eval_episodes=10)
-    print(f"训练完成！平均奖励: {mean_reward} +/- {std_reward}")
+    print(f"Training complete! Mean reward: {mean_reward} +/- {std_reward}")
 
     model.save("output/ppo_cartpole")
     env.close()
 
     # ==========================================
-    # 第二阶段：演示学习成果
+    # Stage 2: Demoing what the agent learned
     # ==========================================
-    print("\n正在展示智能体的学习成果...")
+    print("\nDemoing what the agent learned...")
     render_mode = "human" if args.gui else None
     vis_env = gym.make("CartPole-v1", render_mode=render_mode)
     model = PPO.load("output/ppo_cartpole")
@@ -143,16 +156,16 @@ def main():
             action, _states = model.predict(obs, deterministic=True)
             obs, reward, done, truncated, info = vis_env.step(action)
             score += reward
-        print(f"  回合 {episode + 1} 得分: {score}")
+        print(f"  Episode {episode + 1} score: {score}")
 
     vis_env.close()
 
     if args.gui:
-        print("\nGUI 演示结束。")
+        print("\nGUI demo finished.")
     else:
-        print("\n提示: 加 --gui 可弹出小车动画窗口查看演示效果。")
+        print("\nTip: add --gui to pop up the cart animation window and watch the demo.")
 
-    print("SwanLab 实验看板: swanlab watch swanlog")
+    print("SwanLab experiment dashboard: swanlab watch swanlog")
 
 
 if __name__ == "__main__":

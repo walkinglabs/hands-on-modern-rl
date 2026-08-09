@@ -1,4 +1,4 @@
-# 第11章：VLM 强化学习实验依赖
+# Chapter 11: Dependencies for the VLM reinforcement learning experiments
 transformers==4.57.3
 torch>=2.0.0
 Pillow>=10.0.0

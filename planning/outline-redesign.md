@@ -1,14 +1,14 @@
-# 大纲重构方案 v3:基于真实证据(2025-2026 论文 + Anthropic/OpenAI JD)
+# Outline Redesign Proposal v3: Based on Real Evidence (2025-2026 Papers + Anthropic/OpenAI Job Descriptions)
 
-> v2 是基于训练数据推断的"理想教材"。v3 是基于实际搜索到的 2025-2026 论文与 Anthropic Code RL JD 的**真实证据**修订版,并诚实标注 v2 的过度推断。
+> v2 was an "ideal textbook" inferred from training data. v3 is a revision based on **real evidence** — actual 2025-2026 papers and the Anthropic Code RL job description found via search — and honestly flags where v2 over-extrapolated.
 
 ---
 
-## 一、证据来源(真实可点击)
+## 1. Evidence Sources (Real and Clickable)
 
-### 1.1 真实的 Anthropic 招聘 JD
+### 1.1 A Real Anthropic Job Description
 
-**Research Engineer, Code RL**(job-boards.greenhouse.io/anthropic/jobs/5254364008):
+**Research Engineer, Code RL** (job-boards.greenhouse.io/anthropic/jobs/5254364008):
 
 - "Pioneering fundamental RL research for large language models"
 - "Building scalable RL infrastructure and training methodologies"
@@ -17,12 +17,12 @@
 - "Long-horizon autonomous engineering"
 - "Agentic coding behaviors"
 - "High-performance code for accelerators"
-- **必备**:"Strong software-engineering skills and deep Python expertise, including async/concurrent programming"
-- **加分**:RLHF / post-training / LLM finetuning;coding agents / code-execution sandboxes / eval harnesses / verifiers / developer tooling;program analysis / testing / verification / compilers / formal methods;PyTorch + large-scale distributed training + performance profiling
+- **Required**: "Strong software-engineering skills and deep Python expertise, including async/concurrent programming"
+- **Nice-to-have**: RLHF / post-training / LLM finetuning; coding agents / code-execution sandboxes / eval harnesses / verifiers / developer tooling; program analysis / testing / verification / compilers / formal methods; PyTorch + large-scale distributed training + performance profiling
 
-### 1.2 真实的 2025-2026 关键论文
+### 1.2 Real Key Papers from 2025-2026
 
-| 论文                                                              | 时间              | 出处                                   |
+| Paper                                                             | Date              | Source                                 |
 | ----------------------------------------------------------------- | ----------------- | -------------------------------------- |
 | DeepSeek-R1 (Nature)                                              | 2025.01           | nature.com/articles/s41586-025-09422-z |
 | DAPO (Yu et al.)                                                  | 2025.03           | arXiv:2503.14476                       |
@@ -44,259 +44,259 @@
 | Competitive Programming with Large Reasoning Models               | 2025.02           | OpenAI                                 |
 | Reinforcement Pre-Training (Lambert)                              | 2025.06           | arXiv                                  |
 
-### 1.3 真实的行业信号
+### 1.3 Real Industry Signals
 
-- **Anthropic 拟投入 $1B 在 RL environments**(2025.09 The Information 报道)
-- **Mechanize 给 RL environments 工程师 $500K 年薪**(TechCrunch 2025.09)
-- **Karpathy**:"RLVR 是 LLM 训练流水线的'新主要阶段'"
-- **Post-training 岗位薪资**:OpenAI/Anthropic/DeepMind IC $200K-$312K,Senior $400K+
-- **岗位增长**:2025.01-2026.03 间 RLHF/post-training JD 增长 3 倍
+- **Anthropic reportedly plans to invest $1B in RL environments** (per The Information, 2025.09)
+- **Mechanize is paying RL environment engineers $500K/year** (TechCrunch, 2025.09)
+- **Karpathy**: "RLVR is the 'new major stage' of the LLM training pipeline"
+- **Post-training role salaries**: OpenAI/Anthropic/DeepMind IC $200K-$312K, Senior $400K+
+- **Job growth**: RLHF/post-training job postings grew 3x between 2025.01 and 2026.03
 
 ---
 
-## 二、v2 的诚实评估
+## 2. An Honest Assessment of v2
 
-### 2.1 v2 猜对的部分(有真出处)
+### 2.1 Where v2 Guessed Right (Backed by Real Sources)
 
-| v2 主张                         | 真实证据                                      |
-| ------------------------------- | --------------------------------------------- |
-| PRM 章节重要                    | Lightman et al. 2023 OpenAI,o1/o3 训练核心    |
-| Constitutional AI / RLAIF       | Bai et al. 2022 Anthropic,Claude 训练实际使用 |
-| Sleeper Agents 章节重要         | Hubinger et al. 2024.01(真论文)               |
-| Alignment Faking                | Greenblatt et al. 2024.12(真论文)             |
-| Reward Hacking 章节重要         | Anthropic 2025.11 论文(很新很关键)            |
-| DPO 家族完整覆盖(KTO/IPO/SimPO) | 全部真实存在                                  |
-| GRPO / RLVR 核心                | DeepSeek-R1 Nature 论文已确认                 |
-| Test-time Compute Scaling       | OpenAI o1/o3 系列确认                         |
+| v2 claim                                        | Real evidence                                                |
+| ----------------------------------------------- | ------------------------------------------------------------ |
+| The PRM chapter is important                    | Lightman et al. 2023, OpenAI; core to o1/o3 training         |
+| Constitutional AI / RLAIF                       | Bai et al. 2022, Anthropic; actually used in Claude training |
+| The Sleeper Agents chapter is important         | Hubinger et al. 2024.01 (a real paper)                       |
+| Alignment Faking                                | Greenblatt et al. 2024.12 (a real paper)                     |
+| The Reward Hacking chapter is important         | Anthropic 2025.11 paper (very recent, very important)        |
+| Full coverage of the DPO family (KTO/IPO/SimPO) | All genuinely exist                                          |
+| GRPO / RLVR at the core                         | Confirmed by the DeepSeek-R1 Nature paper                    |
+| Test-time compute scaling                       | Confirmed by the OpenAI o1/o3 series                         |
 
-### 2.2 v2 严重低估的部分(被 JD 证据打脸)
+### 2.2 Where v2 Seriously Underestimated (Contradicted by JD Evidence)
 
-**🔴 最大盲区:RL Environments 设计**
+**🔴 The biggest blind spot: RL environment design**
 
-- Anthropic $1B 投资、Mechanize $500K 工资、Karpathy 称之为"新主要阶段"
-- v2 只在附录 B 工程实践里一笔带过
-- **必须升级为独立核心章节**
+- Anthropic's $1B investment, Mechanize's $500K salaries, Karpathy calling it the "new major stage"
+- v2 only mentions it in passing, in Appendix B's engineering practice
+- **Must be upgraded to a standalone core chapter**
 
-**🟡 工程能力被低估**
+**🟡 Engineering ability was underestimated**
 
-- Anthropic JD 强调:async/concurrent Python、性能 profiling、分布式训练
-- v2 把"工程"放附录,实际是 JD 评分占比最大的部分
-- 一个 candidate 看完 v2 知道算法但写不出能 scale 的 trainer,过不了面试
+- The Anthropic JD emphasizes: async/concurrent Python, performance profiling, distributed training
+- v2 relegates "engineering" to an appendix, but it's actually the largest-weighted part of the JD's requirements
+- A candidate who has only read v2 would know the algorithms but couldn't write a trainer that scales — they wouldn't pass the interview
 
-**🟡 Reasoning Models 没单独成章**
+**🟡 Reasoning Models don't get their own chapter**
 
-- o1、R1、Claude Opus 4.6、Gemini 3.1 Pro 都已是独立产品类别
-- v2 把它塞在"Test-time Compute"一节,严重不够
-- **应单独成章,讲解 SFT→RLHF→RLVR 三阶段**
+- o1, R1, Claude Opus 4.6, and Gemini 3.1 Pro are all now independent product categories
+- v2 crams this into a "Test-time Compute" section, which is badly insufficient
+- **Should be its own chapter, covering the SFT→RLHF→RLVR three-stage progression**
 
-**🟡 GRPO 改进家族覆盖太薄**
+**🟡 Coverage of the GRPO improvement family is too thin**
 
-- 2025-2026 至少 6 个主流变体:DAPO、Dr.GRPO、GSPO、CISPO、REINFORCE++、AREAL
-- 还有 SPO、BSPO、TOPR、GPPO、M2PO
-- v2 只点名 DAPO 一个
+- 2025-2026 has at least 6 mainstream variants: DAPO, Dr.GRPO, GSPO, CISPO, REINFORCE++, AREAL
+- Plus SPO, BSPO, TOPR, GPPO, M2PO
+- v2 only names DAPO
 
-### 2.3 v2 过度推断的部分(学术深度对工业 JD 价值低)
+### 2.3 Where v2 Over-Extrapolated (Academic Depth with Low Industry-JD Value)
 
 **⚠️ Hierarchical RL / Meta-RL / MARL / IRL & GAIL**
 
-- 没有任何找到的 JD 提及这些
-- Karpathy 2025 年终总结也没强调
-- 这些是学术教材(Sutton & Barto / CS285)的内容,但对 OpenAI/Anthropic 入职**帮助有限**
-- **建议降级为附录或合并为一章**
+- Not a single job description found mentions these
+- Karpathy's 2025 year-end review doesn't emphasize them either
+- These are content from academic textbooks (Sutton & Barto / CS285), but offer **limited help** for landing a job at OpenAI/Anthropic
+- **Recommend demoting to an appendix or merging into a single chapter**
 
-**⚠️ "读完直接入职 OpenAI/Anthropic"**
+**⚠️ "Read this and walk straight into a job at OpenAI/Anthropic"**
 
-- 诚实承认:这是过度营销
-- 真实 JD 还要:强 SE 背景、生产调试经验、分布式系统经验、产品 sense
-- 这些不能靠读教材获得
-- v3 应改为"读完能通过技术面试的 RL 知识部分"
+- Honest admission: this was overselling
+- Real job descriptions also require: a strong SE background, production debugging experience, distributed-systems experience, product sense
+- None of these can be acquired just by reading a textbook
+- v3 should reframe this as "after reading, you'll be able to pass the RL portion of a technical interview"
 
-### 2.4 v2 排序错误
+### 2.4 Ordering Mistakes in v2
 
-- 把 PRM 放第 27 章 → 应该是 LLM RL 篇核心章节之一(工业实战强度)
-- 把"Test-time Compute"独立章节 → 应并入 Reasoning Models 章
-- 把 Offline RL 放 Part V 前沿 → 实际是 2025 工业实践重要组成(Anthropic Code RL 间接相关)
-
----
-
-## 三、v3 提案(基于真实证据)
-
-### 设计原则
-
-1. **JD 驱动**:以 Anthropic Code RL JD 的实际要求为锚
-2. **2025 真实趋势**:RL Environments、Reasoning Models、Reward Hacking
-3. **删除低 ROI 学术内容**:Hierarchical / Meta-RL / MARL / IRL 合并
-4. **工程能力升级**:从附录提到正文
-5. **GRPO 家族完整覆盖**:DAPO / Dr.GRPO / GSPO / CISPO / REINFORCE++
-
-### v3 章节结构(28 章 / 6 篇)
+- PRM was placed in Chapter 27 → it should be one of the core chapters in the LLM RL section (given how heavily it's used in industry)
+- "Test-time Compute" was made its own chapter → it should be merged into the Reasoning Models chapter
+- Offline RL was placed in the Part V frontier section → it's actually an important part of 2025 industrial practice (indirectly related to Anthropic Code RL)
 
 ---
 
-#### Part I · 基础与经典 RL(8 章)— 与 v2 一致
+## 3. The v3 Proposal (Evidence-Driven)
 
-1. 强化学习概览
-2. CartPole:第一个强化学习实验
-3. 多臂老虎机与探索-利用理论
-4. 马尔可夫决策过程
-5. 价值函数与贝尔曼方程
-6. 动态规划、蒙特卡洛与时序差分
-7. Q-Learning 与离策略控制
-8. 奖励函数设计
+### Design Principles
 
----
+1. **JD-driven**: anchored to the actual requirements of the Anthropic Code RL job description
+2. **Real 2025 trends**: RL Environments, Reasoning Models, Reward Hacking
+3. **Cut low-ROI academic content**: merge Hierarchical / Meta-RL / MARL / IRL
+4. **Upgrade engineering content**: move it from the appendix into the main text
+5. **Full coverage of the GRPO family**: DAPO / Dr.GRPO / GSPO / CISPO / REINFORCE++
 
-#### Part II · 深度强化学习(6 章)
-
-9. 深度 Q 网络与 Distributional RL
-10. 策略梯度方法
-11. Actor-Critic 架构
-12. PPO 与信任域方法
-13. 连续控制深度方法(DDPG / TD3 / SAC)
-14. 基于模型的深度 RL(MuZero / Dreamer)
+### The v3 Chapter Structure (28 Chapters / 6 Parts)
 
 ---
 
-#### Part III · 高级 RL 方法(精简为 2 章,v2 是 6 章)
+#### Part I · Foundations and Classical RL (8 Chapters) — Same as v2
 
-15. 离线强化学习与决策 Transformer(CQL / IQL / Decision Transformer / Diffuser)
-16. 模仿学习、反向 RL 与元 RL 合集 **[合并]**
-
-- 行为克隆、DAgger
-- MaxEnt IRL、GAIL
-- MAML、RL²、Algorithm Distillation
-
-> **取舍**:Hierarchical RL 和 MARL 不单独成章,在 Part III 末尾设 "延伸阅读" 子节即可。理由:真实 JD 没要求,Anthropic/OpenAI 2025 论文也不强调。
-
----
-
-#### Part IV · LLM 对齐与后训练(8 章 — v2 的核心,扩充)
-
-17. RLHF 训练流水线(SFT → RLHF → RLVR 三阶段)
-18. PPO-RLHF 工业实战
-19. 偏好对齐:DPO 家族(DPO / IPO / KTO / SimPO / Iterative DPO / SPIN)
-20. **GRPO 与可验证奖励:从基础到改进家族** **[v3 重点扩充]**
-
-- 20.1 GRPO 群体归一化原理
-- 20.2 RLVR 范式
-- 20.3 DAPO:非对称裁剪、动态采样、token-level loss、overlong shaping、no KL
-- 20.4 Dr. GRPO:移除 std 归一化
-- 20.5 GSPO:序列级重要性采样
-- 20.6 CISPO:裁剪 IS 权重而非 token 更新
-- 20.7 REINFORCE++ 与 AREAL
-- 20.8 DeepSeek V3.2 的 KL 调参技巧
-- 20.9 选型决策树
-
-21. **Reasoning Models:从 o1 到 Claude Opus 4.6** **[v3 新增独立章]**
-
-- 21.1 推理模型的兴起(o1 → o3 → o4)
-- 21.2 R1-Zero 范式:无 SFT 的纯 RL
-- 21.3 DeepSeek-R1 训练全流程
-- 21.4 Test-time Compute Scaling
-- 21.5 Claude Opus 4.6 的自适应思考
-- 21.6 Hidden CoT vs Visible CoT
-
-22. 过程奖励模型与推理时搜索(PRM / MCTS over Thoughts / Tree of Thoughts / rStar)
-23. **Constitutional AI 与 RLAIF**(Anthropic 对齐范式)
-24. Agentic 强化学习(多轮交互、工具调用、SWE-bench、Deep Research)
+1. Overview of Reinforcement Learning
+2. CartPole: The First Reinforcement Learning Experiment
+3. Multi-Armed Bandits and Exploration-Exploitation Theory
+4. Markov Decision Processes
+5. Value Functions and the Bellman Equation
+6. Dynamic Programming, Monte Carlo, and Temporal Difference Learning
+7. Q-Learning and Off-Policy Control
+8. Reward Function Design
 
 ---
 
-#### Part V · 安全、评估与对齐研究(3 章)
+#### Part II · Deep Reinforcement Learning (6 Chapters)
 
-25. **奖励黑客与对齐失败模式** **[v3 重点更新到 2025.11 论文]**
+9. Deep Q-Networks and Distributional RL
+10. Policy Gradient Methods
+11. Actor-Critic Architectures
+12. PPO and Trust-Region Methods
+13. Deep Methods for Continuous Control (DDPG / TD3 / SAC)
+14. Model-Based Deep RL (MuZero / Dreamer)
 
-- 25.1 奖励黑客分类(Anthropic 2025.11 arxiv 2511.18397)
-- 25.2 School of Reward Hacks(Gao et al. 2025)
-- 25.3 Sleeper Agents(Hubinger et al. 2024)
-- 25.4 Alignment Faking(Greenblatt et al. 2024)
-- 25.5 In-Context Scheming(Apollo 2024)
-- 25.6 Sycophancy to Subterfuge(Anthropic 2024)
-- 25.7 自然涌现的失准(reward hacking 导致)
-- 25.8 防御:preference models、reward hack classifier
+---
 
-26. **可扩展监督与红队**
+#### Part III · Advanced RL Methods (Trimmed to 2 Chapters, Down From 6 in v2)
+
+15. Offline Reinforcement Learning and Decision Transformers (CQL / IQL / Decision Transformer / Diffuser)
+16. Imitation Learning, Inverse RL, and Meta-RL Combined **[merged]**
+
+- Behavior cloning, DAgger
+- MaxEnt IRL, GAIL
+- MAML, RL², Algorithm Distillation
+
+> **Trade-off**: Hierarchical RL and MARL don't get their own chapters — a "further reading" subsection at the end of Part III is sufficient. Rationale: real job descriptions don't require them, and Anthropic/OpenAI's 2025 papers don't emphasize them either.
+
+---
+
+#### Part IV · LLM Alignment and Post-Training (8 Chapters — v2's core, expanded)
+
+17. The RLHF Training Pipeline (the three-stage SFT → RLHF → RLVR progression)
+18. PPO-RLHF in Industrial Practice
+19. Preference Alignment: The DPO Family (DPO / IPO / KTO / SimPO / Iterative DPO / SPIN)
+20. **GRPO and Verifiable Rewards: From Fundamentals to the Improvement Family** **[v3 major expansion]**
+
+- 20.1 The principle of GRPO's group normalization
+- 20.2 The RLVR paradigm
+- 20.3 DAPO: asymmetric clipping, dynamic sampling, token-level loss, overlong shaping, no KL
+- 20.4 Dr. GRPO: removing std normalization
+- 20.5 GSPO: sequence-level importance sampling
+- 20.6 CISPO: clipping the IS weight rather than the token update
+- 20.7 REINFORCE++ and AREAL
+- 20.8 DeepSeek V3.2's KL tuning tricks
+- 20.9 A decision tree for choosing a variant
+
+21. **Reasoning Models: From o1 to Claude Opus 4.6** **[v3 new standalone chapter]**
+
+- 21.1 The rise of reasoning models (o1 → o3 → o4)
+- 21.2 The R1-Zero paradigm: pure RL with no SFT
+- 21.3 The full DeepSeek-R1 training pipeline
+- 21.4 Test-time compute scaling
+- 21.5 Claude Opus 4.6's adaptive thinking
+- 21.6 Hidden CoT vs. visible CoT
+
+22. Process Reward Models and Inference-Time Search (PRM / MCTS over Thoughts / Tree of Thoughts / rStar)
+23. **Constitutional AI and RLAIF** (Anthropic's alignment paradigm)
+24. Agentic Reinforcement Learning (multi-turn interaction, tool use, SWE-bench, Deep Research)
+
+---
+
+#### Part V · Safety, Evaluation, and Alignment Research (3 Chapters)
+
+25. **Reward Hacking and Alignment Failure Modes** **[v3 major update, through the 2025.11 paper]**
+
+- 25.1 A taxonomy of reward hacking (Anthropic 2025.11, arXiv:2511.18397)
+- 25.2 School of Reward Hacks (Gao et al. 2025)
+- 25.3 Sleeper Agents (Hubinger et al. 2024)
+- 25.4 Alignment Faking (Greenblatt et al. 2024)
+- 25.5 In-Context Scheming (Apollo 2024)
+- 25.6 Sycophancy to Subterfuge (Anthropic 2024)
+- 25.7 Naturally emergent misalignment (caused by reward hacking)
+- 25.8 Defenses: preference models, reward-hack classifiers
+
+26. **Scalable Oversight and Red-Teaming**
 
 - Scalable Oversight
 - AI Safety via Debate
-- Weak-to-Strong Generalization(OpenAI 2023)
-- 红队测试方法论
+- Weak-to-Strong Generalization (OpenAI 2023)
+- Red-teaming methodology
 
-27. **RL 评估方法论**(evals = RL environments 等价性,Pash 2025)
-
----
-
-#### Part VI · RL 工程与系统(v3 全新章节,JD 核心)
-
-28. **RL Environments 与 Verifiers 设计** **[v3 核心新增]**
-
-- 28.1 RL Environments 作为新瓶颈(Anthropic $1B,Karpathy)
-- 28.2 Verifier 设计原则
-- 28.3 Evals 与 RL Environments 的等价性
-- 28.4 Sandbox 工程(Docker、code execution)
-- 28.5 长程任务 harness(Anthropic 2025.11 Effective Harnesses)
-- 28.6 多 agent 并行(Karpathy "5-6 agents")
-- 28.7 评测基准:CyberGym、SWE-bench、Terminal-Bench、Prime Intellect Hub
-
-29. **分布式 RL 训练系统**
-
-- 29.1 veRL / OpenRLHF / TRL / NeMo-Aligner 对比
-- 29.2 Rollout 引擎与 vLLM 集成
-- 29.3 异步 RL 训练(LlamaRL 2025)
-- 29.4 GPU 内存优化:ZeRO、FSDP、Gradient Checkpointing
-- 29.5 性能 profiling 与瓶颈分析
-- 29.6 大规模训练调试实战
+27. **RL Evaluation Methodology** (evals as equivalent to RL environments, Pash 2025)
 
 ---
 
-#### Part VII · 研究前沿(精简为 3 章)
+#### Part VI · RL Engineering and Systems (Brand-New in v3, the Core of the JD)
 
-30. 视觉语言模型 RL(VLM-GRPO、EasyR1、GeoQA)
-31. 具身智能与多模态(VLA:π0、RT-2、OpenVLA、Diffusion Policy)
-32. 自我博弈与规模化趋势(AlphaGo → MuZero → LLM Self-Play、RL Scaling Laws)
+28. **Designing RL Environments and Verifiers** **[v3 core addition]**
+
+- 28.1 RL environments as the new bottleneck (Anthropic's $1B, Karpathy)
+- 28.2 Verifier design principles
+- 28.3 The equivalence between evals and RL environments
+- 28.4 Sandbox engineering (Docker, code execution)
+- 28.5 Long-horizon task harnesses (Anthropic's 2025.11 Effective Harnesses)
+- 28.6 Multi-agent parallelism (Karpathy's "5-6 agents")
+- 28.7 Evaluation benchmarks: CyberGym, SWE-bench, Terminal-Bench, Prime Intellect Hub
+
+29. **Distributed RL Training Systems**
+
+- 29.1 Comparing veRL / OpenRLHF / TRL / NeMo-Aligner
+- 29.2 Rollout engines and vLLM integration
+- 29.3 Asynchronous RL training (LlamaRL 2025)
+- 29.4 GPU memory optimization: ZeRO, FSDP, gradient checkpointing
+- 29.5 Performance profiling and bottleneck analysis
+- 29.6 Hands-on large-scale training debugging
 
 ---
 
-## 四、对比总结表
+#### Part VII · Research Frontiers (Trimmed to 3 Chapters)
 
-| 维度                   | 当前 v1   | v2(理想推断)   | **v3(证据驱动)**             |
-| ---------------------- | --------- | -------------- | ---------------------------- |
-| 章节数                 | 12        | 38             | **32**(精简学术,扩充工程)    |
-| RL Environments 重视   | ❌        | ❌             | **✅ 核心章节**              |
-| Reasoning Models 独立  | ❌        | 一节           | **✅ 独立章节**              |
-| GRPO 家族完整          | DAPO 一个 | DAPO + Dr.GRPO | **✅ 6+ 变体**               |
-| 工程能力位置           | 附录      | 附录           | **✅ Part VI 正文**          |
-| Reward Hacking 时效    | 2024 论文 | 2024 论文      | **✅ 2025.11 论文**          |
-| Hierarchical/Meta/MARL | 散落      | 3 章学术       | **减为 1 章合并**            |
-| "直接入职"承诺         | ❌        | ❌(夸大)       | **改为"通过技术面 RL 部分"** |
-| 真实 JD 验证           | 无        | 无             | **✅ Anthropic Code RL JD**  |
+30. RL for Vision-Language Models (VLM-GRPO, EasyR1, GeoQA)
+31. Embodied Intelligence and Multimodality (VLA: π0, RT-2, OpenVLA, Diffusion Policy)
+32. Self-Play and Scaling Trends (AlphaGo → MuZero → LLM Self-Play, RL scaling laws)
 
 ---
 
-## 五、迁移路径(基于真实证据优先级)
+## 4. Comparison Summary Table
 
-**Phase 1**(立即,零风险)— 标题教材化 + 拆分第 3 章 MDP
+| Dimension                              | Current v1 | v2 (ideal extrapolation) | **v3 (evidence-driven)**                                       |
+| -------------------------------------- | ---------- | ------------------------ | -------------------------------------------------------------- |
+| Chapter count                          | 12         | 38                       | **32** (academic content trimmed, engineering expanded)        |
+| Emphasis on RL Environments            | ❌         | ❌                       | **✅ core chapter**                                            |
+| Reasoning Models standalone            | ❌         | one section              | **✅ standalone chapter**                                      |
+| Completeness of the GRPO family        | Only DAPO  | DAPO + Dr.GRPO           | **✅ 6+ variants**                                             |
+| Placement of engineering content       | Appendix   | Appendix                 | **✅ Part VI main text**                                       |
+| Timeliness of reward-hacking coverage  | 2024 paper | 2024 paper               | **✅ 2025.11 paper**                                           |
+| Hierarchical/Meta/MARL                 | Scattered  | 3 academic chapters      | **reduced to 1 merged chapter**                                |
+| The "walk straight into a job" promise | ❌         | ❌ (overstated)          | **reframed as "pass the RL portion of a technical interview"** |
+| Verified against real job descriptions | None       | None                     | **✅ Anthropic Code RL JD**                                    |
 
-**Phase 2**(本月,中风险)— 移走 DPO,补 §20 GRPO 家族完整化(已有部分内容)
+---
 
-**Phase 3**(本季,高 ROI)— 新增 v3 的 Part IV 关键章:
+## 5. Migration Path (Prioritized by Real Evidence)
 
-- §20 GRPO 改进家族
-- §21 Reasoning Models 独立章
-- §22 PRM 与推理搜索
+**Phase 1** (immediate, zero risk) — turn headings into proper textbook form + split Chapter 3 (MDP)
+
+**Phase 2** (this month, medium risk) — move DPO out, add the full §20 GRPO family (some content already exists)
+
+**Phase 3** (this quarter, high ROI) — add the key v3 Part IV chapters:
+
+- §20 The GRPO improvement family
+- §21 Reasoning Models as its own chapter
+- §22 PRM and inference-time search
 - §23 Constitutional AI
-- §25 Reward Hacking(更新到 2025.11)
+- §25 Reward Hacking (updated through 2025.11)
 
-**Phase 4**(下季,JD 核心)— 新增 Part VI RL 工程:
+**Phase 4** (next quarter, the JD's core) — add the Part VI RL engineering chapters:
 
-- §28 RL Environments 与 Verifiers(最重要,JD 验证)
-- §29 分布式训练系统
+- §28 RL Environments and Verifiers (most important, JD-verified)
+- §29 Distributed training systems
 
-**Phase 5**(持续)— Part III 高级 RL、Part VII 前沿研究
+**Phase 5** (ongoing) — Part III advanced RL, Part VII research frontiers
 
 ---
 
-## 六、关键引用(供写作时直接使用)
+## 6. Key Citations (Ready to Use When Writing)
 
 ```
 [DeepSeek-R1] Guo et al. 2025. Nature. https://www.nature.com/articles/s41586-025-09422-z
@@ -322,160 +322,160 @@
 
 ---
 
-## 七、对用户的诚实总结
+## 7. An Honest Summary for the Reader
 
-1. **v2 的方向是对的**,真实证据确认了 PRM、CAI、Sleeper Agents、Reward Hacking、GRPO/RLVR 这些主题确实是 2025 工业重点。
-2. **v2 最大的盲区是 RL Environments**,这是 2025 行业最大投资方向(Anthropic $1B),v3 补为独立章节。
-3. **v2 学术偏重过高**(Hierarchical/Meta/MARL),这些对工业入职帮助小,v3 精简。
-4. **v2 工程部分太弱**,JD 强调 async Python、profiling、分布式,v3 升级到正文。
-5. **"读完直接入职"是过度营销**,真实 JD 还要 SE 经验和生产调试能力,任何教材都无法替代。
-6. **GRPO 家族远比 v2 完整**:至少 6 个主流变体在 2025 出现,必须完整覆盖。
+1. **v2's overall direction was right** — the real evidence confirms that PRM, CAI, Sleeper Agents, Reward Hacking, and GRPO/RLVR really are 2025 industry priorities.
+2. **v2's biggest blind spot was RL Environments** — this is the industry's biggest investment area in 2025 (Anthropic's $1B), and v3 adds it as a standalone chapter.
+3. **v2 leaned too heavily on academic content** (Hierarchical/Meta/MARL) — these offer little help for landing an industry job, so v3 trims them.
+4. **v2's engineering coverage was too thin** — the JD emphasizes async Python, profiling, and distributed systems, so v3 promotes it into the main text.
+5. **"Read this and walk straight into a job" was overselling** — real job descriptions also require SE experience and production-debugging skills that no textbook can substitute for.
+6. **The GRPO family is far more extensive than v2 suggested** — at least 6 mainstream variants appeared in 2025, and full coverage is necessary.
 
 ---
 
-# v4 增量:中国实验室证据(2025-2026)
+# v4 Addendum: Evidence from Chinese Labs (2025-2026)
 
-> 搜索范围扩展到国内主要实验室(DeepSeek、Qwen、智谱 Zhipu、阶跃星辰 StepFun),发现 v3 在以下方向需要强化。
+> Research scope expanded to major domestic labs (DeepSeek, Qwen, Zhipu, StepFun); found that v3 needs strengthening in the following areas.
 
-## 八、中国实验室真实证据
+## 8. Real Evidence from Chinese Labs
 
-### 8.1 智谱 GLM 对齐团队面试真题(牛客网真实面经)
+### 8.1 Real Zhipu GLM Alignment-Team Interview Questions (Real Interview Reports from Nowcoder)
 
-**[来源]** nowcoder.com 智谱 AI 话题区,多位候选人的真实一面/二面记录
+**[Source]** nowcoder.com's Zhipu AI topic section — real first-/second-round interview records from multiple candidates
 
-**重点考察内容**:
+**Key areas tested**:
 
-- **PG → REINFORCE → TRPO → PPO 完整推导链**(从 RL 角度优化 PPO)
-- **DPO 家族 + DPO 正则化方法**(优化 DPO 的方向)
-- **DeepSeek GRPO 与 PPO 的对比**
-- **手撕 transformer decoder block**
-- **DeepSpeed 与 Megatron 的对比**
-- **PPO/DPO 训练资源消耗估算**(面试官现场推算 GPU 小时)
-- 反馈:"如果只做过 SFT 的基本就不用浪费时间投递了"
+- **The full derivation chain PG → REINFORCE → TRPO → PPO** (optimizing PPO from an RL perspective)
+- **The DPO family + DPO regularization methods** (directions for optimizing DPO)
+- **Comparing DeepSeek's GRPO with PPO**
+- **Whiteboard-coding a transformer decoder block**
+- **Comparing DeepSpeed and Megatron**
+- **Estimating PPO/DPO training resource consumption** (interviewers had candidates estimate GPU-hours on the spot)
+- Feedback: "If you've only done SFT, honestly don't bother applying"
 
-→ **v4 启示**:本书必须涵盖
+→ **v4 takeaway**: this book must cover
 
-- ✅ 完整 PG 推导链(已有,需强化为独立理论小节)
-- ✅ DPO 正则化方法(v3 §19 需扩充)
-- ✅ 训练成本估算章节(v3 §29 工程章需新增"成本估算"小节)
+- ✅ The complete PG derivation chain (already present, needs to be strengthened into a standalone theory subsection)
+- ✅ DPO regularization methods (v3 §19 needs expansion)
+- ✅ A training-cost-estimation chapter (v3's §29 engineering chapter needs a new "cost estimation" subsection)
 
-### 8.2 DeepSeek 真实训练数据(Stanford CRFM 透明度报告)
+### 8.2 Real DeepSeek Training Data (Stanford CRFM Transparency Report)
 
-**[来源]** crfm.stanford.edu/fmti/December-2025/company-reports/DeepSeek_FinalReport_FMTI2025.html
+**[Source]** crfm.stanford.edu/fmti/December-2025/company-reports/DeepSeek_FinalReport_FMTI2025.html
 
-- DeepSeek-V3 预训练:**2.664M H800 GPU 小时,14.8T tokens**
-- DeepSeek-R1-Zero:**648 H800 GPUs × 198 小时 = 128K GPU 小时**
-- DeepSeek-R1(完整多阶段):**648 H800 GPUs × ~80 小时**
-- V3 + R1 总计:**2.8M GPU 小时,67 天**
-- 训练模块:加载 actor + critic(可选),支持 PPO/GRPO/DPO
-- Best-Fit 数据 packing,DualPipe 算法
+- DeepSeek-V3 pretraining: **2.664M H800 GPU-hours, 14.8T tokens**
+- DeepSeek-R1-Zero: **648 H800 GPUs × 198 hours = 128K GPU-hours**
+- DeepSeek-R1 (full multi-stage): **648 H800 GPUs × ~80 hours**
+- V3 + R1 total: **2.8M GPU-hours, 67 days**
+- Training module: loads actor + critic (optional), supports PPO/GRPO/DPO
+- Best-Fit data packing, the DualPipe algorithm
 
-→ **v4 启示**:
+→ **v4 takeaway**:
 
-- ✅ 训练成本估算必须有具体数字参考(本书可加附录"GPU 小时估算表")
-- ✅ DualPipe、Best-Fit packing 这些工程实现应进 §29 工程章
+- ✅ Cost estimation needs concrete reference numbers (this book could add a "GPU-hour estimation table" appendix)
+- ✅ Engineering implementations like DualPipe and Best-Fit packing should go into the §29 engineering chapter
 
-### 8.3 Qwen3 训练方法(真实技术报告)
+### 8.3 Qwen3 Training Methodology (Real Technical Reports)
 
-**[来源]** Qwen3 Technical Report (arXiv:2505.09388)、Qwen3-Thinking-2507、Qwen2.5-Math
+**[Source]** the Qwen3 Technical Report (arXiv:2505.09388), Qwen3-Thinking-2507, Qwen2.5-Math
 
-- **Qwen3 使用 GSPO**(Group Sequence Policy Optimization,Zheng et al. 2025)— 序列级重要性采样
-- **Qwen2.5-Math**:self-improvement 路径
-- **Qwen3-Thinking-2507**:AIME 86.7,LiveCodeBench 74.1(超越 o3/o4-mini)
-- **数据污染问题**(arXiv:2507.10532):Qwen 因预训练包含 benchmark 答案,RL 收益部分来自记忆激活而非推理泛化
+- **Qwen3 uses GSPO** (Group Sequence Policy Optimization, Zheng et al. 2025) — sequence-level importance sampling
+- **Qwen2.5-Math**: a self-improvement approach
+- **Qwen3-Thinking-2507**: AIME 86.7, LiveCodeBench 74.1 (surpassing o3/o4-mini)
+- **The data-contamination issue** (arXiv:2507.10532): because Qwen's pretraining data included benchmark answers, some of the RL gains come from activating memorization rather than from genuine reasoning generalization
 
-→ **v4 启示**:
+→ **v4 takeaway**:
 
-- ✅ GSPO 必须在 GRPO 家族章重点讲(v3 §20.5 已有)
-- ✅ 数据污染问题应进 §25 reward hacking 章
-- ⚠️ Qwen3 "随机奖励也能提升"现象 — 揭示 RLVR 的微妙性
+- ✅ GSPO must get significant coverage in the GRPO family chapter (already present in v3 §20.5)
+- ✅ The data-contamination issue should go into the §25 reward-hacking chapter
+- ⚠️ Qwen3's "even random rewards can improve performance" phenomenon reveals the subtlety of RLVR
 
-### 8.4 StepFun(阶跃星辰)独特方向
+### 8.4 StepFun's Unique Direction
 
-**[来源]** static.stepfun.com/blog/step-3.5-flash、github.com/stepfun-ai/Step-Audio-R1、arXiv:2601.09668 (Step3-VL-10B)
+**[Source]** static.stepfun.com/blog/step-3.5-flash, github.com/stepfun-ai/Step-Audio-R1, arXiv:2601.09668 (Step3-VL-10B)
 
-**真实岗位需求**(BOSS 直聘 + 牛客 + 阶跃官网):
+**Real job postings** (BOSS Zhipin + Nowcoder + StepFun's own site):
 
-- AI Infra 工程师:训练框架、推理加速、分布式系统
-- Kernel 开发、MoE 通信优化、万卡集群
-- 语音/多模态优先方向
-- StepStar 2026 校招(本硕博顶尖)
+- AI infra engineers: training frameworks, inference acceleration, distributed systems
+- Kernel development, MoE communication optimization, 10,000-GPU-cluster work
+- Speech/multimodal prioritized directions
+- StepStar 2026 campus recruiting (top master's/PhD candidates)
 
-**Step 独特技术贡献**:
+**Step's unique technical contributions**:
 
-- **Step-Audio-R1**:首个语音语言模型实现 test-time compute scaling
-- **Step-Audio-R1.5**:从 RLVR 转向 **RLHF for Audio Reasoning**(声音自然度 + 推理)
+- **Step-Audio-R1**: the first speech-language model to achieve test-time compute scaling
+- **Step-Audio-R1.5**: shifts from RLVR to **RLHF for Audio Reasoning** (balancing vocal naturalness with reasoning)
 - **Step3-VL-10B**:
-  - **SeRe**(Sequential Reasoning):标准 CoT,64K context
-  - **PaCoRe**(Parallel Coordinated Reasoning):**16 路并行 rollout 聚合**,128K context,test-time compute 扩展
-  - AIME 2025: 94.4(PaCoRe 模式)
-- **Step 3.5 Flash**:MoE 196B/11B active,AIME 97.3,推理 350 tokens/s
-- **Deep Research**:多智能体架构
+  - **SeRe** (Sequential Reasoning): standard CoT, 64K context
+  - **PaCoRe** (Parallel Coordinated Reasoning): **16-way parallel rollout aggregation**, 128K context, test-time compute scaling
+  - AIME 2025: 94.4 (in PaCoRe mode)
+- **Step 3.5 Flash**: MoE 196B/11B active, AIME 97.3, 350 tokens/s inference
+- **Deep Research**: a multi-agent architecture
 
-→ **v4 启示**:
+→ **v4 takeaway**:
 
-- ✅ **PaCoRe 等并行协调推理**应进 §22 PRM/推理搜索章(全新的 test-time scaling 方法)
-- ✅ **音频 RL** 是国内特色方向,§31 具身/多模态章应单独小节
-- ✅ **MoE + RL** 的工程优化应进 §29 分布式训练
-- ✅ **多模态 RL 比美国更前沿**(Step3-VL-10B 在 AIME 2025 击败 GLM-4.6V/Qwen3-VL)
+- ✅ **Parallel coordinated reasoning approaches like PaCoRe** should go into the §22 PRM/inference-search chapter (a brand-new test-time-scaling method)
+- ✅ **Audio RL** is a distinctively domestic direction; §31 (embodiment/multimodality) should give it its own subsection
+- ✅ **MoE + RL engineering optimization** should go into §29 (distributed training)
+- ✅ **Multimodal RL is more cutting-edge in China than in the US** (Step3-VL-10B beats GLM-4.6V/Qwen3-VL on AIME 2025)
 
-### 8.5 中国实验室特色(对比 OpenAI/Anthropic)
+### 8.5 Distinctive Traits of Chinese Labs (vs. OpenAI/Anthropic)
 
-| 维度     | OpenAI/Anthropic                           | 中国实验室(DeepSeek/Qwen/Zhipu/Step)        |
-| -------- | ------------------------------------------ | ------------------------------------------- |
-| 重点     | RL Environments、Safety、Constitutional AI | **MoE 训练、多模态 RL、Kernel 优化**        |
-| 推理范式 | o1/o3 Hidden CoT                           | R1 Visible CoT + **PaCoRe 并行推理**        |
-| 多模态   | 偏文本 + 视觉                              | **音频 RL、视觉推理、GUI Agent**            |
-| 训练成本 | 商业不公开                                 | **公开 GPU 小时**(DeepSeek 透明度最高)      |
-| 面试重点 | async Python、verifiers、sandboxes         | **PG 推导链、DPO 家族、DeepSpeed/Megatron** |
-| 工程岗   | RL Environments $500K                      | **Kernel、MoE 通信、万卡集群**              |
+| Dimension          | OpenAI/Anthropic                           | Chinese Labs (DeepSeek/Qwen/Zhipu/Step)                         |
+| ------------------ | ------------------------------------------ | --------------------------------------------------------------- |
+| Focus              | RL Environments, Safety, Constitutional AI | **MoE training, multimodal RL, kernel optimization**            |
+| Reasoning paradigm | o1/o3 hidden CoT                           | R1 visible CoT + **PaCoRe parallel reasoning**                  |
+| Multimodality      | Leans text + vision                        | **Audio RL, visual reasoning, GUI agents**                      |
+| Training cost      | Not disclosed commercially                 | **GPU-hours disclosed publicly** (DeepSeek is most transparent) |
+| Interview focus    | Async Python, verifiers, sandboxes         | **PG derivation chain, the DPO family, DeepSpeed/Megatron**     |
+| Engineering roles  | RL environments, $500K                     | **Kernel work, MoE communication, 10,000-GPU clusters**         |
 
 ---
 
-## 九、v4 新增章节建议
+## 9. Proposed New Chapters for v4
 
-基于中国实验室证据,在 v3 基础上**额外补充**:
+Based on evidence from Chinese labs, **add the following** on top of v3:
 
-### v4 §20.10 中国实验室的 GRPO 实战变体
+### v4 §20.10 China's Hands-On GRPO Variants
 
-- Qwen3 GSPO(序列级 IS)
-- DeepSeek V3.2 的 KL 调参(数学任务 zero KL)
-- Dr. GRPO 在 Qwen 系列的应用
+- Qwen3 GSPO (sequence-level IS)
+- DeepSeek V3.2's KL tuning (zero KL for math tasks)
+- Applying Dr. GRPO within the Qwen series
 
-### v4 §22.6 并行协调推理(PaCoRe)— **全新小节**
+### v4 §22.6 Parallel Coordinated Reasoning (PaCoRe) — **entirely new subsection**
 
-- Step3-VL-10B 的 16 路并行 rollout 聚合
-- Test-time compute scaling 的另一条路径
-- 与 MCTS over Thoughts 的对比
+- Step3-VL-10B's 16-way parallel rollout aggregation
+- An alternative path for test-time compute scaling
+- Comparison with MCTS over Thoughts
 
-### v4 §25.9 数据污染与 RLVR 的微妙性
+### v4 §25.9 Data Contamination and the Subtlety of RLVR
 
-- "随机奖励也能提升 Qwen 性能"现象(arXiv:2507.10532)
-- GRPO 的 clipping bias 导致记忆激活
-- 评估 RLVR 真实收益的方法论
+- The "even random rewards can improve Qwen's performance" phenomenon (arXiv:2507.10532)
+- How GRPO's clipping bias activates memorization
+- Methodology for assessing the genuine gains from RLVR
 
-### v4 §29.7 MoE 训练与 RL 集成 **[中国实验室核心]**
+### v4 §29.7 MoE Training and RL Integration **[a core strength of Chinese labs]**
 
-- DeepSeek-V3 MoE 架构
-- 万卡集群上的 RL 训练
+- The DeepSeek-V3 MoE architecture
+- RL training on 10,000-GPU clusters
 - DeepSpeed / Megatron / DualPipe / Best-Fit packing
-- 训练成本估算实战(参考 DeepSeek 公开数据)
+- Hands-on training-cost estimation (using DeepSeek's public data as reference)
 
-### v4 §31.4 音频 RL **[新增小节]**
+### v4 §31.4 Audio RL **[new subsection]**
 
-- Step-Audio-R1:首个 test-time compute scaling 语音模型
-- 从 RLVR 到 RLHF for Audio 的迁移
-- 韵律自然度与推理能力的平衡
+- Step-Audio-R1: the first speech model with test-time compute scaling
+- The shift from RLVR to RLHF for Audio
+- Balancing prosodic naturalness with reasoning ability
 
-### v4 §31.5 多模态 RL 的中国前沿
+### v4 §31.5 China's Multimodal RL Frontier
 
-- Step3-VL-10B、GLM-4.6V、Qwen3-VL 的对比
-- 视觉推理 RL 的"missing trace"问题(Step 论文)
-- Acoustic-Grounded Reasoning(Step-Audio R1.1)
+- Comparing Step3-VL-10B, GLM-4.6V, and Qwen3-VL
+- The "missing trace" problem in visual-reasoning RL (from the Step paper)
+- Acoustic-Grounded Reasoning (Step-Audio R1.1)
 
 ---
 
-## 十、中国实验室关键引用
+## 10. Key Citations from Chinese Labs
 
 ```
 [Qwen3 Technical Report] Yang et al. 2025. arXiv:2505.09388
@@ -486,32 +486,32 @@
 [DeepSeek-R1 Nature] Guo et al. 2025. nature.com/articles/s41586-025-09422-z
 [DeepSeek-V3 Tech Report] DeepSeek-AI 2024. arXiv:2412.19437
 [DeepSeek CRFM Transparency] crfm.stanford.edu/fmti/December-2025/company-reports/DeepSeek_FinalReport_FMTI2025.html
-[智谱 GLM 对齐面试真题] nowcoder.com/creation/subject/da767c9233384be9a2992ee3d1946518
+[Zhipu GLM alignment interview questions] nowcoder.com/creation/subject/da767c9233384be9a2992ee3d1946518
 [Qwen Contamination Study] arXiv:2507.10532 (Reasoning or Memorization?)
 [Olmo 3 GRPO improvements] magazine.sebastianraschka.com/p/state-of-llms-2025
 ```
 
 ---
 
-## 十一、综合 v4 调整总结
+## 11. Summary of Combined v4 Adjustments
 
-| v3 章节            | v4 调整                                      | 理由                              |
-| ------------------ | -------------------------------------------- | --------------------------------- |
-| §20 GRPO 家族      | **新增 §20.10 中国实验室变体**               | Qwen3 GSPO、DeepSeek V3.2 KL 调参 |
-| §22 PRM/搜索       | **新增 §22.6 PaCoRe 并行协调推理**           | Step3-VL 独创方法                 |
-| §25 Reward Hacking | **新增 §25.9 数据污染与 RLVER 微妙性**       | Qwen 实证发现                     |
-| §29 分布式训练     | **新增 §29.7 MoE + RL 集成**                 | DeepSeek/Step 核心工程            |
-| §31 具身/多模态    | **新增 §31.4 音频 RL、§31.5 中国多模态前沿** | Step-Audio、Step3-VL              |
+| v3 chapter                   | v4 adjustment                                             | Rationale                           |
+| ---------------------------- | --------------------------------------------------------- | ----------------------------------- |
+| §20 GRPO family              | **add §20.10 China's variants**                           | Qwen3 GSPO, DeepSeek V3.2 KL tuning |
+| §22 PRM/search               | **add §22.6 PaCoRe parallel coordinated reasoning**       | An original Step3-VL method         |
+| §25 Reward Hacking           | **add §25.9 data contamination and the subtlety of RLVR** | An empirical finding from Qwen      |
+| §29 distributed training     | **add §29.7 MoE + RL integration**                        | Core engineering at DeepSeek/Step   |
+| §31 embodiment/multimodality | **add §31.4 audio RL, §31.5 China's multimodal frontier** | Step-Audio, Step3-VL                |
 
-**结论**:中国实验室证据强化了 v3 的以下判断:
+**Conclusion**: the evidence from Chinese labs reinforces the following v3 judgments:
 
-1. GRPO 家族完整覆盖是必要的(中国实验室是 GRPO 改进主要贡献者)
-2. MoE + RL 工程必须深入(中国比美国更重视)
-3. 多模态 RL 比预想的更成熟(应提早进正文)
-4. 训练成本估算应成为附录标准内容
+1. Full coverage of the GRPO family is necessary (Chinese labs are the main contributors to GRPO improvements)
+2. MoE + RL engineering must be covered in depth (China invests more heavily in it than the US does)
+3. Multimodal RL is more mature than expected (should be moved earlier into the main text)
+4. Training-cost estimation should become standard appendix content
 
-但中国实验室也带来 v3 没覆盖的新方向:
+But the evidence from Chinese labs also surfaces new directions not covered by v3:
 
-- **音频 RL**(Step-Audio 独特)
-- **PaCoRe 并行协调推理**(Step 独创 test-time scaling)
-- **数据污染与 RLVER 真实收益的微妙性**(Qwen 揭示的问题)
+- **Audio RL** (a StepFun specialty)
+- **PaCoRe parallel coordinated reasoning** (Step's original test-time scaling approach)
+- **The subtlety of data contamination and genuine RLVR gains** (a problem surfaced by Qwen)

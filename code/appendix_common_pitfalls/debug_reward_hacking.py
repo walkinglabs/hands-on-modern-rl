@@ -1,22 +1,26 @@
 """
-附录A - 常见坑与解法：奖励作弊（Reward Hacking）的诊断与修复
+Appendix A - Common Pitfalls and Solutions: Diagnosing and Fixing Reward Hacking
 
-本脚本演示强化学习中最常见、最危险的陷阱之一：奖励作弊。
+This script demonstrates one of the most common and dangerous pitfalls in reinforcement
+learning: reward hacking.
 
-什么是奖励作弊？
-    智能体学会了"钻空子"——利用奖励函数的设计缺陷来获取高分，
-    但实际上并没有完成我们真正期望的任务。
+What is reward hacking?
+    The agent learns to "game the system" -- exploiting a flaw in the reward function's
+    design to earn a high score, without actually accomplishing the task we really wanted.
 
-典型表现：
-    - 奖励曲线持续上升（看起来训练很成功）
-    - 但实际任务表现反而下降（甚至完全不做正事）
+Typical symptoms:
+    - The reward curve keeps rising (training looks like it's succeeding)
+    - But actual task performance is declining instead (or the agent stops doing the
+      real task altogether)
 
-本脚本包含三个场景：
-    场景1：被动手存活——CartPole 中智能体学会"站着不动"获取奖励
-    场景2：奖励塑形出错——不当的中间奖励导致意外行为
-    场景3：正确的奖励设计——如何避免上述问题
+This script includes three scenarios:
+    Scenario 1: Passive survival -- the agent in CartPole learns to "just stand there"
+        to collect reward
+    Scenario 2: Bad reward shaping -- an ill-conceived intermediate reward causes
+        unintended behavior
+    Scenario 3: Correct reward design -- how to avoid the problems above
 
-运行方式：
+How to run:
     python debug_reward_hacking.py
 """
 
@@ -30,21 +34,21 @@ import torch.optim as optim
 import gymnasium as gym
 import matplotlib.pyplot as plt
 
-# 创建输出目录
+# Create the output directory
 os.makedirs("output", exist_ok=True)
 
-# 设置中文字体，确保图表标题和标签正常显示
+# Set a CJK-capable font so chart titles and labels render correctly
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 
 
 # ==========================================
-# 第一部分：工具组件（Q网络、经验回放、智能体）
+# Part 1: Utility components (Q-network, replay buffer, agent)
 # ==========================================
 class QNetwork(nn.Module):
     """
-    Q 网络：将状态映射到每个动作的 Q 值
-    结构：state_dim → 128 → 128 → action_dim
+    Q-network: maps a state to the Q-value of each action
+    Architecture: state_dim -> 128 -> 128 -> action_dim
     """
 
     def __init__(self, state_dim, action_dim):
@@ -58,25 +62,25 @@ class QNetwork(nn.Module):
         )
 
     def forward(self, x):
-        """前向传播：输入状态，输出各动作的 Q 值"""
+        """Forward pass: takes a state, outputs Q-values for each action"""
         return self.net(x)
 
 
 class ReplayBuffer:
     """
-    经验回放缓冲区：存储和采样训练数据
+    Experience replay buffer: stores and samples training data
     """
 
     def __init__(self, capacity=10000):
-        """用 deque 实现，容量满后自动丢弃旧数据"""
+        """Implemented with a deque; once full, old data is dropped automatically"""
         self.buffer = collections.deque(maxlen=capacity)
 
     def push(self, state, action, reward, next_state, done):
-        """存储一条转移经验 (s, a, r, s', done)"""
+        """Store one transition (s, a, r, s', done)"""
         self.buffer.append((state, action, reward, next_state, done))
 
     def sample(self, batch_size):
-        """随机采样一批数据，打破时间相关性"""
+        """Randomly sample a batch of data to break temporal correlation"""
         batch = random.sample(self.buffer, batch_size)
         states, actions, rewards, next_states, dones = zip(*batch)
         return (
@@ -93,10 +97,12 @@ class ReplayBuffer:
 
 class DQNAgent:
     """
-    DQN 智能体：整合 Q 网络、目标网络、经验回放和 ε-贪心策略
+    DQN agent: combines the Q-network, target network, replay buffer, and
+    epsilon-greedy policy
 
-    为了复用代码，这里使用统一的智能体结构，
-    不同场景通过修改环境包装器来改变奖励函数。
+    To keep the code reusable, we use a single unified agent structure here;
+    the different scenarios change the reward function by modifying the
+    environment wrapper instead.
     """
 
     def __init__(self, state_dim, action_dim, lr=1e-3, gamma=0.99):
@@ -112,7 +118,7 @@ class DQNAgent:
         self.buffer = ReplayBuffer(capacity=10000)
 
     def select_action(self, state, epsilon):
-        """ε-贪心动作选择"""
+        """Epsilon-greedy action selection"""
         if random.random() < epsilon:
             return random.randint(0, self.action_dim - 1)
         else:
@@ -122,7 +128,7 @@ class DQNAgent:
             return q_values.argmax(dim=1).item()
 
     def update(self, batch_size):
-        """从经验回放中采样并更新 Q 网络"""
+        """Sample from the replay buffer and update the Q-network"""
         if len(self.buffer) < batch_size:
             return 0.0
 
@@ -150,27 +156,30 @@ class DQNAgent:
         return loss.item()
 
     def update_target(self):
-        """将 Q 网络的权重复制到目标网络（硬更新）"""
+        """Copy the Q-network's weights to the target network (hard update)"""
         self.target_net.load_state_dict(self.q_net.state_dict())
 
 
 # ==========================================
-# 第二部分：自定义环境包装器（模拟奖励作弊）
+# Part 2: Custom environment wrappers (simulating reward hacking)
 # ==========================================
 class HackedRewardWrapper(gym.Wrapper):
     """
-    被动存活奖励包装器 —— 模拟"奖励作弊"场景
+    Passive-survival reward wrapper -- simulates a "reward hacking" scenario
 
-    原始 CartPole 奖励：每步 +1，直到杆子倒下。
-    这本身是正确的设计：智能体需要保持杆子直立才能获得高分。
+    Original CartPole reward: +1 per step until the pole falls.
+    This is actually correct by design: the agent needs to keep the pole
+    upright in order to score high.
 
-    但如果我们额外给"存活时间"加分，而不要求杆子角度，
-    智能体可能学会一种奇怪策略：让杆子快速来回摆动，
-    或者找到某种物理引擎漏洞来延长存活时间。
+    But if we additionally reward "time survived" without requiring anything
+    about the pole's angle, the agent might learn a strange strategy: making
+    the pole swing rapidly back and forth, or finding some quirk of the
+    physics engine to prolong survival time.
 
-    这里我们模拟一种更极端的情况：
-    给"杆子几乎水平"的状态额外奖励（即快要倒下也有奖励），
-    这会鼓励智能体在边缘状态徘徊，而不是真正保持平衡。
+    Here we simulate a more extreme case: giving an extra reward for states
+    where "the pole is nearly horizontal" (i.e. rewarding it even when it's
+    about to fall), which encourages the agent to linger near the edge state
+    instead of actually staying balanced.
     """
 
     def __init__(self, env, survival_bonus=2.0):
@@ -179,15 +188,18 @@ class HackedRewardWrapper(gym.Wrapper):
 
     def step(self, action):
         """
-        修改奖励函数：
-        - 原始奖励：每步 +1
-        - 作弊奖励：额外给"存活"本身加分，不管杆子角度如何
-        - 只要没结束，就给大额 bonus → 智能体学会了"拖延"
+        Modify the reward function:
+        - Original reward: +1 per step
+        - Hacked reward: an extra bonus just for "surviving", regardless of
+          the pole's angle
+        - As long as the episode hasn't ended, a large bonus is given ->
+          the agent learns to "stall"
         """
         next_state, reward, done, truncated, info = self.env.step(action)
 
-        # 作弊奖励：不管做什么，只要还活着就给额外奖励
-        # 这会让智能体发现"随便做什么都行，只要活着"
+        # Hacked reward: no matter what it does, as long as it's still alive
+        # it gets an extra reward. This lets the agent discover that "it
+        # doesn't matter what you do, as long as you're alive"
         hacked_reward = reward + self.survival_bonus
 
         return next_state, hacked_reward, done, truncated, info
@@ -195,14 +207,15 @@ class HackedRewardWrapper(gym.Wrapper):
 
 class BadShapingWrapper(gym.Wrapper):
     """
-    不当奖励塑形包装器 —— 模拟"奖励塑形出错"场景
+    Bad reward-shaping wrapper -- simulates a "reward shaping gone wrong" scenario
 
-    场景：我们希望智能体把小车推到屏幕中央。
-    设计了一个"距中心越近越好"的中间奖励。
-    但问题是：智能体学会了在中心附近来回振荡，
-    而不是稳定地保持平衡！
+    Scenario: we want the agent to push the cart to the center of the screen.
+    We designed an intermediate reward for "the closer to center, the better".
+    The problem is: the agent learns to oscillate back and forth near the
+    center, instead of stably keeping its balance!
 
-    这种情况在现实中很常见：你以为的"帮助"其实是"误导"。
+    This situation is quite common in practice: what you think is "helping"
+    can actually be "misleading".
     """
 
     def __init__(self, env, position_reward_weight=5.0):
@@ -211,18 +224,19 @@ class BadShapingWrapper(gym.Wrapper):
 
     def step(self, action):
         """
-        修改奖励函数：
-        - 原始奖励：每步 +1（保持杆子直立）
-        - 塑形奖励：额外给"小车接近中心"加分
+        Modify the reward function:
+        - Original reward: +1 per step (keep the pole upright)
+        - Shaped reward: an extra bonus for "the cart being close to center"
 
-        问题在于 position_reward_weight 太大，
-        导致智能体主要关注"推车到中心"，而忽略了"保持杆子直立"。
-        结果：小车确实在中心了，但杆子倒了。
+        The problem is that position_reward_weight is too large, causing the
+        agent to focus mainly on "pushing the cart to center" while ignoring
+        "keeping the pole upright". Result: the cart does end up centered,
+        but the pole falls over.
         """
         next_state, reward, done, truncated, info = self.env.step(action)
 
-        # next_state[0] 是小车的位置，范围大约 [-2.4, 2.4]
-        # 给"靠近中心"的位置奖励
+        # next_state[0] is the cart's position, roughly in the range [-2.4, 2.4]
+        # Reward being "close to center"
         position = next_state[0]
         position_reward = self.position_reward_weight * (1.0 - abs(position) / 2.4)
 
@@ -232,21 +246,23 @@ class BadShapingWrapper(gym.Wrapper):
 
 
 # ==========================================
-# 第三部分：统一训练函数
+# Part 3: Unified training function
 # ==========================================
 def train_agent(env, label, num_episodes=300, batch_size=64):
     """
-    在给定环境中训练 DQN 智能体，返回训练曲线和任务指标
+    Train a DQN agent in the given environment, returning the training curves
+    and task metrics
 
-    参数：
-        env: 训练环境（可能是被包装过的）
-        label: 场景名称（用于打印和绘图）
-        num_episodes: 训练回合数
-        batch_size: 批次大小
-    返回：
-        reward_history: 每回合的奖励列表（修改后的奖励）
-        task_score_history: 每回合的真实任务得分（原始奖励之和）
-        loss_history: 损失值历史
+    Args:
+        env: the training environment (possibly wrapped)
+        label: scenario name (for printing and plotting)
+        num_episodes: number of training episodes
+        batch_size: batch size
+    Returns:
+        reward_history: list of per-episode rewards (the modified reward)
+        task_score_history: list of per-episode true task scores (sum of the
+            original reward)
+        loss_history: history of loss values
     """
     state_dim = env.observation_space.shape[0]
     action_dim = env.action_space.n
@@ -259,24 +275,24 @@ def train_agent(env, label, num_episodes=300, batch_size=64):
 
     epsilon = EPSILON_START
     reward_history = []
-    task_score_history = []  # 真实任务得分（原始奖励）
+    task_score_history = []  # True task score (original reward)
     loss_history = []
 
     for episode in range(num_episodes):
         state, _ = env.reset()
         episode_reward = 0.0
-        episode_task_score = 0.0  # 只统计原始 CartPole 奖励
+        episode_task_score = 0.0  # Tracks only the original CartPole reward
         episode_loss = 0.0
         steps = 0
 
         while True:
             action = agent.select_action(state, epsilon)
 
-            # 记录修改后的奖励（用于训练）
+            # Record the modified reward (used for training)
             next_state, reward, done, truncated, _ = env.step(action)
 
-            # 同时计算原始任务得分（不包含作弊奖励）
-            # 原始 CartPole 每步奖励为 1.0
+            # Also compute the true task score (excluding the hacked bonus)
+            # The original CartPole reward is 1.0 per step
             original_reward = 1.0
 
             agent.buffer.push(state, action, reward, next_state, float(done))
@@ -303,9 +319,9 @@ def train_agent(env, label, num_episodes=300, batch_size=64):
             avg_reward = np.mean(reward_history[-50:])
             avg_task = np.mean(task_score_history[-50:])
             print(
-                f"  [{label}] 回合 {episode + 1:4d}/{num_episodes} | "
-                f"奖励(修改后): {avg_reward:7.1f} | "
-                f"任务得分(原始): {avg_task:5.1f}"
+                f"  [{label}] Episode {episode + 1:4d}/{num_episodes} | "
+                f"Reward (modified): {avg_reward:7.1f} | "
+                f"Task score (original): {avg_task:5.1f}"
             )
 
     env.close()
@@ -313,73 +329,75 @@ def train_agent(env, label, num_episodes=300, batch_size=64):
 
 
 # ==========================================
-# 第四部分：诊断函数 —— 检测奖励作弊
+# Part 4: Diagnostic function -- detect reward hacking
 # ==========================================
 def diagnose_reward_hacking(reward_history, task_score_history, label):
     """
-    奖励作弊诊断工具
+    Reward hacking diagnostic tool
 
-    核心思路：
-        - 奖励作弊的标志是"奖励上升，但任务表现下降"
-        - 我们通过计算奖励曲线与任务得分曲线的相关性来判断
-        - 如果两者正相关且都上升 → 正常
-        - 如果奖励上升但任务得分下降 → 作弊！
+    Core idea:
+        - The signature of reward hacking is "reward rising, but task
+          performance declining"
+        - We judge this by looking at the correlation between the reward
+          curve and the task score curve
+        - If both are positively correlated and rising -> normal
+        - If reward rises but task score falls -> hacking!
 
-    参数：
-        reward_history: 修改后的奖励曲线
-        task_score_history: 真实任务得分曲线
-        label: 场景名称
-    返回：
-        is_hacked: 是否检测到作弊（True/False）
+    Args:
+        reward_history: the modified reward curve
+        task_score_history: the true task score curve
+        label: scenario name
+    Returns:
+        is_hacked: whether hacking was detected (True/False)
     """
     print(f"\n{'=' * 60}")
-    print(f"  奖励作弊诊断报告 —— {label}")
+    print(f"  Reward hacking diagnostic report -- {label}")
     print(f"{'=' * 60}")
 
-    # 检查前 1/4 与后 1/4 的趋势对比
+    # Compare the trend between the first quarter and the last quarter
     n = len(reward_history)
     quarter = max(n // 4, 1)
 
-    # 前段和后段的平均奖励
+    # Average reward in the early and late segments
     early_reward = np.mean(reward_history[:quarter])
     late_reward = np.mean(reward_history[-quarter:])
     reward_trend = late_reward - early_reward
 
-    # 前段和后段的平均任务得分
+    # Average task score in the early and late segments
     early_task = np.mean(task_score_history[:quarter])
     late_task = np.mean(task_score_history[-quarter:])
     task_trend = late_task - early_task
 
-    print(f"  前段平均奖励（修改后）: {early_reward:.1f}")
-    print(f"  后段平均奖励（修改后）: {late_reward:.1f}")
-    print(f"  奖励变化趋势: {'↑' if reward_trend > 0 else '↓'} {abs(reward_trend):.1f}")
+    print(f"  Average reward, early phase (modified): {early_reward:.1f}")
+    print(f"  Average reward, late phase (modified): {late_reward:.1f}")
+    print(f"  Reward trend: {'↑' if reward_trend > 0 else '↓'} {abs(reward_trend):.1f}")
     print(f"  ─────────────────────────────")
-    print(f"  前段平均任务得分（原始）: {early_task:.1f}")
-    print(f"  后段平均任务得分（原始）: {late_task:.1f}")
-    print(f"  任务得分变化趋势: {'↑' if task_trend > 0 else '↓'} {abs(task_trend):.1f}")
+    print(f"  Average task score, early phase (original): {early_task:.1f}")
+    print(f"  Average task score, late phase (original): {late_task:.1f}")
+    print(f"  Task score trend: {'↑' if task_trend > 0 else '↓'} {abs(task_trend):.1f}")
 
-    # 诊断：奖励上升但任务表现下降 = 作弊
+    # Diagnosis: reward rising but task performance falling = hacking
     is_hacked = (reward_trend > 0) and (task_trend < 0)
 
-    # 计算奖励与任务得分的相关系数
+    # Compute the correlation coefficient between reward and task score
     if n > 10:
         correlation = np.corrcoef(reward_history, task_score_history)[0, 1]
-        print(f"  奖励与任务得分的相关系数: {correlation:.3f}")
+        print(f"  Correlation between reward and task score: {correlation:.3f}")
     else:
         correlation = 1.0
 
     print(f"  ─────────────────────────────")
     if is_hacked:
-        print(f"  ⚠️  检测到奖励作弊！")
-        print(f"  奖励在上升，但真实任务表现反而在下降。")
-        print(f"  智能体可能学会了利用奖励函数的漏洞。")
-        print(f"  建议：重新审视奖励函数设计。")
+        print(f"  ⚠️  Reward hacking detected!")
+        print(f"  The reward is rising, but true task performance is actually declining.")
+        print(f"  The agent may have learned to exploit a flaw in the reward function.")
+        print(f"  Recommendation: revisit the reward function design.")
     elif correlation < 0.3:
-        print(f"  ⚠️  奖励与任务得分相关性很低（{correlation:.3f}）")
-        print(f"  奖励函数可能没有正确反映任务目标。")
-        print(f"  建议：检查奖励函数是否与真实目标对齐。")
+        print(f"  ⚠️  Correlation between reward and task score is very low ({correlation:.3f})")
+        print(f"  The reward function may not correctly reflect the task objective.")
+        print(f"  Recommendation: check whether the reward function is aligned with the true goal.")
     else:
-        print(f"  ✓  奖励与任务表现一致，未检测到作弊。")
+        print(f"  ✓  Reward and task performance are consistent, no hacking detected.")
 
     print(f"{'=' * 60}")
 
@@ -387,70 +405,70 @@ def diagnose_reward_hacking(reward_history, task_score_history, label):
 
 
 # ==========================================
-# 第五部分：主实验流程
+# Part 5: Main experiment flow
 # ==========================================
 def run_all_experiments():
     """
-    运行所有三个场景的对比实验
+    Run the comparison experiment across all three scenarios
 
-    场景1：被动存活作弊（HackedRewardWrapper）
-    场景2：奖励塑形出错（BadShapingWrapper）
-    场景3：正确设计（原始 CartPole 奖励）
+    Scenario 1: Passive survival hacking (HackedRewardWrapper)
+    Scenario 2: Bad reward shaping (BadShapingWrapper)
+    Scenario 3: Correct design (original CartPole reward)
     """
 
-    NUM_EPISODES = 300  # 每个场景训练 300 回合
+    NUM_EPISODES = 300  # Train each scenario for 300 episodes
 
     print("=" * 60)
-    print("  附录A：奖励作弊（Reward Hacking）实验")
+    print("  Appendix A: Reward Hacking experiments")
     print("=" * 60)
-    print(f"  每个场景训练 {NUM_EPISODES} 回合")
-    print(f"  通过对比'修改后奖励'和'真实任务得分'来诊断作弊")
+    print(f"  Each scenario trains for {NUM_EPISODES} episodes")
+    print(f"  Hacking is diagnosed by comparing the 'modified reward' against the 'true task score'")
     print("=" * 60)
 
-    # ── 场景1：被动存活作弊 ──
+    # -- Scenario 1: passive survival hacking --
     print("\n" + "─" * 60)
-    print("  场景1：被动存活奖励作弊")
-    print("  问题：不管做什么，只要活着就给额外奖励")
-    print("  预期：智能体学会拖延，而非真正保持平衡")
+    print("  Scenario 1: Passive-survival reward hacking")
+    print("  Problem: an extra reward is given for merely staying alive, no matter what")
+    print("  Expected: the agent learns to stall rather than genuinely stay balanced")
     print("─" * 60)
 
     hacked_env = HackedRewardWrapper(
         gym.make("CartPole-v1"),
-        survival_bonus=2.0,  # 额外的存活奖励
+        survival_bonus=2.0,  # Extra survival bonus
     )
     hacked_rewards, hacked_task_scores, hacked_losses = train_agent(
-        hacked_env, "作弊奖励", num_episodes=NUM_EPISODES
+        hacked_env, "Hacked reward", num_episodes=NUM_EPISODES
     )
-    diagnose_reward_hacking(hacked_rewards, hacked_task_scores, "场景1-被动存活作弊")
+    diagnose_reward_hacking(hacked_rewards, hacked_task_scores, "Scenario 1 - Passive survival hacking")
 
-    # ── 场景2：奖励塑形出错 ──
+    # -- Scenario 2: bad reward shaping --
     print("\n" + "─" * 60)
-    print("  场景2：奖励塑形出错")
-    print("  问题：过度奖励'靠近中心'，导致忽略'保持平衡'")
-    print("  预期：小车确实在中心，但杆子可能倒下")
+    print("  Scenario 2: Bad reward shaping")
+    print("  Problem: over-rewarding 'being near center' causes 'staying balanced' to be neglected")
+    print("  Expected: the cart really does end up near center, but the pole may fall")
     print("─" * 60)
 
     bad_shaping_env = BadShapingWrapper(
         gym.make("CartPole-v1"),
-        position_reward_weight=5.0,  # 位置奖励权重过大
+        position_reward_weight=5.0,  # Position reward weight too large
     )
     shaping_rewards, shaping_task_scores, shaping_losses = train_agent(
-        bad_shaping_env, "塑形出错", num_episodes=NUM_EPISODES
+        bad_shaping_env, "Bad shaping", num_episodes=NUM_EPISODES
     )
-    diagnose_reward_hacking(shaping_rewards, shaping_task_scores, "场景2-塑形出错")
+    diagnose_reward_hacking(shaping_rewards, shaping_task_scores, "Scenario 2 - Bad shaping")
 
-    # ── 场景3：正确的奖励设计 ──
+    # -- Scenario 3: correct reward design --
     print("\n" + "─" * 60)
-    print("  场景3：正确的奖励设计（基准线）")
-    print("  使用原始 CartPole 奖励：每步 +1，直到杆子倒下")
-    print("  这是简洁、有效的奖励设计典范")
+    print("  Scenario 3: Correct reward design (baseline)")
+    print("  Uses the original CartPole reward: +1 per step until the pole falls")
+    print("  This is a model example of a simple, effective reward design")
     print("─" * 60)
 
     correct_env = gym.make("CartPole-v1")
     correct_rewards, correct_task_scores, correct_losses = train_agent(
-        correct_env, "正确奖励", num_episodes=NUM_EPISODES
+        correct_env, "Correct reward", num_episodes=NUM_EPISODES
     )
-    diagnose_reward_hacking(correct_rewards, correct_task_scores, "场景3-正确设计")
+    diagnose_reward_hacking(correct_rewards, correct_task_scores, "Scenario 3 - Correct design")
 
     return (hacked_rewards, hacked_task_scores,
             shaping_rewards, shaping_task_scores,
@@ -458,34 +476,35 @@ def run_all_experiments():
 
 
 # ==========================================
-# 第六部分：可视化对比
+# Part 6: Visual comparison
 # ==========================================
 def plot_comparison(hacked_rewards, hacked_task_scores,
                     shaping_rewards, shaping_task_scores,
                     correct_rewards, correct_task_scores):
     """
-    绘制三个场景的对比图
+    Plot the comparison across the three scenarios
 
-    上排：修改后的奖励曲线（看起来都不错）
-    下排：真实任务得分曲线（作弊的场景暴露问题）
+    Top row: the modified reward curves (they all look fine)
+    Bottom row: the true task score curves (the hacking scenarios expose the problem)
 
-    这种"上下对照"的方式是诊断奖励作弊的标准方法。
+    This "top vs. bottom" comparison is the standard method for diagnosing
+    reward hacking.
     """
 
     fig, axes = plt.subplots(2, 3, figsize=(18, 10))
-    fig.suptitle("奖励作弊诊断：修改后奖励 vs 真实任务得分",
+    fig.suptitle("Reward hacking diagnosis: modified reward vs. true task score",
                  fontsize=16, fontweight='bold')
 
     scenarios = [
-        ("场景1：被动存活作弊", hacked_rewards, hacked_task_scores, "#e74c3c"),
-        ("场景2：奖励塑形出错", shaping_rewards, shaping_task_scores, "#e67e22"),
-        ("场景3：正确奖励设计", correct_rewards, correct_task_scores, "#27ae60"),
+        ("Scenario 1: Passive survival hacking", hacked_rewards, hacked_task_scores, "#e74c3c"),
+        ("Scenario 2: Bad reward shaping", shaping_rewards, shaping_task_scores, "#e67e22"),
+        ("Scenario 3: Correct reward design", correct_rewards, correct_task_scores, "#27ae60"),
     ]
 
-    window = 20  # 滑动平均窗口
+    window = 20  # Moving average window
 
     for col, (title, rewards, task_scores, color) in enumerate(scenarios):
-        # ── 上排：修改后的奖励曲线 ──
+        # -- Top row: the modified reward curve --
         ax_top = axes[0, col]
         ax_top.plot(rewards, alpha=0.2, color=color)
         if len(rewards) >= window:
@@ -493,14 +512,14 @@ def plot_comparison(hacked_rewards, hacked_task_scores,
                 np.mean(rewards[max(0, i - window): i + 1])
                 for i in range(len(rewards))
             ]
-            ax_top.plot(moving_avg, color=color, linewidth=2, label='滑动平均')
-        ax_top.set_title(f"{title}\n修改后奖励", fontsize=12)
-        ax_top.set_xlabel('训练回合')
-        ax_top.set_ylabel('奖励（修改后）')
+            ax_top.plot(moving_avg, color=color, linewidth=2, label='Moving average')
+        ax_top.set_title(f"{title}\nModified reward", fontsize=12)
+        ax_top.set_xlabel('Training episode')
+        ax_top.set_ylabel('Reward (modified)')
         ax_top.grid(True, alpha=0.3)
         ax_top.legend(fontsize=9)
 
-        # ── 下排：真实任务得分曲线 ──
+        # -- Bottom row: the true task score curve --
         ax_bot = axes[1, col]
         ax_bot.plot(task_scores, alpha=0.2, color=color)
         if len(task_scores) >= window:
@@ -508,60 +527,63 @@ def plot_comparison(hacked_rewards, hacked_task_scores,
                 np.mean(task_scores[max(0, i - window): i + 1])
                 for i in range(len(task_scores))
             ]
-            ax_bot.plot(moving_avg_task, color=color, linewidth=2, label='滑动平均')
-        ax_bot.set_title(f"{title}\n真实任务得分", fontsize=12)
-        ax_bot.set_xlabel('训练回合')
-        ax_bot.set_ylabel('任务得分（原始）')
+            ax_bot.plot(moving_avg_task, color=color, linewidth=2, label='Moving average')
+        ax_bot.set_title(f"{title}\nTrue task score", fontsize=12)
+        ax_bot.set_xlabel('Training episode')
+        ax_bot.set_ylabel('Task score (original)')
         ax_bot.grid(True, alpha=0.3)
         ax_bot.legend(fontsize=9)
 
     plt.tight_layout()
     plt.savefig("output/reward_hacking_diagnosis.png", dpi=150, bbox_inches='tight')
-    print("\n诊断图已保存为 output/reward_hacking_diagnosis.png")
+    print("\nDiagnostic plot saved to output/reward_hacking_diagnosis.png")
     plt.show()
 
 
 # ==========================================
-# 第七部分：奖励设计原则总结
+# Part 7: Summary of reward design principles
 # ==========================================
 def print_reward_design_principles():
     """
-    打印正确的奖励设计原则
+    Print the principles of correct reward design
 
-    这些原则来自强化学习实践中的经验总结，
-    特别参考了 OpenAI 和 DeepMind 的奖励工程指南。
+    These principles are distilled from practical experience in reinforcement
+    learning, drawing in particular on the reward-engineering guidance from
+    OpenAI and DeepMind.
     """
     print("\n" + "=" * 60)
-    print("  奖励设计最佳实践（避免奖励作弊）")
+    print("  Reward design best practices (avoiding reward hacking)")
     print("=" * 60)
 
     principles = [
-        ("1. 保持奖励简单",
-         "奖励函数应该尽可能简单直接。CartPole 的奖励就是每步 +1，"
-         "没有额外的塑形项，但效果最好。"),
+        ("1. Keep the reward simple",
+         "The reward function should be as simple and direct as possible. CartPole's reward "
+         "is just +1 per step, with no extra shaping term, yet it works best."),
 
-        ("2. 确保奖励与目标对齐",
-         "奖励必须准确反映你真正想要的行为。如果一个'坏'行为能获得高奖励，"
-         "智能体一定会找到并利用它。"),
+        ("2. Make sure the reward is aligned with the goal",
+         "The reward must accurately reflect the behavior you actually want. If a 'bad' "
+         "behavior can earn a high reward, the agent will surely find and exploit it."),
 
-        ("3. 避免过度塑形",
-         "奖励塑形（Reward Shaping）是把双刃剑。"
-         "不当的塑形不仅不能帮助学习，反而会引入新的局部最优。"
-         "如果必须塑形，使用势函数塑形（Potential-Based Shaping），"
-         "它不会改变最优策略。"),
+        ("3. Avoid over-shaping",
+         "Reward shaping is a double-edged sword. "
+         "Poorly designed shaping not only fails to help learning, it can introduce new local optima. "
+         "If shaping is necessary, use potential-based shaping, "
+         "which does not change the optimal policy."),
 
-        ("4. 监控多个指标",
-         "永远不要只看一个指标。同时监控：奖励、任务得分、行为分布。"
-         "如果奖励上升但任务表现下降，说明发生了作弊。"),
+        ("4. Monitor multiple metrics",
+         "Never look at just one metric. Monitor reward, task score, and behavior "
+         "distribution together. "
+         "If reward rises while task performance falls, that indicates hacking."),
 
-        ("5. 先跑基线，再加复杂度",
-         "先用最简单的奖励函数跑一个基线，确认能学到东西。"
-         "然后逐步添加塑形项，每一步都验证是否真正帮助了学习。"),
+        ("5. Run a baseline first, then add complexity",
+         "Start with the simplest possible reward function to establish a baseline and confirm "
+         "that learning is happening at all. "
+         "Then gradually add shaping terms, verifying at each step that it genuinely helps learning."),
 
-        ("6. 做对抗测试",
-         "训练完成后，用不同的初始状态测试智能体。"
-         "如果智能体在某些状态下表现异常差，"
-         "可能说明它学到了某种'投机取巧'的策略。"),
+        ("6. Run adversarial tests",
+         "After training, test the agent from different initial states. "
+         "If the agent performs unusually poorly in certain states, "
+         "it may indicate it has learned some kind of 'cheating' strategy."),
     ]
 
     for title, description in principles:
@@ -569,16 +591,16 @@ def print_reward_design_principles():
         print(f"    {description}")
 
     print("\n" + "=" * 60)
-    print("  诊断清单：如何快速发现奖励作弊")
+    print("  Diagnostic checklist: how to quickly spot reward hacking")
     print("=" * 60)
 
     checklist = [
-        "□ 奖励曲线是否持续上升？",
-        "□ 任务表现（真实得分）是否也在同步上升？",
-        "□ 奖励和任务表现的相关系数是否大于 0.5？",
-        "□ 智能体的行为是否符合预期（而非找到奇怪策略）？",
-        "□ 在不同初始条件下，智能体是否依然表现良好？",
-        "□ 奖励函数中是否存在可以被利用的'漏洞'？",
+        "[ ] Is the reward curve continuously rising?",
+        "[ ] Is task performance (true score) also rising in sync?",
+        "[ ] Is the correlation coefficient between reward and task performance greater than 0.5?",
+        "[ ] Does the agent's behavior match expectations (rather than finding a strange strategy)?",
+        "[ ] Does the agent still perform well under different initial conditions?",
+        "[ ] Does the reward function contain any exploitable 'loophole'?",
     ]
 
     for item in checklist:
@@ -588,23 +610,23 @@ def print_reward_design_principles():
 
 
 # ==========================================
-# 程序入口
+# Program entry point
 # ==========================================
 if __name__ == "__main__":
-    # 运行全部实验
+    # Run all experiments
     results = run_all_experiments()
 
-    # 解包结果
+    # Unpack the results
     (hacked_rewards, hacked_task_scores,
      shaping_rewards, shaping_task_scores,
      correct_rewards, correct_task_scores) = results
 
-    # 绘制对比图
+    # Plot the comparison
     plot_comparison(
         hacked_rewards, hacked_task_scores,
         shaping_rewards, shaping_task_scores,
         correct_rewards, correct_task_scores,
     )
 
-    # 打印奖励设计原则
+    # Print the reward design principles
     print_reward_design_principles()

@@ -1,20 +1,23 @@
 """
-第8章：RLHF PPO 对齐训练
-==========================
+Chapter 8: RLHF PPO Alignment Training
+=========================================
 
-本脚本演示 RLHF 三阶段流水线的第三阶段 —— PPO 对齐训练。
-内容包括：
-  1. 加载 SFT 模型作为策略模型（Actor）
-  2. 使用奖励模型对生成回复进行评分
-  3. PPO 训练循环：生成 → 评分 → 计算优势 → 裁剪更新
-  4. 跟踪奖励、KL 散度、回复长度等指标
-  5. 对比对齐前后的回复质量
+This script demonstrates the third stage of the three-stage RLHF pipeline —
+PPO alignment training.
+Contents:
+  1. Load the SFT model as the policy model (Actor)
+  2. Use the reward model to score generated responses
+  3. PPO training loop: generate → score → compute advantage → clipped update
+  4. Track reward, KL divergence, response length, and other metrics
+  5. Compare response quality before and after alignment
 
-注意：这是一个简化/模拟版本。完整的 RLHF-PPO 训练通常需要：
-  - 大规模集群（数十到数百 GPU）
-  - 数十万条偏好数据
-  - 复杂的分布式训练框架
-  本脚本旨在帮助理解 PPO 在 RLHF 中的核心算法流程。
+Note: this is a simplified/simulated version. A full RLHF-PPO training run
+typically requires:
+  - A large-scale cluster (tens to hundreds of GPUs)
+  - Hundreds of thousands of preference examples
+  - A sophisticated distributed training framework
+  This script is meant to help you understand the core PPO algorithm flow
+  within RLHF.
 """
 
 import os
@@ -28,20 +31,20 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-# 创建输出目录
+# Create the output directory
 os.makedirs("output", exist_ok=True)
 
-# 设置中文字体
+# Configure a CJK-capable font
 plt.rcParams["font.sans-serif"] = ["SimHei", "Arial Unicode MS", "DejaVu Sans"]
 plt.rcParams["axes.unicode_minus"] = False
 
 # ==========================================
-# 1. 辅助函数
+# 1. Helper functions
 # ==========================================
 
 def generate_response(model, tokenizer, prompt, max_new_tokens=80, temperature=0.7):
     """
-    使用模型生成回复。
+    Generate a response using the model.
     """
     messages = [{"role": "user", "content": prompt}]
     text = tokenizer.apply_chat_template(
@@ -68,86 +71,87 @@ def generate_response(model, tokenizer, prompt, max_new_tokens=80, temperature=0
 
 def compute_log_probs(model, input_ids, attention_mask):
     """
-    计算模型在给定序列上的对数概率。
-    用于 PPO 中的重要性采样比率计算。
+    Compute the model's log-probabilities over a given sequence.
+    Used to compute the importance-sampling ratio in PPO.
     """
     outputs = model(input_ids=input_ids, attention_mask=attention_mask)
     logits = outputs.logits
 
-    # 取每个位置预测下一个 token 的对数概率
-    # logits[:, :-1, :] 对应位置 t 的预测，target 是 input_ids[:, 1:]
+    # Take the log-probability of predicting the next token at each position
+    # logits[:, :-1, :] corresponds to the prediction at position t; the target is input_ids[:, 1:]
     shift_logits = logits[:, :-1, :]
     shift_labels = input_ids[:, 1:]
 
-    # 计算对数 softmax
+    # Compute log-softmax
     log_probs = F.log_softmax(shift_logits, dim=-1)
 
-    # 提取实际 token 的对数概率
+    # Extract the log-probability of the actual token
     token_log_probs = log_probs.gather(
         2, shift_labels.unsqueeze(-1)
     ).squeeze(-1)
 
-    # 用 attention mask 排除 padding 部分（对齐到 shift 后的位置）
+    # Use the attention mask to exclude padding (aligned to the shifted positions)
     shift_mask = attention_mask[:, 1:]
     token_log_probs = token_log_probs * shift_mask
 
-    # 返回序列的平均对数概率
+    # Return the sequence's average log-probability
     return token_log_probs.sum(dim=-1) / shift_mask.sum(dim=-1)
 
 
 # ==========================================
-# 2. 简化奖励模型
+# 2. Simplified reward model
 # ==========================================
 
 class SimpleRewardModel:
     """
-    简化的奖励模型。
+    A simplified reward model.
 
-    在实际 RLHF 中，奖励模型是通过偏好对训练的深度神经网络。
-    这里我们使用基于规则的评分函数来模拟奖励模型的行为，
-    以便在单机上快速演示 PPO 对齐流程。
+    In real RLHF, the reward model is a deep neural network trained on
+    preference pairs. Here we use a rule-based scoring function to simulate
+    the reward model's behavior, so the PPO alignment flow can be
+    demonstrated quickly on a single machine.
 
-    评分规则：
-      - 回复长度适中（50-200字）：加分
-      - 包含有用的结构化信息（编号、代码块等）：加分
-      - 态度友好、有礼貌：加分
-      - 回复过短或拒绝回答：扣分
+    Scoring rules:
+      - Moderate response length (50-200 characters): bonus
+      - Contains useful structured information (numbered lists, code blocks, etc.): bonus
+      - Friendly, polite tone: bonus
+      - Response too short or refuses to answer: penalty
     """
 
     def __init__(self, tokenizer, backbone_model=None):
         self.tokenizer = tokenizer
         self.backbone_model = backbone_model
 
-        # 如果提供了骨干模型，尝试加载训练好的价值头
+        # If a backbone model is provided, try to load a trained value head
         self.value_head = None
         if backbone_model is not None:
             hidden_size = backbone_model.config.hidden_size
             self.value_head = nn.Linear(hidden_size, 1)
 
-            # 尝试加载已训练的价值头参数
+            # Try to load trained value head parameters
             value_head_path = "./output/rm_results/value_head.pt"
             if os.path.exists(value_head_path):
                 self.value_head.load_state_dict(
                     torch.load(value_head_path, map_location="cpu")
                 )
-                print(f"  已加载训练好的价值头参数：{value_head_path}")
+                print(f"  Loaded trained value head parameters: {value_head_path}")
 
     def score(self, prompt, response):
         """
-        对 (prompt, response) 对进行评分。
-        返回一个标量奖励值。
+        Score a (prompt, response) pair.
+        Returns a scalar reward value.
 
-        如果有训练好的神经网络奖励模型，优先使用；
-        否则使用基于规则的评分。
+        If a trained neural reward model is available, it is used first;
+        otherwise a rule-based score is used.
         """
-        # 尝试使用神经网络奖励模型
+        # Try to use the neural reward model
         if self.backbone_model is not None and self.value_head is not None:
             return self._neural_score(prompt, response)
         else:
             return self._rule_based_score(prompt, response)
 
     def _neural_score(self, prompt, response):
-        """使用神经网络奖励模型评分"""
+        """Score using the neural reward model"""
         messages = [
             {"role": "user", "content": prompt},
             {"role": "assistant", "content": response},
@@ -168,34 +172,34 @@ class SimpleRewardModel:
             last_token_hidden = last_hidden[0, seq_len[0]]
             reward = self.value_head(last_token_hidden).item()
 
-        # 将神经网络输出与规则评分结合，提高鲁棒性
+        # Combine the neural network output with the rule-based score for robustness
         rule_score = self._rule_based_score(prompt, response)
         return 0.5 * reward + 0.5 * rule_score
 
     def _rule_based_score(self, prompt, response):
-        """基于规则的评分函数（模拟奖励模型）"""
+        """Rule-based scoring function (simulates a reward model)"""
         score = 0.0
 
-        # ---- 长度评分 ----
+        # ---- Length score ----
         length = len(response)
         if length < 10:
-            score -= 2.0  # 回复太短
+            score -= 2.0  # Response too short
         elif length < 30:
-            score -= 0.5  # 回复偏短
+            score -= 0.5  # Response somewhat short
         elif 50 <= length <= 300:
-            score += 1.5  # 长度适中
+            score += 1.5  # Moderate length
         elif length > 500:
-            score -= 0.5  # 过长可能有冗余
+            score -= 0.5  # Too long, possibly redundant
 
-        # ---- 结构化内容评分 ----
+        # ---- Structured content score ----
         if any(marker in response for marker in ["1.", "2.", "3.", "（1）", "（2）"]):
-            score += 1.0  # 有编号列表，结构化好
+            score += 1.0  # Has a numbered list, well structured
         if "```" in response:
-            score += 1.0  # 包含代码块
+            score += 1.0  # Contains a code block
         if any(marker in response for marker in ["：\n", "：\r\n", "步骤", "方法"]):
-            score += 0.5  # 有结构化说明
+            score += 0.5  # Has structured explanation
 
-        # ---- 态度评分 ----
+        # ---- Tone score ----
         positive_words = ["请", "建议", "可以帮助", "以下", "当然", "好的"]
         negative_words = ["不关我事", "自己搜", "随便", "不想", "懒得"]
         for word in positive_words:
@@ -205,8 +209,8 @@ class SimpleRewardModel:
             if word in response:
                 score -= 1.0
 
-        # ---- 内容相关性评分 ----
-        # 检查回复是否与提问相关（简单关键词匹配）
+        # ---- Relevance score ----
+        # Check whether the response is relevant to the prompt (simple keyword matching)
         prompt_keywords = set(prompt.replace("？", "").replace("？", "").replace("，", "").split())
         response_words = set(response.replace("，", "").replace("。", "").split())
         overlap = len(prompt_keywords & response_words)
@@ -217,26 +221,27 @@ class SimpleRewardModel:
 
 
 # ==========================================
-# 3. PPO 训练器
+# 3. PPO trainer
 # ==========================================
 
 class PPOTrainer:
     """
-    简化的 PPO 训练器。
+    A simplified PPO trainer.
 
-    PPO（Proximal Policy Optimization）在 RLHF 中的核心流程：
-      1. 策略模型（Actor）生成回复
-      2. 奖励模型对回复进行评分
-      3. 计算优势函数（Advantage）
-      4. 使用裁剪目标函数更新策略模型
-      5. 添加 KL 散度惩罚，防止策略偏离参考模型太远
+    The core PPO (Proximal Policy Optimization) flow in RLHF:
+      1. The policy model (Actor) generates a response
+      2. The reward model scores the response
+      3. Compute the advantage function
+      4. Update the policy model using the clipped objective
+      5. Add a KL-divergence penalty to keep the policy close to the reference model
 
-    PPO 裁剪目标：
+    PPO clipped objective:
       L_CLIP = min(r(θ) * A, clip(r(θ), 1-ε, 1+ε) * A)
 
-    其中 r(θ) = π_θ(a|s) / π_ref(a|s) 是新旧策略的概率比。
+    where r(θ) = π_θ(a|s) / π_ref(a|s) is the probability ratio between the
+    new and old policies.
 
-    总损失 = -L_CLIP + β * KL(π_θ || π_ref)
+    Total loss = -L_CLIP + β * KL(π_θ || π_ref)
     """
 
     def __init__(
@@ -253,14 +258,14 @@ class PPOTrainer:
         self.reference_model = reference_model
         self.reward_model = reward_model
         self.tokenizer = tokenizer
-        self.kl_coef = kl_coef        # KL 散度惩罚系数
-        self.clip_range = clip_range  # PPO 裁剪范围
+        self.kl_coef = kl_coef        # KL divergence penalty coefficient
+        self.clip_range = clip_range  # PPO clip range
 
         self.optimizer = torch.optim.AdamW(
             policy_model.parameters(), lr=learning_rate
         )
 
-        # 训练统计
+        # Training statistics
         self.stats = {
             "rewards": [],
             "kl_divergences": [],
@@ -271,13 +276,13 @@ class PPOTrainer:
 
     def compute_kl_divergence(self, input_ids, attention_mask):
         """
-        计算策略模型与参考模型之间的 KL 散度。
+        Compute the KL divergence between the policy model and the reference model.
         KL(π_θ || π_ref) = Σ π_θ * log(π_θ / π_ref)
 
-        这里使用近似计算：对每个 token 位置的 KL 散度求平均。
+        Uses an approximation here: the KL divergence at each token position is averaged.
         """
         with torch.no_grad():
-            # 策略模型的 logits
+            # Policy model logits
             policy_outputs = self.policy_model(
                 input_ids=input_ids, attention_mask=attention_mask
             )
@@ -285,19 +290,19 @@ class PPOTrainer:
             policy_log_probs = F.log_softmax(policy_logits, dim=-1)
             policy_probs = torch.softmax(policy_logits, dim=-1)
 
-            # 参考模型的 logits
+            # Reference model logits
             ref_outputs = self.reference_model(
                 input_ids=input_ids, attention_mask=attention_mask
             )
             ref_logits = ref_outputs.logits[:, :-1, :]
             ref_log_probs = F.log_softmax(ref_logits, dim=-1)
 
-            # 逐 token 计算 KL 散度
+            # Compute KL divergence per token
             kl_per_token = (
                 policy_probs * (policy_log_probs - ref_log_probs)
             ).sum(dim=-1)
 
-            # 排除 padding token
+            # Exclude padding tokens
             shift_mask = attention_mask[:, 1:]
             kl_div = (kl_per_token * shift_mask).sum() / shift_mask.sum()
 
@@ -305,14 +310,14 @@ class PPOTrainer:
 
     def train_step(self, prompts):
         """
-        执行一步 PPO 训练。
+        Run one step of PPO training.
 
-        步骤：
-          1. 用策略模型为每个 prompt 生成回复
-          2. 用奖励模型对回复评分
-          3. 计算优势函数
-          4. 计算 PPO 裁剪损失 + KL 惩罚
-          5. 反向传播更新策略模型
+        Steps:
+          1. Use the policy model to generate a response for each prompt
+          2. Score the responses with the reward model
+          3. Compute the advantage function
+          4. Compute the PPO clipped loss + KL penalty
+          5. Backpropagate and update the policy model
         """
         self.policy_model.train()
 
@@ -324,26 +329,26 @@ class PPOTrainer:
         all_old_log_probs = []
 
         for prompt in prompts:
-            # ---- 步骤1：生成回复 ----
+            # ---- Step 1: generate a response ----
             response, input_len, full_ids = generate_response(
                 self.policy_model, self.tokenizer, prompt,
                 max_new_tokens=60, temperature=0.8,
             )
 
-            # 准备编码
+            # Prepare encoding
             input_ids = full_ids.unsqueeze(0)
             attention_mask = torch.ones_like(input_ids)
 
-            # ---- 步骤2：奖励模型评分 ----
+            # ---- Step 2: score with the reward model ----
             reward = self.reward_model.score(prompt, response)
             batch_rewards.append(reward)
             batch_lengths.append(len(response))
 
-            # ---- 步骤3：计算 KL 散度 ----
+            # ---- Step 3: compute KL divergence ----
             kl_div = self.compute_kl_divergence(input_ids, attention_mask)
             batch_kl.append(kl_div)
 
-            # ---- 步骤4：记录旧策略的对数概率 ----
+            # ---- Step 4: record the old policy's log-probability ----
             with torch.no_grad():
                 old_log_prob = compute_log_probs(
                     self.policy_model, input_ids, attention_mask
@@ -352,54 +357,54 @@ class PPOTrainer:
             all_input_ids.append(input_ids)
             all_attention_masks.append(attention_mask)
 
-        # ---- 步骤5：计算优势函数 ----
-        # 简化版：使用奖励值本身作为优势（不做 GAE 估计）
+        # ---- Step 5: compute the advantage function ----
+        # Simplified version: use the reward value itself as the advantage (no GAE estimation)
         rewards_tensor = torch.tensor(batch_rewards, dtype=torch.float32)
         advantages = rewards_tensor - rewards_tensor.mean()
         advantages = advantages / (advantages.std() + 1e-8)
 
-        # ---- 步骤6：PPO 裁剪更新 ----
+        # ---- Step 6: PPO clipped update ----
         total_policy_loss = 0.0
         for i, (input_ids, att_mask, old_log_p) in enumerate(
             zip(all_input_ids, all_attention_masks, all_old_log_probs)
         ):
-            # 新策略的对数概率
+            # New policy's log-probability
             new_log_prob = compute_log_probs(
                 self.policy_model, input_ids, att_mask
             )
 
-            # 重要性采样比率
+            # Importance-sampling ratio
             ratio = torch.exp(new_log_prob - old_log_p)
 
-            # PPO 裁剪目标
+            # PPO clipped objective
             advantage = advantages[i]
             surr1 = ratio * advantage
             surr2 = torch.clamp(
                 ratio, 1.0 - self.clip_range, 1.0 + self.clip_range
             ) * advantage
 
-            # 取较小值（保守更新）
+            # Take the minimum (conservative update)
             policy_loss = -torch.min(surr1, surr2)
             total_policy_loss += policy_loss
 
-        # 平均策略损失
+        # Average policy loss
         avg_policy_loss = total_policy_loss / len(prompts)
 
-        # KL 惩罚项
+        # KL penalty term
         avg_kl = sum(batch_kl) / len(batch_kl)
         kl_penalty = self.kl_coef * avg_kl
 
-        # 总损失 = 策略损失 + KL 惩罚
+        # Total loss = policy loss + KL penalty
         total_loss = avg_policy_loss + kl_penalty
 
-        # 反向传播
+        # Backward pass
         self.optimizer.zero_grad()
         total_loss.backward()
-        # 梯度裁剪，防止梯度爆炸
+        # Gradient clipping to prevent exploding gradients
         torch.nn.utils.clip_grad_norm_(self.policy_model.parameters(), 1.0)
         self.optimizer.step()
 
-        # 记录统计信息
+        # Record statistics
         self.stats["rewards"].append(sum(batch_rewards) / len(batch_rewards))
         self.stats["kl_divergences"].append(avg_kl)
         self.stats["policy_losses"].append(avg_policy_loss.item())
@@ -417,82 +422,82 @@ class PPOTrainer:
 
 
 # ==========================================
-# 4. 训练指标可视化
+# 4. Training metrics visualization
 # ==========================================
 
 def plot_training_stats(stats, save_path="output/ppo_training_stats.png"):
     """
-    绘制 PPO 训练过程中的各项指标变化。
+    Plot the metrics tracked during PPO training.
     """
     fig, axes = plt.subplots(2, 2, figsize=(12, 10))
 
-    # ---- 平均奖励 ----
+    # ---- Average reward ----
     ax = axes[0, 0]
     ax.plot(stats["rewards"], "g-o", markersize=4)
-    ax.set_title("平均奖励 (Average Reward)")
-    ax.set_xlabel("训练步数")
-    ax.set_ylabel("奖励值")
+    ax.set_title("Average Reward")
+    ax.set_xlabel("Training step")
+    ax.set_ylabel("Reward")
     ax.grid(True, alpha=0.3)
 
-    # ---- KL 散度 ----
+    # ---- KL divergence ----
     ax = axes[0, 1]
     ax.plot(stats["kl_divergences"], "r-o", markersize=4)
-    ax.set_title("KL 散度 (KL Divergence)")
-    ax.set_xlabel("训练步数")
-    ax.set_ylabel("KL 散度")
+    ax.set_title("KL Divergence")
+    ax.set_xlabel("Training step")
+    ax.set_ylabel("KL divergence")
     ax.grid(True, alpha=0.3)
 
-    # ---- 策略损失 ----
+    # ---- Policy loss ----
     ax = axes[1, 0]
     ax.plot(stats["policy_losses"], "b-o", markersize=4)
-    ax.set_title("策略损失 (Policy Loss)")
-    ax.set_xlabel("训练步数")
-    ax.set_ylabel("损失值")
+    ax.set_title("Policy Loss")
+    ax.set_xlabel("Training step")
+    ax.set_ylabel("Loss")
     ax.grid(True, alpha=0.3)
 
-    # ---- 回复长度 ----
+    # ---- Response length ----
     ax = axes[1, 1]
     ax.plot(stats["response_lengths"], "m-o", markersize=4)
-    ax.set_title("平均回复长度 (Response Length)")
-    ax.set_xlabel("训练步数")
-    ax.set_ylabel("字符数")
+    ax.set_title("Average Response Length")
+    ax.set_xlabel("Training step")
+    ax.set_ylabel("Character count")
     ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
     plt.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.close()
-    print(f"  训练指标图已保存至：{save_path}")
+    print(f"  Training metrics plot saved to: {save_path}")
 
 
 # ==========================================
-# 5. 主流程
+# 5. Main flow
 # ==========================================
 
 def main():
     print("=" * 60)
-    print("第8章：RLHF PPO 对齐训练")
+    print("Chapter 8: RLHF PPO Alignment Training")
     print("=" * 60)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"\n  使用设备：{device}")
-    print("  注意：这是简化/模拟版本，用于演示 PPO 对齐的核心算法流程。")
+    print(f"\n  Using device: {device}")
+    print("  Note: this is a simplified/simulated version, meant to demonstrate the core PPO alignment algorithm flow.")
 
     model_name = "Qwen/Qwen2.5-0.5B-Instruct"
 
-    # ---- 5.1 加载 SFT 模型（策略模型） ----
-    print("\n[步骤1] 加载策略模型（SFT 模型）...")
+    # ---- 5.1 Load the SFT model (policy model) ----
+    print("\n[Step 1] Loading the policy model (SFT model)...")
 
     sft_path = "./output/sft_results/sft_model"
     if os.path.exists(sft_path):
-        print(f"  发现已保存的 SFT 模型：{sft_path}")
+        print(f"  Found a saved SFT model: {sft_path}")
         policy_model = AutoModelForCausalLM.from_pretrained(
             sft_path, torch_dtype=torch.float32,
         )
         tokenizer = AutoTokenizer.from_pretrained(sft_path)
-        print("  已加载 SFT 模型作为策略模型。")
+        print("  Loaded the SFT model as the policy model.")
     else:
-        print(f"  未找到 SFT 模型，直接加载基础模型 {model_name}")
-        print("  （建议先运行 sft_pipeline.py 进行 SFT 训练）")
+        print(f"  No SFT model found, loading the base model {model_name} directly")
+        print("  (It is recommended to run sft_pipeline.py first to perform SFT training)")
         policy_model = AutoModelForCausalLM.from_pretrained(
             model_name, torch_dtype=torch.float32,
         )
@@ -501,35 +506,35 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
-    # ---- 5.2 创建参考模型（冻结，不参与训练） ----
-    print("\n[步骤2] 创建参考模型（冻结的 SFT 模型副本）...")
-    # 参考模型是策略模型的初始副本，用于计算 KL 散度
+    # ---- 5.2 Create the reference model (frozen, not trained) ----
+    print("\n[Step 2] Creating the reference model (a frozen copy of the SFT model)...")
+    # The reference model is an initial copy of the policy model, used to compute KL divergence
     reference_model = copy.deepcopy(policy_model)
     reference_model.eval()
     for param in reference_model.parameters():
         param.requires_grad = False
-    print("  参考模型已创建并冻结参数。")
+    print("  Reference model created and its parameters frozen.")
 
-    # ---- 5.3 初始化奖励模型 ----
-    print("\n[步骤3] 初始化奖励模型...")
+    # ---- 5.3 Initialize the reward model ----
+    print("\n[Step 3] Initializing the reward model...")
 
-    # 尝试加载之前训练好的奖励模型骨干
+    # Try to load a previously trained reward model backbone
     rm_backbone = None
     rm_backbone_path = "./output/rm_results"
     if os.path.exists(os.path.join(rm_backbone_path, "value_head.pt")):
-        print(f"  发现训练好的奖励模型参数：{rm_backbone_path}")
+        print(f"  Found trained reward model parameters: {rm_backbone_path}")
         rm_backbone = AutoModelForCausalLM.from_pretrained(
             model_name, torch_dtype=torch.float32,
         )
     else:
-        print("  未找到训练好的奖励模型，将使用基于规则的评分函数。")
-        print("  （建议先运行 reward_model_training.py 训练奖励模型）")
+        print("  No trained reward model found; falling back to the rule-based scoring function.")
+        print("  (It is recommended to run reward_model_training.py first to train the reward model)")
 
     reward_model = SimpleRewardModel(tokenizer, backbone_model=rm_backbone)
-    print("  奖励模型初始化完成。")
+    print("  Reward model initialized.")
 
-    # ---- 5.4 对齐前测试 ----
-    print("\n[步骤4] PPO 对齐前的模型输出测试...")
+    # ---- 5.4 Test before alignment ----
+    print("\n[Step 4] Testing model output before PPO alignment...")
     test_prompts = [
         "用 Python 写一个求列表最大值的函数。",
         "解释什么是机器学习。",
@@ -537,7 +542,7 @@ def main():
         "如何提高英语水平？",
     ]
 
-    print("  --- PPO 对齐前的输出 ---")
+    print("  --- Output before PPO alignment ---")
     before_responses = []
     before_rewards = []
     for prompt in test_prompts:
@@ -550,16 +555,16 @@ def main():
         before_rewards.append(reward)
         print(f"  Q: {prompt}")
         print(f"  A: {response[:80]}...")
-        print(f"  奖励分数: {reward:.3f}")
+        print(f"  Reward score: {reward:.3f}")
         print()
 
-    # ---- 5.5 配置 PPO 训练 ----
-    print("[步骤5] 配置 PPO 训练...")
-    print("  超参数：")
+    # ---- 5.5 Configure PPO training ----
+    print("[Step 5] Configuring PPO training...")
+    print("  Hyperparameters:")
     print("    - learning_rate = 1e-6")
-    print("    - KL 惩罚系数 (β) = 0.1")
-    print("    - PPO 裁剪范围 (ε) = 0.2")
-    print("    - 训练步数 = 10")
+    print("    - KL penalty coefficient (β) = 0.1")
+    print("    - PPO clip range (ε) = 0.2")
+    print("    - training steps = 10")
 
     ppo_trainer = PPOTrainer(
         policy_model=policy_model,
@@ -571,7 +576,7 @@ def main():
         learning_rate=1e-6,
     )
 
-    # 用于训练的 prompt 池
+    # Prompt pool used for training
     train_prompts_pool = [
         "请解释什么是深度学习。",
         "用 Python 写一个冒泡排序。",
@@ -583,18 +588,18 @@ def main():
         "写一段鼓励正在学习的人的话。",
     ]
 
-    # ---- 5.6 执行 PPO 训练循环 ----
-    print("\n[步骤6] 开始 PPO 对齐训练...")
+    # ---- 5.6 Run the PPO training loop ----
+    print("\n[Step 6] Starting PPO alignment training...")
     print("  " + "-" * 60)
-    print(f"  {'步数':>4} | {'平均奖励':>8} | {'KL散度':>8} | {'策略损失':>8} | {'总损失':>8}")
+    print(f"  {'Step':>4} | {'AvgReward':>8} | {'KL':>8} | {'PolicyLoss':>8} | {'TotalLoss':>8}")
     print("  " + "-" * 60)
 
     num_steps = 10
     for step in range(num_steps):
-        # 每步随机选择一批 prompt
+        # Randomly sample a batch of prompts each step
         step_prompts = random_sample(train_prompts_pool, k=4)
 
-        # 执行一步 PPO 训练
+        # Run one step of PPO training
         step_stats = ppo_trainer.train_step(step_prompts)
 
         print(f"  {step + 1:>4} | "
@@ -605,22 +610,22 @@ def main():
 
     print("  " + "-" * 60)
 
-    # ---- 5.7 打印训练指标汇总 ----
+    # ---- 5.7 Print training metrics summary ----
     stats = ppo_trainer.stats
 
-    print("\n[步骤7] 训练指标汇总：")
-    print(f"  奖励变化：{stats['rewards'][0]:.3f} → {stats['rewards'][-1]:.3f} "
-          f"(变化: {stats['rewards'][-1] - stats['rewards'][0]:+.3f})")
-    print(f"  KL 散度变化：{stats['kl_divergences'][0]:.4f} → {stats['kl_divergences'][-1]:.4f}")
-    print(f"  回复长度变化：{stats['response_lengths'][0]:.1f} → {stats['response_lengths'][-1]:.1f}")
+    print("\n[Step 7] Training metrics summary:")
+    print(f"  Reward change: {stats['rewards'][0]:.3f} → {stats['rewards'][-1]:.3f} "
+          f"(delta: {stats['rewards'][-1] - stats['rewards'][0]:+.3f})")
+    print(f"  KL divergence change: {stats['kl_divergences'][0]:.4f} → {stats['kl_divergences'][-1]:.4f}")
+    print(f"  Response length change: {stats['response_lengths'][0]:.1f} → {stats['response_lengths'][-1]:.1f}")
 
-    # ---- 5.8 可视化训练过程 ----
-    print("\n[步骤8] 可视化训练过程...")
+    # ---- 5.8 Visualize the training process ----
+    print("\n[Step 8] Visualizing the training process...")
     plot_training_stats(stats, save_path="output/ppo_training_stats.png")
 
-    # ---- 5.9 对齐后测试 ----
-    print("\n[步骤9] PPO 对齐后的模型输出测试...")
-    print("  --- PPO 对齐后的输出 ---")
+    # ---- 5.9 Test after alignment ----
+    print("\n[Step 9] Testing model output after PPO alignment...")
+    print("  --- Output after PPO alignment ---")
 
     policy_model.eval()
     after_responses = []
@@ -635,57 +640,57 @@ def main():
         after_rewards.append(reward)
         print(f"  Q: {prompt}")
         print(f"  A: {response[:80]}...")
-        print(f"  奖励分数: {reward:.3f}")
+        print(f"  Reward score: {reward:.3f}")
         print()
 
-    # ---- 5.10 前后对比总结 ----
+    # ---- 5.10 Before/after comparison summary ----
     print("=" * 60)
-    print("PPO 对齐前后对比总结：")
+    print("Before/after PPO alignment comparison summary:")
     print("=" * 60)
 
     for i, prompt in enumerate(test_prompts):
-        print(f"\n  提示：{prompt}")
-        print(f"  对齐前 [{before_rewards[i]:.3f}]：{before_responses[i][:60]}...")
-        print(f"  对齐后 [{after_rewards[i]:.3f}]：{after_responses[i][:60]}...")
-        print(f"  奖励变化：{after_rewards[i] - before_rewards[i]:+.3f}")
+        print(f"\n  Prompt: {prompt}")
+        print(f"  Before [{before_rewards[i]:.3f}]: {before_responses[i][:60]}...")
+        print(f"  After [{after_rewards[i]:.3f}]: {after_responses[i][:60]}...")
+        print(f"  Reward change: {after_rewards[i] - before_rewards[i]:+.3f}")
 
     avg_before = sum(before_rewards) / len(before_rewards)
     avg_after = sum(after_rewards) / len(after_rewards)
-    print(f"\n  平均奖励：对齐前 {avg_before:.3f} → 对齐后 {avg_after:.3f} "
+    print(f"\n  Average reward: before {avg_before:.3f} → after {avg_after:.3f} "
           f"({avg_after - avg_before:+.3f})")
 
-    # ---- 5.11 保存对齐后的模型 ----
-    print("\n[步骤10] 保存 PPO 对齐后的模型...")
+    # ---- 5.11 Save the aligned model ----
+    print("\n[Step 10] Saving the PPO-aligned model...")
     save_dir = "./output/ppo_results"
     os.makedirs(save_dir, exist_ok=True)
     save_path = os.path.join(save_dir, "aligned_model")
     policy_model.save_pretrained(save_path)
     tokenizer.save_pretrained(save_path)
-    print(f"  对齐后的模型已保存至：{save_path}")
+    print(f"  Aligned model saved to: {save_path}")
 
-    # 保存训练统计
+    # Save training statistics
     stats_path = os.path.join(save_dir, "ppo_stats.json")
     with open(stats_path, "w", encoding="utf-8") as f:
         json.dump(stats, f, ensure_ascii=False, indent=2)
-    print(f"  训练统计已保存至：{stats_path}")
+    print(f"  Training statistics saved to: {stats_path}")
 
-    # ---- 总结 ----
+    # ---- Summary ----
     print("\n" + "=" * 60)
-    print("RLHF 三阶段流水线全部完成！")
+    print("All three RLHF pipeline stages complete!")
     print("=" * 60)
-    print("\n  阶段回顾：")
-    print("  [1] SFT（监督微调）    → output/sft_results/sft_model")
-    print("  [2] RM（奖励模型训练）  → output/rm_results/value_head.pt")
-    print("  [3] PPO（对齐训练）     → output/ppo_results/aligned_model")
-    print("\n  核心概念总结：")
-    print("  - SFT：用指令数据让模型学会基本的指令跟随能力")
-    print("  - RM：学习人类偏好，给好回复高分、差回复低分")
-    print("  - PPO：用奖励模型的反馈优化策略，同时用 KL 惩罚保持稳定")
+    print("\n  Stage recap:")
+    print("  [1] SFT (supervised fine-tuning)  → output/sft_results/sft_model")
+    print("  [2] RM (reward model training)    → output/rm_results/value_head.pt")
+    print("  [3] PPO (alignment training)       → output/ppo_results/aligned_model")
+    print("\n  Core concepts recap:")
+    print("  - SFT: use instruction data to teach the model basic instruction-following ability")
+    print("  - RM: learn human preferences, scoring good responses high and bad responses low")
+    print("  - PPO: optimize the policy using feedback from the reward model, while using a KL penalty to stay stable")
     print("=" * 60)
 
 
 def random_sample(lst, k):
-    """从列表中随机采样 k 个元素"""
+    """Randomly sample k elements from a list"""
     import random
     return random.sample(lst, min(k, len(lst)))
 

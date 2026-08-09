@@ -1,5 +1,6 @@
 """
-从 SwanLab backup 文件提取训练数据，生成所有指标的对比曲线图
+Extract training data from SwanLab backup files and generate comparison
+curves for all metrics.
 """
 
 import os
@@ -140,7 +141,7 @@ def select_best_runs(run_records):
 
 
 def smooth(data, window=3):
-    """移动平均平滑"""
+    """Moving-average smoothing"""
     if len(data) < window:
         return data
     return np.convolve(data, np.ones(window) / window, mode="valid")
@@ -175,7 +176,7 @@ def main():
         print(f"Using {run['name']}: {run['run_dir']}")
     runs = [(run["name"], run["metrics"]) for run in selected_runs]
 
-    # ---- 全局样式 ----
+    # ---- Global style ----
     plt.style.use("seaborn-v0_8-whitegrid")
     plt.rcParams.update({
         "font.family": "sans-serif",
@@ -195,9 +196,10 @@ def main():
 
     def get_iters_vals(name, metrics, key):
         """
-        统一 x 轴为 Total Timesteps。
-        SB3 的 step 已经是 timesteps（0, 2048, 4096, ...），直接用。
-        PyTorch PPO 的 step 是迭代号（0, 1, 2, ...），需要 × 2048。
+        Normalize the x-axis to Total Timesteps.
+        SB3's step is already in timesteps (0, 2048, 4096, ...), used as-is.
+        PyTorch PPO's step is an iteration index (0, 1, 2, ...), so it
+        needs to be multiplied by 2048.
         """
         data = metrics.get(key, [])
         if not data:
@@ -210,7 +212,7 @@ def main():
         return timesteps, vals
 
     # ================================================
-    # 1. 奖励曲线（大图）— SB3 vs PyTorch 对比
+    # 1. Reward curve (large chart) - SB3 vs PyTorch comparison
     # ================================================
     fig, ax = plt.subplots(figsize=(12, 5.5))
 
@@ -256,7 +258,7 @@ def main():
     save_chart(fig, output_dir, "training_curves.png")
 
     # ================================================
-    # 2. 回合长度（Episode Length Mean）
+    # 2. Episode length (Episode Length Mean)
     # ================================================
     fig, ax = plt.subplots(figsize=(10, 4.5))
     for name, metrics in runs:
@@ -415,7 +417,7 @@ def main():
     save_chart(fig, output_dir, "learning_rate.png")
 
     # ================================================
-    # 10. 训练指标总览（4 合 1）
+    # 10. Training metrics overview (4-in-1)
     # ================================================
     fig, axes = plt.subplots(2, 2, figsize=(14, 9))
 
@@ -448,7 +450,7 @@ def main():
     save_chart(fig, output_dir, "training_metrics.png")
 
     # ================================================
-    # 11. 全景指标总览（6 合 1）
+    # 11. Full metrics overview (6-in-1)
     # ================================================
     fig, axes = plt.subplots(2, 3, figsize=(16, 9))
 

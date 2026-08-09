@@ -1,4 +1,4 @@
-# 第6章：Actor-Critic 连续控制实验依赖
+# Chapter 6: Dependencies for Actor-Critic continuous control experiments
 gymnasium[classic-control]>=0.29.0
 stable-baselines3>=2.0.0
 torch>=2.0.0

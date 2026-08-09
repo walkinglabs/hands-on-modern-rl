@@ -1,15 +1,15 @@
 """
-第7章：DPO 对齐方法实战 —— 从偏好数据到模型对齐
+Chapter 7: DPO Alignment in Practice -- From Preference Data to Model Alignment
 ==========================================================
 
-本脚本完整演示 DPO (Direct Preference Optimization) 的训练流程：
-  1. 构造详细的偏好数据集（毒性/讽刺 → 礼貌/有用）
-  2. 加载 Qwen2.5-0.5B-Instruct 模型
-  3. 使用 DPOTrainer 训练，β=0.1
-  4. 训练前后对比：用同样的 prompt 测试模型输出
-  5. 对比不同 β 值（0.01 / 0.1 / 1.0）的训练效果
+This script gives a complete walkthrough of the DPO (Direct Preference Optimization) training pipeline:
+  1. Construct a detailed preference dataset (toxic/sarcastic -> polite/helpful)
+  2. Load the Qwen2.5-0.5B-Instruct model
+  3. Train with DPOTrainer, beta=0.1
+  4. Compare before and after training: test the model's output on the same prompts
+  5. Compare training results across different beta values (0.01 / 0.1 / 1.0)
 
-运行方式：
+How to run:
   pip install -r requirements.txt
   python dpo_hands_on.py
 """
@@ -22,10 +22,10 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import DPOTrainer, DPOConfig
 
 # ==========================================
-# 1. 构造偏好数据集
+# 1. Construct the preference dataset
 # ==========================================
-# 每条数据包含：prompt（用户输入）、chosen（礼貌/有用的回复）、rejected（粗鲁/讽刺的回复）
-# 这里构造了 10 条关于毒性/讽刺对齐的示例，比第 2 章更加丰富
+# Each entry contains: prompt (user input), chosen (a polite/helpful reply), rejected (a rude/sarcastic reply)
+# Here we construct 10 examples on toxicity/sarcasm alignment, a richer set than in Chapter 2
 
 preference_data = [
     {
@@ -80,17 +80,17 @@ preference_data = [
     },
 ]
 
-print(f"偏好数据集包含 {len(preference_data)} 条样本")
-print(f"数据主题覆盖：毒性语言对齐、讽刺语气修正、共情能力增强等场景")
+print(f"Preference dataset contains {len(preference_data)} examples")
+print(f"Topics covered: toxic language alignment, sarcasm correction, empathy enhancement, and more")
 print()
 
 
 # ==========================================
-# 2. 定义辅助函数
+# 2. Define helper functions
 # ==========================================
 
 def generate_response(model, tokenizer, prompt, max_new_tokens=100):
-    """使用模型生成回复，返回生成的文本"""
+    """Generate a reply with the model and return the generated text"""
     messages = [{"role": "user", "content": prompt}]
     text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
     inputs = tokenizer([text], return_tensors="pt").to(model.device)
@@ -100,40 +100,40 @@ def generate_response(model, tokenizer, prompt, max_new_tokens=100):
     return response
 
 
-def test_model(model, tokenizer, test_prompts, label="模型"):
-    """对一组测试 prompt 生成回复并打印"""
+def test_model(model, tokenizer, test_prompts, label="Model"):
+    """Generate and print replies for a set of test prompts"""
     print("=" * 60)
-    print(f"【{label}回复展示】")
+    print(f"[{label} Reply Showcase]")
     print("=" * 60)
     for i, prompt in enumerate(test_prompts):
         response = generate_response(model, tokenizer, prompt)
         print(f"Prompt {i+1}: {prompt}")
-        print(f"回复: {response}")
+        print(f"Reply: {response}")
         print("-" * 40)
     print()
 
 
 def train_dpo_with_beta(preference_data, beta, model_name, save_dir, num_epochs=3):
     """
-    使用指定的 β 值进行 DPO 训练
+    Run DPO training with the given beta value
 
-    参数:
-        beta: DPO 的 KL 散度惩罚系数
-              - β 越小 → 模型偏离参考模型越远，对齐力度更强，但可能过度拟合
-              - β 越大 → 模型更保守，偏离参考模型的幅度更小
-        返回: 训练好的模型和分词器，以及训练日志
+    Args:
+        beta: DPO's KL-divergence penalty coefficient
+              - smaller beta -> the model drifts further from the reference model, stronger alignment but possible overfitting
+              - larger beta -> the model stays more conservative, drifting less from the reference model
+        Returns: the trained model and tokenizer, plus the training log
     """
     print(f"\n{'#' * 60}")
-    print(f"  开始 DPO 训练 | β = {beta} | 训练轮次 = {num_epochs}")
+    print(f"  Starting DPO training | beta = {beta} | epochs = {num_epochs}")
     print(f"{'#' * 60}\n")
 
-    # 加载模型和分词器
-    print(f"正在加载模型 {model_name} ...")
+    # Load the model and tokenizer
+    print(f"Loading model {model_name} ...")
     model = AutoModelForCausalLM.from_pretrained(model_name)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     tokenizer.pad_token = tokenizer.eos_token
 
-    # 构造训练数据集
+    # Build the training dataset
     data_dict = {
         "prompt": [item["prompt"] for item in preference_data],
         "chosen": [item["chosen"] for item in preference_data],
@@ -141,7 +141,7 @@ def train_dpo_with_beta(preference_data, beta, model_name, save_dir, num_epochs=
     }
     train_dataset = Dataset.from_dict(data_dict)
 
-    # 配置训练参数
+    # Configure training arguments
     training_args = DPOConfig(
         output_dir=save_dir,
         per_device_train_batch_size=2,
@@ -154,7 +154,7 @@ def train_dpo_with_beta(preference_data, beta, model_name, save_dir, num_epochs=
         beta=beta,
     )
 
-    # 创建 DPOTrainer
+    # Create the DPOTrainer
     trainer = DPOTrainer(
         model=model,
         args=training_args,
@@ -162,15 +162,15 @@ def train_dpo_with_beta(preference_data, beta, model_name, save_dir, num_epochs=
         processing_class=tokenizer,
     )
 
-    # 执行训练
-    print("开始训练...")
+    # Run training
+    print("Starting training...")
     train_result = trainer.train()
 
-    # 打印训练指标
-    print(f"\n训练完成！关键指标：")
-    print(f"  总训练 Loss: {train_result.training_loss:.4f}")
+    # Print training metrics
+    print(f"\nTraining complete! Key metrics:")
+    print(f"  Total training loss: {train_result.training_loss:.4f}")
 
-    # 获取训练日志中的详细指标
+    # Pull the detailed metrics out of the training log
     log_history = trainer.state.log_history
     for log_entry in log_history:
         if "loss" in log_entry:
@@ -183,47 +183,47 @@ def train_dpo_with_beta(preference_data, beta, model_name, save_dir, num_epochs=
                   f"chosen_reward={chosen_reward}, rejected_reward={rejected_reward}, "
                   f"margin={reward_margin}")
 
-    # 保存模型
+    # Save the model
     trainer.save_model(save_dir)
-    print(f"模型已保存至 {save_dir}")
+    print(f"Model saved to {save_dir}")
 
     return model, tokenizer, train_result
 
 
 # ==========================================
-# 3. 测试 prompt 准备
+# 3. Prepare test prompts
 # ==========================================
 
-# 这些 prompt 用于测试训练前后模型的表现
-# 包含训练集中出现过的和全新的 prompt，检验泛化能力
+# These prompts are used to test the model's behavior before and after training
+# They include prompts seen during training and brand-new ones, to check generalization
 test_prompts = [
-    "你就是个人工智障，你怎么这么笨？",           # 训练集中出现过
-    "今天面试又挂了，觉得自己就是个废物。",       # 训练集中出现过
-    "你这翻译也太差了，有好好学过英语吗？",       # 全新 prompt（泛化测试）
-    "我最近压力好大，天天加班到凌晨，快崩溃了。",  # 全新 prompt（泛化测试）
+    "你就是个人工智障，你怎么这么笨？",           # seen during training
+    "今天面试又挂了，觉得自己就是个废物。",       # seen during training
+    "你这翻译也太差了，有好好学过英语吗？",       # brand-new prompt (generalization test)
+    "我最近压力好大，天天加班到凌晨，快崩溃了。",  # brand-new prompt (generalization test)
 ]
 
 
 # ==========================================
-# 4. 加载基础模型，测试训练前的表现
+# 4. Load the base model and test pre-training behavior
 # ==========================================
 
 MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 
-print("正在加载基础模型（训练前）...")
+print("Loading base model (before training)...")
 base_tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 base_model = AutoModelForCausalLM.from_pretrained(MODEL_NAME, device_map="auto")
 base_tokenizer.pad_token = base_tokenizer.eos_token
 
-test_model(base_model, base_tokenizer, test_prompts, label="训练前（基础模型）")
+test_model(base_model, base_tokenizer, test_prompts, label="Before Training (Base Model)")
 
-# 释放基础模型的显存
+# Free up the base model's GPU memory
 del base_model
 torch.cuda.empty_cache() if torch.cuda.is_available() else None
 
 
 # ==========================================
-# 5. 用不同 β 值进行 DPO 训练并对比
+# 5. Run DPO training with different beta values and compare
 # ==========================================
 
 beta_values = [0.01, 0.1, 1.0]
@@ -239,56 +239,56 @@ for beta in beta_values:
         num_epochs=3,
     )
 
-    # 测试训练后的模型
-    print(f"\nβ = {beta} 的训练后测试结果：")
-    test_model(model, tokenizer, test_prompts, label=f"训练后 β={beta}")
+    # Test the trained model
+    print(f"\nPost-training test results for beta = {beta}:")
+    test_model(model, tokenizer, test_prompts, label=f"After Training beta={beta}")
 
-    # 保存结果用于对比
+    # Save the results for comparison
     results[beta] = {
         "train_loss": train_result.training_loss,
         "save_dir": save_dir,
     }
 
-    # 释放当前模型的显存，为下一个 β 值的训练腾出空间
+    # Free up the current model's GPU memory to make room for the next beta value's training
     del model
     torch.cuda.empty_cache() if torch.cuda.is_available() else None
 
 
 # ==========================================
-# 6. 汇总对比不同 β 值的效果
+# 6. Summarize and compare results across beta values
 # ==========================================
 
 print("\n" + "=" * 60)
-print("【不同 β 值的 DPO 训练结果对比】")
+print("[DPO Training Results Compared Across Beta Values]")
 print("=" * 60)
 print()
-print("β 值的作用：控制模型偏离参考模型（Reference Model）的幅度")
-print("  - β 小（如 0.01）：对齐力度更强，但可能过度拟合偏好数据")
-print("  - β 大（如 1.0） ：模型更保守，回复更接近原始模型风格")
-print("  - β 适中（如 0.1）：在对齐效果和保持能力之间取得平衡")
+print("Role of the beta value: controls how far the model drifts from the reference model")
+print("  - Small beta (e.g. 0.01): stronger alignment, but may overfit the preference data")
+print("  - Large beta (e.g. 1.0) : more conservative, replies stay closer to the original model's style")
+print("  - Moderate beta (e.g. 0.1): balances alignment effect against retained capability")
 print()
 
 for beta in beta_values:
-    print(f"  β = {beta}: 最终训练 Loss = {results[beta]['train_loss']:.4f}")
+    print(f"  beta = {beta}: final training loss = {results[beta]['train_loss']:.4f}")
 
 print()
 print("=" * 60)
-print("【实验总结】")
+print("[Experiment Summary]")
 print("=" * 60)
 print("""
-1. DPO 通过偏好数据（chosen vs rejected）直接优化模型，
-   无需显式训练奖励模型，比 RLHF 更简洁高效。
+1. DPO optimizes the model directly from preference data (chosen vs rejected),
+   without explicitly training a reward model, making it simpler and more efficient than RLHF.
 
-2. β 参数是 DPO 的核心超参数：
-   - 它控制策略模型与参考模型之间的 KL 散度惩罚
-   - β 越小，模型越敢于偏离参考模型，对齐力度更强
-   - β 越大，模型越保守，不容易出现"过度对齐"的问题
+2. The beta parameter is DPO's core hyperparameter:
+   - It controls the KL-divergence penalty between the policy model and the reference model
+   - The smaller beta is, the more the model is willing to drift from the reference model, and the stronger the alignment
+   - The larger beta is, the more conservative the model stays, avoiding the problem of "over-alignment"
 
-3. 实际应用中，β 的选择通常在 0.05 ~ 0.5 之间，
-   需要根据具体任务和数据质量来调优。
+3. In practice, beta is usually chosen between 0.05 and 0.5,
+   and should be tuned based on the specific task and data quality.
 
-4. 观察日志中的 rewards/chosen 和 rewards/rejected：
-   - chosen 的奖励应该逐渐升高（模型更偏好好的回答）
-   - rejected 的奖励应该逐渐降低（模型更排斥差的回答）
-   - 两者的差值（margin）反映了模型区分偏好的能力
+4. Watch rewards/chosen and rewards/rejected in the logs:
+   - The chosen reward should gradually increase (the model increasingly prefers good answers)
+   - The rejected reward should gradually decrease (the model increasingly rejects bad answers)
+   - The gap between them (the margin) reflects the model's ability to distinguish preferences
 """)

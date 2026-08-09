@@ -1,4 +1,4 @@
-# 第3章：MDP 与价值函数实验依赖
+# Chapter 3: dependencies for MDP and value function experiments
 gymnasium[classic-control]>=0.29.0
 numpy>=1.24.0
 matplotlib>=3.7.0

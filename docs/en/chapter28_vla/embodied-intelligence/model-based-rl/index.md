@@ -10,7 +10,7 @@ In embodied intelligence, the real world is not a Gym environment that can be `r
 
 This is the starting point of **Model-Based RL (MBRL)**. The agent first learns a model of the environment, then uses that model for planning, for generating imagined trajectories, or for assisting policy updates. Compared with model-free methods, MBRL does not only try to learn "what should I do in this state?" It also tries to learn "if I do this, how will the world change?"
 
-![World Model Roadmap](../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/world-model-roadmap.png)
+![World Model Roadmap](../../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/world-model-roadmap.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
   <em>Figure 1: A roadmap of world models in deep learning. Source: Ding et al., "Understanding World or Predicting Future? A Comprehensive Survey of World Models", Fig. 1[^worldmodelsurvey].</em>
@@ -263,7 +263,7 @@ $$
 
 Read this formula as a procedure. First randomly generate $M$ candidate action sequences. The $j$-th sequence is rolled forward for $H$ steps in the model, producing a sequence of predicted rewards $\hat r_{t+h}^{(j)}$. Sum these rewards, and choose the sequence with the highest total score. Finally, execute only $a_0^*$, observe the new real state, and plan again. This is the minimal version of model predictive control.
 
-The full script is in [minimal_mbrl_point_mass.py](../../../chapter28_vla/embodied-intelligence/model-based-rl/snippets/minimal_mbrl_point_mass.py), and can be run directly:
+The full script is in [minimal_mbrl_point_mass.py](../../../../chapter28_vla/embodied-intelligence/model-based-rl/snippets/minimal_mbrl_point_mass.py), and can be run directly:
 
 ```bash
 python docs/chapter28_vla/embodied-intelligence/model-based-rl/snippets/minimal_mbrl_point_mass.py
@@ -325,7 +325,7 @@ $$
 
 This loss can also be read in two parts. The first term is like a "weighted squared error": if the true target $y_t$ is far from the predicted mean $\mu_{\phi_i}$, the penalty is large; if the model itself predicts a large variance $\Sigma_{\phi_i}$, meaning it admits uncertainty, this error penalty is softened. The second term, $\log|\Sigma_{\phi_i}|$, penalizes making the variance infinitely large. Therefore, the model cannot avoid all mistakes by saying "I am very uncertain." It must balance prediction accuracy with honest uncertainty estimation.
 
-![PETS Probabilistic Ensemble](../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/pets-probabilistic-ensemble.png)
+![PETS Probabilistic Ensemble](../../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/pets-probabilistic-ensemble.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
   <em>Figure 2: PETS uses probabilistic dynamics models, trajectory propagation, and MPC for low-sample control. Source: Chua et al., "Deep Reinforcement Learning in a Handful of Trials using Probabilistic Dynamics Models", Fig. 1[^pets].</em>
@@ -438,7 +438,7 @@ Notice that this planner returns only `mean[0]`, the current action. After execu
 
 MBRL is not a single algorithm. It is a family of paradigms that place a "model" inside the RL loop.
 
-![Dreamer Components](../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/dreamer-components.png)
+![Dreamer Components](../../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/dreamer-components.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
   <em>Figure 3: Dreamer separates learning latent-space dynamics, learning behavior in imagination, and acting in the real environment into three components. Source: Hafner et al., "Dream to Control", Fig. 3[^dreamer].</em>
@@ -465,7 +465,7 @@ for step in range(num_steps):
 
 MBPO can be viewed as a modern Dyna variant: real environment data first enters a replay buffer, the world model learns from that replay buffer, and then short rollouts branch from real states and are added to policy learning[^mbpo]. Its lesson is very simple: **the model can help, but do not let the model imagine for too long.**
 
-![MBPO Model Error Rollout](../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/mbpo-model-error-rollout.png)
+![MBPO Model Error Rollout](../../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/mbpo-model-error-rollout.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
   <em>Figure 4: The MBPO paper shows the same action sequence gradually diverging between the real environment and the model rollout, illustrating how long rollouts amplify model error. Source: Janner et al., "When to Trust Your Model", Fig. 4[^mbpo].</em>
@@ -489,7 +489,7 @@ Intuitively, latent-space MBRL does not require the model to reconstruct every p
 
 ## Three Milestones
 
-![TD-MPC2 Overview](../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/tdmpc2-overview.png)
+![TD-MPC2 Overview](../../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/tdmpc2-overview.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
   <em>Figure 5: TD-MPC2 shows the scaling trend of modern latent-space world models in continuous control. Source: Hansen et al., "TD-MPC2", Fig. 1[^tdmpc2].</em>
@@ -537,7 +537,7 @@ $$
 
 Here, $K$ is the unroll length. For every step $k$, the loss checks three predictions: the reward prediction $r_k$ should be close to the real or training target $u_{t+k}$; the value prediction $v_k$ should be close to the target value $z_{t+k}$; and the policy prior $p_k$ should be close to the policy $\pi_{t+k}$ produced by MCTS. In other words, MuZero's model only needs to be useful for planning. It does not need to faithfully reconstruct the entire world.
 
-![MuZero Learned Model](../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/muzero-learned-model.png)
+![MuZero Learned Model](../../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/muzero-learned-model.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
   <em>Figure 6: MuZero uses a learned model for planning, acting, and training. Source: Schrittwieser et al., "Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model", Fig. 1[^muzero].</em>
@@ -594,7 +594,7 @@ $$
 
 This formula resembles the earlier RL objective, but the data source has changed. The reward in the real environment is $r_t$; the reward in Dreamer's imagined trajectory is $\hat{r}_t$. Real environment transitions come from the physical world; Dreamer's transitions come from the learned latent-space world model $\hat{p}_\phi$. The actor parameters are $\psi$, and the training objective is to increase the average imagined return.
 
-![Dreamer Components](../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/dreamer-components.png)
+![Dreamer Components](../../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/dreamer-components.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
   <em>Figure 7: Dreamer's latent-imagination training structure. Source: Hafner et al., "Dream to Control", Fig. 3[^dreamer].</em>
@@ -613,7 +613,7 @@ This formula resembles the earlier RL objective, but the data source has changed
 
 Embodied intelligence and MBRL naturally fit together, not because "MBRL is more advanced," but because the physical world is too expensive, too slow, and too dangerous.
 
-![Autonomous Driving World Model Review](../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/autonomous-driving-world-model-review.png)
+![Autonomous Driving World Model Review](../../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/autonomous-driving-world-model-review.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
   <em>Figure 8: A survey of autonomous-driving world models places physical-world prediction, behavior planning, training data, and application tasks in one structural diagram. Source: Feng et al., "A Survey of World Models for Autonomous Driving", Fig. 1[^adwmsurvey].</em>
@@ -832,7 +832,7 @@ $$
 
 Read this formula as follows: first, the target encoder $E_{\bar{\theta}}$ encodes the target region $y$ into representation $z_y$; then the context encoder $E_\theta$ sees the visible region $x$, and the predictor $P_\phi$ guesses the target representation $\hat{z}_y$; the loss makes the predicted representation close to the true target representation. $\mathrm{sg}$ means stop-gradient: the target side is treated as the answer, and gradients are not allowed to change the answer itself.
 
-![V-JEPA Architecture](../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/vjepa-architecture.png)
+![V-JEPA Architecture](../../../../chapter28_vla/embodied-intelligence/model-based-rl/images/paper/vjepa-architecture.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
   <em>Figure 9: Video-JEPA's joint-embedding predictive architecture predicts target video-segment embeddings in representation space. Source: Bardes et al., "Revisiting Feature Prediction for Learning Visual Representations from Video", Fig. 2[^vjepa].</em>

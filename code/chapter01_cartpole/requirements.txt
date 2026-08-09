@@ -1,4 +1,4 @@
-# 第1章：CartPole 实验环境依赖
+# Chapter 1: CartPole experiment environment dependencies
 gymnasium[classic-control]>=0.29.0
 stable-baselines3>=2.0.0
 torch>=2.0.0

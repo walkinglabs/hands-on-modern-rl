@@ -1,99 +1,99 @@
-# 16.8 动手：veRL 代码生成 RL 实验
+# 16.8 Hands-On: veRL Code Generation RL Experiment
 
-本目录是《动手学现代强化学习》[16.8 节](../../../docs/chapter18_grpo/verl-code-sandbox.md)的配套代码：**用 veRL 在代码生成任务上跑通 PPO 训练**。
+This directory holds the companion code for _Hands-On Modern Reinforcement Learning_, [Section 16.8](../../../docs/chapter18_grpo/verl-code-sandbox.md): **running PPO training on a code generation task with veRL**.
 
-代码题和数学题一样有一个关键优势：答案不是靠人打分，而是**可以运行测试来验证**。能通过测试就给正奖励，不能就低奖励——这就是"硬反馈"。本节要让模型学会写真正能跑通的程序。
+Code problems share a key advantage with math problems: the answer isn't graded by a human, it **can be verified by running tests**. Passing the tests earns positive reward, failing earns low reward — this is "hard feedback." This section is about getting a model to write programs that actually run.
 
-## 数据：Eurus-2-RL-Data 到底长什么样
+## The data: what Eurus-2-RL-Data actually looks like
 
-这个数据集容易让人困惑（见 [issue #53](https://github.com/walkinglabs/hands-on-modern-rl/issues/53)）。它**不是** HumanEval 那种带 `entry_point` / `tests` 字段的格式，真实结构是：
+This dataset is easy to get confused about (see [issue #53](https://github.com/walkinglabs/hands-on-modern-rl/issues/53)). It is **not** in the HumanEval-style format with `entry_point` / `tests` fields; its real structure is:
 
-| 字段 | 含义 |
-| ---- | ---- |
-| `prompt` | chat 消息列表。`system` 是 PRIME 推理动作模板（`[ASSESS]`/`[ADVANCE]`…），`user` 才是题目 |
-| `ability` | `"math"` 或 `"code"`，本实验只取 `code`（train 25,276 条 / val 1,024 条） |
-| `reward_model` | `{"ground_truth": <答案>, "style": "rule"}`。code 样本的 `ground_truth` 是 JSON 字符串 `{"inputs": [...], "outputs": [...]}`，即 **stdin/stdout 测试对** |
-| `data_source` | 来源：`codecontests` / `taco` / `apps` / `codeforces` |
-| `extra_info` | `{index, split}` |
+| Field          | Meaning                                                                                                                                                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `prompt`       | A chat message list. `system` is PRIME's reasoning action template (`[ASSESS]`/`[ADVANCE]`…); `user` holds the actual problem                                            |
+| `ability`      | `"math"` or `"code"` — this experiment uses only `code` (25,276 train rows / 1,024 val rows)                                                                             |
+| `reward_model` | `{"ground_truth": <answer>, "style": "rule"}`. For code samples, `ground_truth` is a JSON string `{"inputs": [...], "outputs": [...]}`, i.e. **stdin/stdout test pairs** |
+| `data_source`  | Origin: `codecontests` / `taco` / `apps` / `codeforces`                                                                                                                  |
+| `extra_info`   | `{index, split}`                                                                                                                                                         |
 
-也就是说，这些是**"读 stdin、写 stdout"的竞赛编程题**，不是"实现某个函数签名"的题。验证信息藏在 `reward_model.ground_truth` 里，veRL 会在训练时把它传给 reward 函数。
+In other words, these are **competitive-programming problems that read from stdin and write to stdout**, not "implement this function signature" problems. The verification info lives in `reward_model.ground_truth`, and veRL passes it to the reward function at training time.
 
-## 三步把它跑起来
+## Getting it running in three steps
 
-### 1. 准备数据
+### 1. Prepare the data
 
-把数据集过滤出 code 样本、重建 prompt、采样 1000 条，生成 veRL 需要的 parquet：
+Filter the dataset down to code samples, rebuild the prompt, sample 1000 rows, and produce the parquet files veRL needs:
 
 ```bash
 conda activate test
 pip install datasets pandas pyarrow
 python prepare_data.py
-# 输出: ~/data/eurus2/train1000.parquet（1000 条）和 validation.parquet（1024 条）
+# Output: ~/data/eurus2/train1000.parquet (1000 rows) and validation.parquet (1024 rows)
 ```
 
-### 2. 验证 reward 函数（不需要 GPU）
+### 2. Validate the reward function (no GPU needed)
 
-`code_reward.py` 是核心逻辑，可以独立自检：
+`code_reward.py` holds the core logic and can self-check standalone:
 
 ```bash
 python code_reward.py
-# 正确代码 -> score=1.00 pass_rate=1.00 format=1
-# 错误代码 -> score=0.00 pass_rate=0.00 format=1
-# 无代码   -> score=0.00 pass_rate=0.00 format=0
+# correct code -> score=1.00 pass_rate=1.00 format=1
+# wrong code   -> score=0.00 pass_rate=0.00 format=1
+# no code      -> score=0.00 pass_rate=0.00 format=0
 ```
 
-### 3. 开始训练（需要 GPU）
+### 3. Start training (GPU required)
 
 ```bash
 chmod +x run_qwen_coder_ppo_single_gpu.sh
 ./run_qwen_coder_ppo_single_gpu.sh
 ```
 
-在 1 张 GPU 上用 48 条样本跑 8 步 PPO 的实测输出（验证集 acc 从 0 开始随训练上升）：
+Actual output from running 8 PPO steps with 48 samples on 1 GPU (validation acc rises from 0 as training proceeds):
 
 ```
-step:2   critic/score/mean:0.15        # 训练集出现通过测试的代码
+step:2   critic/score/mean:0.15        # code that passes tests starts appearing in the train set
 step:8   val-core/apps/acc/mean@1:0.147
          val-core/codeforces/acc/mean@1:0.153
 ```
 
-## 关键设计讲解
+## Key design decisions explained
 
-### reward：为什么是 I/O 测试，而不是 assert
+### Reward: why I/O tests instead of assert
 
-HumanEval 风格的 reward 会把测试写成 `assert two_sum(...) == ...` 然后 `exec`。但 Eurus-2-RL-Data 的 code 样本没有这种测试，`ground_truth` 是一组 **stdin/stdout 输入输出对**。所以 reward 的做法是：
+HumanEval-style rewards write tests as `assert two_sum(...) == ...` and then `exec` them. But Eurus-2-RL-Data's code samples don't have that kind of test — `ground_truth` is a set of **stdin/stdout input-output pairs**. So the reward works like this:
 
-1. 从模型回答里提取 ```python 代码块
-2. 把代码写进临时 `.py` 文件
-3. 用 `subprocess` 起独立进程，对每个输入喂入 stdin，比对 stdout 和期望输出
-4. 返回通过率作为 reward
+1. Extract the ```python code block from the model's response
+2. Write the code to a temp `.py` file
+3. Spawn an independent process with `subprocess`, feed each input to stdin, and compare stdout against the expected output
+4. Return the pass rate as the reward
 
-用 `subprocess` 而不是 `exec` 有两个好处：**完整进程隔离**（模型写的死循环、文件操作、网络请求都影响不到训练进程）和**能模拟真实运行**（程序真正从 stdin 读、往 stdout 写）。
+Using `subprocess` instead of `exec` has two benefits: **full process isolation** (an infinite loop, file operations, or network requests written by the model can't affect the training process) and **realistic execution** (the program genuinely reads from stdin and writes to stdout).
 
-### prompt：为什么必须是 chat 消息格式
+### Prompt: why it must be in chat message format
 
-veRL 的 RLHFDataset 会把 `prompt` 交给模型的 `apply_chat_template`。**如果 `prompt` 是纯字符串，Qwen 的模板会直接丢弃内容**，只生成 system + assistant 两个特殊 token（实测只有 24 个 token），模型根本看不到题目，reward 恒为 0。
+veRL's RLHFDataset passes `prompt` to the model's `apply_chat_template`. **If `prompt` is a plain string, Qwen's template silently discards the content**, emitting only the system + assistant special tokens (24 tokens total in practice) — the model never sees the problem statement, and reward stays 0.
 
-所以 `prepare_data.py` 把 prompt 重建为 chat 格式：
+So `prepare_data.py` rebuilds the prompt in chat format:
 
 ```
 [{"role": "system", "content": "You are a competitive programming assistant."},
  {"role": "user",   "content": "Read the problem below and write a Python solution...\n\nProblem:\n{problem}"}]
 ```
 
-### verl 接口：compute_score 的签名
+### The verl interface: the compute_score signature
 
-veRL 的 RewardManager 用固定签名调用 reward 函数（见 `verl/workers/reward_manager/naive.py`）：
+veRL's RewardManager calls the reward function with a fixed signature (see `verl/workers/reward_manager/naive.py`):
 
 ```python
 def compute_score(data_source, solution_str, ground_truth, extra_info=None):
-    """返回 {"score": pass_rate, "pass_rate": pass_rate, "format": 是否提取到代码}"""
+    """Returns {"score": pass_rate, "pass_rate": pass_rate, "format": whether code was extracted}"""
 ```
 
-- `ground_truth` 来自数据集 `reward_model["ground_truth"]`（不需要你自己传）
-- 返回 dict 时 veRL 以 `"score"` 作为 PPO 主奖励，其余 key 作为日志
+- `ground_truth` comes from the dataset's `reward_model["ground_truth"]` (you don't pass it yourself)
+- When a dict is returned, veRL uses `"score"` as the main PPO reward; the other keys are logged
 
-训练脚本里必须用 `custom_reward_function` 把它接进 verl，否则 reward 不会生效：
+The training script must wire it into verl via `custom_reward_function`, or reward won't take effect:
 
 ```bash
 REWARD=(
@@ -103,17 +103,17 @@ REWARD=(
 )
 ```
 
-## 文件说明
+## File overview
 
-| 文件 | 作用 |
-| ---- | ---- |
-| `prepare_data.py` | 下载 Eurus-2-RL-Data → 过滤 code 样本 → 重建 chat 格式 prompt → 采样 → parquet |
-| `code_reward.py` | I/O 型 reward：提取代码 → 子进程跑 stdin/stdout 测试 → 返回通过率 |
-| `run_qwen_coder_ppo_single_gpu.sh` | 单卡 0.5B PPO 启动脚本（含 `custom_reward_function` 接线） |
+| File                               | Purpose                                                                                            |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `prepare_data.py`                  | Downloads Eurus-2-RL-Data → filters code samples → rebuilds chat-format prompt → samples → parquet |
+| `code_reward.py`                   | I/O-based reward: extracts code → runs stdin/stdout tests in a subprocess → returns pass rate      |
+| `run_qwen_coder_ppo_single_gpu.sh` | Single-GPU 0.5B PPO launch script (includes `custom_reward_function` wiring)                       |
 
-## 环境提示
+## Environment notes
 
-跑这个实验需要一台有 GPU 的机器，并装好 veRL（含 vLLM rollout 依赖）。两个容易踩的坑：
+Running this experiment requires a machine with a GPU and veRL installed (including the vLLM rollout dependencies). Two easy pitfalls:
 
-- **verl 0.9 需要 `transfer_queue`**：`pip install git+https://github.com/Ascend/TransferQueue.git`，否则启动时 `import transfer_queue` 会直接报错。
-- **多卡机器上要指定 GPU**：通过 `CUDA_VISIBLE_DEVICES`（或 `HIP_VISIBLE_DEVICES`）选一张卡跑，避免和别的任务抢显存。
+- **verl 0.9 requires `transfer_queue`**: `pip install git+https://github.com/Ascend/TransferQueue.git`, otherwise `import transfer_queue` fails immediately at startup.
+- **On multi-GPU machines, specify a GPU explicitly**: use `CUDA_VISIBLE_DEVICES` (or `HIP_VISIBLE_DEVICES`) to pick a single GPU, so you don't compete for memory with other jobs.

@@ -1,26 +1,27 @@
 """
-第9章：用 SAC（Soft Actor-Critic）训练 HalfCheetah-v4
-——理解最大熵强化学习的核心创新
+Chapter 9: Training HalfCheetah-v4 with SAC (Soft Actor-Critic)
+——Understanding the core innovations of maximum entropy reinforcement learning
 
-运行方式：
+Usage:
     python sac_halfcheetah.py
 
-SAC 的核心思想：
-    1. 熵正则化（Entropy Regularization）：在最大化期望回报的同时，最大化策略的熵
-       → 鼓励策略保持随机性，提高探索能力和鲁棒性
-    2. 自动温度调节（Automatic Temperature Tuning）：alpha 参数自动调整
-       → 不需要手动调节探索-利用的平衡
-    3. 双 Q 网络（Twin Critics）：取两个 Q 值中的较小值，缓解过估计
-       → 与 TD3 的思想类似，但结合了最大熵框架
+Core ideas behind SAC:
+    1. Entropy Regularization: maximize the policy's entropy while also maximizing
+       the expected return
+       → encourages the policy to stay stochastic, improving exploration and robustness
+    2. Automatic Temperature Tuning: the alpha parameter is adjusted automatically
+       → no need to manually tune the exploration-exploitation trade-off
+    3. Twin Critics: take the smaller of two Q-values to mitigate overestimation
+       → similar in spirit to TD3, but combined with the maximum entropy framework
 
-SAC 的目标函数：
+SAC's objective function:
     J(π) = Σ_t E_{(s,a)~ρ_π}[r(s,a) + α * H(π(·|s))]
-    其中 H 是策略的熵，α 是温度参数
+    where H is the policy's entropy and α is the temperature parameter
 
-与 PPO、TD3 的对比：
-    - PPO：同策略（on-policy），简单但样本效率低
-    - TD3：异策略（off-policy），确定性策略，双 Q 网络
-    - SAC：异策略（off-policy），随机策略，熵正则化，样本效率最高
+Comparison with PPO and TD3:
+    - PPO: on-policy, simple but sample-inefficient
+    - TD3: off-policy, deterministic policy, twin Q-networks
+    - SAC: off-policy, stochastic policy, entropy regularization, highest sample efficiency
 """
 
 import os
@@ -31,68 +32,68 @@ from stable_baselines3 import SAC
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import BaseCallback
 
-# 创建输出目录
+# Create output directory
 os.makedirs("output", exist_ok=True)
 
-# 设置中文字体
+# Configure CJK font support
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 
 
 # ==========================================
-# 第一部分：自定义训练回调 —— 记录 SAC 关键指标
+# Part 1: Custom training callback —— logs key SAC metrics
 # ==========================================
 class SACTrainingCallback(BaseCallback):
     """
-    自定义回调：在训练过程中记录 SAC 的关键指标
+    Custom callback: logs SAC's key metrics during training
 
-    SAC 的核心监控指标：
-        - episode_reward：回合累计奖励，衡量策略性能
-        - entropy/alpha：熵系数（温度参数），衡量探索强度
-        - critic_loss：Critic 网络损失，衡量价值估计质量
-        - actor_loss：Actor 网络损失，衡量策略优化方向
+    SAC's core monitoring metrics:
+        - episode_reward: cumulative episode reward, measures policy performance
+        - entropy/alpha: entropy coefficient (temperature parameter), measures exploration strength
+        - critic_loss: critic network loss, measures value estimation quality
+        - actor_loss: actor network loss, measures the direction of policy optimization
 
-    与 PPO 回调的区别：
-        - SAC 是 off-policy，数据可以复用，没有 clip_fraction
-        - SAC 有 alpha（温度参数）自动调节机制
-        - SAC 有两个 Critic 网络，关注的是整体 critic_loss
+    Differences from the PPO callback:
+        - SAC is off-policy, so data can be reused; there is no clip_fraction
+        - SAC has an automatic alpha (temperature parameter) tuning mechanism
+        - SAC has two critic networks, so we track the overall critic_loss
     """
 
     def __init__(self, check_freq=1000, verbose=1):
         super().__init__(verbose)
         self.check_freq = check_freq
-        # 记录训练过程中的指标
+        # Metrics recorded during training
         self.episode_rewards = []
-        self.alpha_list = []          # 熵系数（温度参数）
-        self.critic_loss_list = []    # Critic 损失
-        self.actor_loss_list = []     # Actor 损失
-        self.entropy_list = []        # 策略熵
-        self.timesteps_list = []      # 对应的时间步
+        self.alpha_list = []          # Entropy coefficient (temperature parameter)
+        self.critic_loss_list = []    # Critic loss
+        self.actor_loss_list = []     # Actor loss
+        self.entropy_list = []        # Policy entropy
+        self.timesteps_list = []      # Corresponding timesteps
 
     def _on_step(self):
-        # 从信息字典中提取回合奖励（当回合结束时）
+        # Extract episode reward from the info dict (when an episode ends)
         for info in self.locals.get("infos", []):
             if "episode" in info:
                 self.episode_rewards.append(info["episode"]["r"])
 
-        # 每隔 check_freq 步记录一次训练指标
+        # Log training metrics every check_freq steps
         if self.num_timesteps % self.check_freq == 0 and self.num_timesteps > 0:
             logger = self.model.logger
             if hasattr(logger, "name_to_value"):
                 name_to_value = logger.name_to_value
 
-                # alpha：SAC 的温度参数
-                # 自动调节模式下，alpha 会根据目标熵自适应调整
-                # alpha 越大 → 鼓励更多探索
-                # alpha 越小 → 更倾向于利用
+                # alpha: SAC's temperature parameter
+                # In automatic tuning mode, alpha is adaptively adjusted based on the target entropy
+                # Larger alpha → encourages more exploration
+                # Smaller alpha → favors exploitation
                 alpha = name_to_value.get("train/entropy_coef", 0)
-                # critic_loss：两个 Q 网络的总损失
-                # 衡量 Q 值对实际回报的拟合程度
+                # critic_loss: total loss of the two Q-networks
+                # Measures how well the Q-values fit the actual returns
                 critic_loss = name_to_value.get("train/critic_loss", 0)
-                # actor_loss：策略网络的损失
-                # 包含 Q 值项和熵项
+                # actor_loss: loss of the policy network
+                # Includes both the Q-value term and the entropy term
                 actor_loss = name_to_value.get("train/actor_loss", 0)
-                # entropy：当前策略的平均熵
+                # entropy: average entropy of the current policy
                 entropy = name_to_value.get("train/entropy", 0)
 
                 self.alpha_list.append(alpha)
@@ -105,113 +106,114 @@ class SACTrainingCallback(BaseCallback):
 
 
 # ==========================================
-# 第二部分：创建连续动作空间环境
+# Part 2: Create the continuous action-space environment
 # ==========================================
 print("=" * 50)
-print("第9章：SAC 训练 HalfCheetah-v4（连续控制）")
+print("Chapter 9: Training HalfCheetah-v4 with SAC (continuous control)")
 print("=" * 50)
 
-print("\n正在创建 HalfCheetah-v4 环境...")
+print("\nCreating the HalfCheetah-v4 environment...")
 
-# HalfCheetah 是 MuJoCo 中的经典连续控制任务
-# 特点：
-#   - 状态空间：17 维（关节角度、速度等）
-#   - 动作空间：6 维连续向量（各关节的力矩）
-#   - 目标：让半猎豹机器人尽可能快地向前跑
-#   - 奖励：前进速度 - 控制代价
+# HalfCheetah is a classic continuous control task from MuJoCo
+# Characteristics:
+#   - State space: 17 dimensions (joint angles, velocities, etc.)
+#   - Action space: 6-dimensional continuous vector (torque at each joint)
+#   - Goal: make the half-cheetah robot run forward as fast as possible
+#   - Reward: forward velocity - control cost
 env = gym.make("HalfCheetah-v4")
 
 state_dim = env.observation_space.shape[0]   # 17
 action_dim = env.action_space.shape[0]       # 6
-action_low = env.action_space.low            # 动作下界
-action_high = env.action_space.high          # 动作上界
+action_low = env.action_space.low            # Lower bound of the action space
+action_high = env.action_space.high          # Upper bound of the action space
 
-print(f"  状态维度:   {state_dim}")
-print(f"  动作维度:   {action_dim}")
-print(f"  动作范围:   [{action_low[0]:.1f}, {action_high[0]:.1f}] × {action_dim}")
-print(f"  动作类型:   连续（Box）")
+print(f"  State dimension:  {state_dim}")
+print(f"  Action dimension: {action_dim}")
+print(f"  Action range:     [{action_low[0]:.1f}, {action_high[0]:.1f}] × {action_dim}")
+print(f"  Action type:      continuous (Box)")
 
 
 # ==========================================
-# 第三部分：配置 SAC 超参数
+# Part 3: Configure SAC hyperparameters
 # ==========================================
-print("\n配置 SAC 超参数...")
+print("\nConfiguring SAC hyperparameters...")
 
-# SAC 的关键超参数解析：
+# Breakdown of SAC's key hyperparameters:
 #
 # learning_rate=3e-4
-#   学习率。SAC 通常使用与 PPO 相同的学习率
-#   因为有熵正则化的保护，对学习率不太敏感
+#   Learning rate. SAC typically uses the same learning rate as PPO;
+#   thanks to the protection of entropy regularization, it is not very
+#   sensitive to the learning rate
 #
 # buffer_size=100000
-#   经验回放缓冲区大小
-#   SAC 是 off-policy 算法，可以复用旧数据
-#   缓冲区越大，数据多样性越好
+#   Size of the replay buffer
+#   SAC is an off-policy algorithm, so it can reuse old data
+#   A larger buffer means greater data diversity
 #
 # batch_size=256
-#   每次更新使用的小批量大小
-#   SAC 通常用较大的 batch_size（256 或 512）
-#   比 PPO 的 64 大得多，因为 off-policy 更稳定
+#   Mini-batch size used for each update
+#   SAC typically uses a larger batch_size (256 or 512)
+#   much bigger than PPO's 64, because off-policy training is more stable
 #
 # tau=0.005
-#   目标网络的软更新系数
+#   Soft-update coefficient for the target networks
 #   θ_target ← τ * θ + (1 - τ) * θ_target
-#   小 tau = 慢更新 = 更稳定，但跟踪延迟
+#   small tau = slow update = more stable, but with tracking lag
 #
 # gamma=0.99
-#   折扣因子，与 PPO 相同
-#   控制对未来回报的重视程度
+#   Discount factor, same as PPO
+#   controls how much weight is placed on future returns
 #
 # ent_coef="auto"
-#   熵系数自动调节（SAC 的核心创新！）
-#   SAC 会自动调整 alpha 值来维持目标熵水平
-#   默认目标熵 = -dim(A) = -6（动作维度的负数）
+#   Automatic entropy coefficient tuning (SAC's core innovation!)
+#   SAC automatically adjusts alpha to maintain the target entropy level
+#   Default target entropy = -dim(A) = -6 (negative of the action dimension)
 
 model = SAC(
-    policy="MlpPolicy",          # 多层感知机策略
-    env=env,                     # 训练环境
-    learning_rate=3e-4,          # 学习率
-    buffer_size=100_000,         # 经验回放缓冲区大小
-    batch_size=256,              # 小批量大小
-    tau=0.005,                   # 目标网络软更新系数
-    gamma=0.99,                  # 折扣因子
-    ent_coef="auto",             # 熵系数：自动调节（SAC 的核心创新）
-    target_update_interval=1,    # 目标网络更新频率（每步更新）
-    train_freq=1,                # 训练频率（每步训练一次）
-    gradient_steps=1,            # 每次训练的梯度步数
+    policy="MlpPolicy",          # Multi-layer perceptron policy
+    env=env,                     # Training environment
+    learning_rate=3e-4,          # Learning rate
+    buffer_size=100_000,         # Replay buffer size
+    batch_size=256,              # Mini-batch size
+    tau=0.005,                   # Target network soft-update coefficient
+    gamma=0.99,                  # Discount factor
+    ent_coef="auto",             # Entropy coefficient: automatic tuning (SAC's core innovation)
+    target_update_interval=1,    # Target network update frequency (updated every step)
+    train_freq=1,                # Training frequency (train once per step)
+    gradient_steps=1,            # Number of gradient steps per training call
     verbose=1,
     seed=42,
     device="auto",
     policy_kwargs=dict(
-        net_arch=[256, 256],     # 网络结构：比 PPO 更宽
+        net_arch=[256, 256],     # Network architecture: wider than PPO's
     ),
 )
 
-print(f"  学习率:         {model.learning_rate}")
-print(f"  缓冲区大小:     {model.buffer_size}")
-print(f"  批量大小:       {model.batch_size}")
-print(f"  软更新系数 tau: {model.tau}")
-print(f"  折扣因子 gamma: {model.gamma}")
-print(f"  熵系数模式:     自动调节（ent_coef='auto'）")
-print(f"  目标熵:         {-action_dim}（= -动作维度）")
+print(f"  Learning rate:        {model.learning_rate}")
+print(f"  Buffer size:          {model.buffer_size}")
+print(f"  Batch size:           {model.batch_size}")
+print(f"  Soft-update tau:      {model.tau}")
+print(f"  Discount gamma:       {model.gamma}")
+print(f"  Entropy coef mode:    automatic tuning (ent_coef='auto')")
+print(f"  Target entropy:       {-action_dim} (= -action dimension)")
 
-# 解释 SAC 策略网络结构
-# SAC 的 Actor 输出高斯分布的参数：均值 μ 和标准差 σ
-# 动作采样：a ~ tanh(N(μ, σ²))
-# 使用 tanh 压缩确保动作在有界范围内
-print(f"\n  网络结构: {model.policy}")
+# Explanation of the SAC policy network architecture
+# SAC's actor outputs the parameters of a Gaussian distribution: mean μ and std σ
+# Action sampling: a ~ tanh(N(μ, σ²))
+# The tanh squashing ensures actions stay within the bounded range
+print(f"\n  Network architecture: {model.policy}")
 
 
 # ==========================================
-# 第四部分：训练模型
+# Part 4: Train the model
 # ==========================================
-print("\n开始训练（100000 时间步）...")
+print("\nStarting training (100000 timesteps)...")
 print("-" * 50)
 
-# 创建训练监控回调
+# Create the training monitoring callback
 callback = SACTrainingCallback(check_freq=1000)
 
-# 训练 100,000 个时间步（演示用，实际训练通常需要 1M+）
+# Train for 100,000 timesteps (for demonstration; real training usually needs 1M+)
 total_timesteps = 100_000
 model.learn(
     total_timesteps=total_timesteps,
@@ -220,116 +222,116 @@ model.learn(
 )
 
 print("-" * 50)
-print("训练完成！")
+print("Training complete!")
 
 
 # ==========================================
-# 第五部分：绘制训练曲线
+# Part 5: Plot the training curves
 # ==========================================
-print("\n正在绘制训练曲线...")
+print("\nPlotting training curves...")
 
 fig, axes = plt.subplots(2, 3, figsize=(18, 10))
-fig.suptitle("SAC 训练 HalfCheetah-v4 — 训练指标监控", fontsize=16, fontweight="bold")
+fig.suptitle("SAC Training on HalfCheetah-v4 — Training Metrics", fontsize=16, fontweight="bold")
 
-# 子图1：回合奖励曲线
+# Subplot 1: episode reward curve
 ax1 = axes[0, 0]
 if callback.episode_rewards:
     rewards = callback.episode_rewards
     window = min(20, len(rewards))
     smoothed = np.convolve(rewards, np.ones(window) / window, mode="valid")
-    ax1.plot(rewards, alpha=0.3, color="#90CAF9", label="原始奖励")
+    ax1.plot(rewards, alpha=0.3, color="#90CAF9", label="Raw reward")
     ax1.plot(range(window - 1, len(rewards)), smoothed,
-             color="#2196F3", linewidth=2, label=f"滑动平均 (窗口={window})")
-ax1.set_title("回合奖励", fontsize=13)
-ax1.set_xlabel("回合")
-ax1.set_ylabel("累计奖励")
+             color="#2196F3", linewidth=2, label=f"Moving average (window={window})")
+ax1.set_title("Episode Reward", fontsize=13)
+ax1.set_xlabel("Episode")
+ax1.set_ylabel("Cumulative Reward")
 ax1.legend()
 ax1.grid(True, alpha=0.3)
 
-# 子图2：熵系数（alpha）—— SAC 的核心创新
+# Subplot 2: entropy coefficient (alpha) —— SAC's core innovation
 ax2 = axes[0, 1]
 if callback.alpha_list:
     ax2.plot(callback.timesteps_list, callback.alpha_list,
              color="#FF9800", alpha=0.8, linewidth=1.5)
-    # 标注：alpha 自动调节的含义
+    # Annotation: what the automatic decline of alpha means
     ax2.annotate(
-        "alpha 自适应下降\n→ 策略越来越确定",
+        "alpha adapts downward\n→ policy becomes more deterministic",
         xy=(callback.timesteps_list[-1] * 0.6,
             max(callback.alpha_list) * 0.7),
         fontsize=9, color="gray", style="italic",
     )
-ax2.set_title("熵系数 alpha（自动调节）", fontsize=13)
-ax2.set_xlabel("时间步")
+ax2.set_title("Entropy Coefficient alpha (auto-tuned)", fontsize=13)
+ax2.set_xlabel("Timestep")
 ax2.set_ylabel("alpha")
 ax2.grid(True, alpha=0.3)
 
-# 子图3：策略熵
+# Subplot 3: policy entropy
 ax3 = axes[0, 2]
 if callback.entropy_list:
     ax3.plot(callback.timesteps_list, callback.entropy_list,
              color="#4CAF50", alpha=0.8, linewidth=1.5)
-ax3.set_title("策略熵（探索程度）", fontsize=13)
-ax3.set_xlabel("时间步")
-ax3.set_ylabel("熵")
+ax3.set_title("Policy Entropy (exploration level)", fontsize=13)
+ax3.set_xlabel("Timestep")
+ax3.set_ylabel("Entropy")
 ax3.grid(True, alpha=0.3)
 
-# 子图4：Critic 损失
+# Subplot 4: critic loss
 ax4 = axes[1, 0]
 if callback.critic_loss_list:
     ax4.plot(callback.timesteps_list, callback.critic_loss_list,
              color="#F44336", alpha=0.8, linewidth=1.5)
-ax4.set_title("Critic 损失（双 Q 网络）", fontsize=13)
-ax4.set_xlabel("时间步")
-ax4.set_ylabel("损失值")
+ax4.set_title("Critic Loss (twin Q-networks)", fontsize=13)
+ax4.set_xlabel("Timestep")
+ax4.set_ylabel("Loss")
 ax4.grid(True, alpha=0.3)
 
-# 子图5：Actor 损失
+# Subplot 5: actor loss
 ax5 = axes[1, 1]
 if callback.actor_loss_list:
     ax5.plot(callback.timesteps_list, callback.actor_loss_list,
              color="#9C27B0", alpha=0.8, linewidth=1.5)
-ax5.set_title("Actor 损失（策略优化）", fontsize=13)
-ax5.set_xlabel("时间步")
-ax5.set_ylabel("损失值")
+ax5.set_title("Actor Loss (policy optimization)", fontsize=13)
+ax5.set_xlabel("Timestep")
+ax5.set_ylabel("Loss")
 ax5.grid(True, alpha=0.3)
 
-# 子图6：奖励分布直方图
+# Subplot 6: reward distribution histogram
 ax6 = axes[1, 2]
 if callback.episode_rewards:
-    # 将训练分为前半段和后半段，对比奖励分布
+    # Split training into first half and second half, compare reward distributions
     mid = len(callback.episode_rewards) // 2
     first_half = callback.episode_rewards[:mid]
     second_half = callback.episode_rewards[mid:]
-    ax6.hist(first_half, bins=20, alpha=0.5, color="#90CAF9", label="前半段")
-    ax6.hist(second_half, bins=20, alpha=0.5, color="#2196F3", label="后半段")
+    ax6.hist(first_half, bins=20, alpha=0.5, color="#90CAF9", label="First half")
+    ax6.hist(second_half, bins=20, alpha=0.5, color="#2196F3", label="Second half")
     ax6.legend()
-ax6.set_title("奖励分布（前半 vs 后半）", fontsize=13)
-ax6.set_xlabel("回合奖励")
-ax6.set_ylabel("频次")
+ax6.set_title("Reward Distribution (first half vs second half)", fontsize=13)
+ax6.set_xlabel("Episode Reward")
+ax6.set_ylabel("Frequency")
 ax6.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.savefig("output/sac_halfcheetah_curves.png", dpi=150, bbox_inches="tight")
-print("训练曲线已保存至: output/sac_halfcheetah_curves.png")
+print("Training curves saved to: output/sac_halfcheetah_curves.png")
 plt.show()
 
 
 # ==========================================
-# 第六部分：评估训练好的模型
+# Part 6: Evaluate the trained model
 # ==========================================
-print("\n正在评估最终模型（10 个测试回合）...")
+print("\nEvaluating the final model (10 test episodes)...")
 print("-" * 50)
 
-# 创建评估用的独立环境
+# Create a separate environment for evaluation
 eval_env = gym.make("HalfCheetah-v4")
 mean_reward, std_reward = evaluate_policy(
     model, eval_env, n_eval_episodes=10, deterministic=True
 )
-print(f"10 回合测试结果：")
-print(f"  平均奖励: {mean_reward:.2f}")
-print(f"  标准差:   {std_reward:.2f}")
+print(f"10-episode test results:")
+print(f"  Mean reward: {mean_reward:.2f}")
+print(f"  Std dev:     {std_reward:.2f}")
 
-# 逐回合测试，展示详细结果
+# Test episode by episode to show detailed results
 test_rewards = []
 for ep in range(10):
     obs, _ = eval_env.reset()
@@ -341,27 +343,27 @@ for ep in range(10):
         total_reward += reward
     test_rewards.append(total_reward)
 
-print(f"\n逐回合奖励：")
+print(f"\nPer-episode rewards:")
 for i, r in enumerate(test_rewards):
-    print(f"  回合 {i + 1:2d}: {r:8.2f}")
+    print(f"  Episode {i + 1:2d}: {r:8.2f}")
 
-print(f"\n最高奖励: {max(test_rewards):.2f}")
-print(f"最低奖励: {min(test_rewards):.2f}")
-print(f"奖励标准差: {np.std(test_rewards):.2f}")
+print(f"\nMax reward: {max(test_rewards):.2f}")
+print(f"Min reward: {min(test_rewards):.2f}")
+print(f"Reward std dev: {np.std(test_rewards):.2f}")
 eval_env.close()
 
 
 # ==========================================
-# 第七部分：保存模型
+# Part 7: Save the model
 # ==========================================
 model.save("output/sac_halfcheetah")
-print(f"\n模型已保存至: output/sac_halfcheetah.zip")
+print(f"\nModel saved to: output/sac_halfcheetah.zip")
 
 print("\n" + "=" * 50)
-print("SAC 核心要点总结：")
-print("  1. 熵正则化：在目标函数中加入策略熵，鼓励探索")
-print("  2. 自动温度：alpha 参数自适应调节，无需手动调参")
-print("  3. 双 Q 网络：取最小 Q 值，缓解过估计问题")
-print("  4. 重参数化：使用重参数化技巧降低梯度方差")
-print("  5. 随机策略：输出高斯分布，天然支持连续动作空间")
+print("SAC key takeaways:")
+print("  1. Entropy regularization: adds policy entropy to the objective to encourage exploration")
+print("  2. Automatic temperature: the alpha parameter adapts on its own, no manual tuning needed")
+print("  3. Twin Q-networks: take the minimum Q-value to mitigate overestimation")
+print("  4. Reparameterization: uses the reparameterization trick to reduce gradient variance")
+print("  5. Stochastic policy: outputs a Gaussian distribution, naturally suited to continuous action spaces")
 print("=" * 50)

@@ -1,41 +1,41 @@
 """
-第9章：连续控制算法大比拼 —— PPO vs TD3 vs SAC
-——在相同环境下公平对比三种主流连续控制算法
+Chapter 9: Continuous Control Algorithm Showdown —— PPO vs TD3 vs SAC
+——A fair comparison of three mainstream continuous control algorithms under the same environment
 
-运行方式：
+Usage:
     python ppo_td3_sac_comparison.py
 
-三种算法的核心差异：
+Core differences between the three algorithms:
 
-    PPO（Proximal Policy Optimization）—— 简单稳健的"老牌选手"
-        类型：同策略（on-policy）
-        策略：随机策略（高斯分布）
-        核心机制：裁剪目标函数，限制策略更新幅度
-        优点：实现简单、超参数鲁棒、训练稳定
-        缺点：样本效率低（数据只能用一次）
-        适用场景：快速原型验证、对稳定性要求高的场景
+    PPO (Proximal Policy Optimization) —— the simple, robust "veteran"
+        Type: on-policy
+        Policy: stochastic (Gaussian distribution)
+        Core mechanism: clipped objective function, limits how much the policy can change per update
+        Pros: simple to implement, robust to hyperparameters, stable training
+        Cons: low sample efficiency (data can only be used once)
+        Use cases: fast prototyping, scenarios that demand high stability
 
-    TD3（Twin Delayed DDPG）—— 确定性策略的"精益求精"
-        类型：异策略（off-policy）
-        策略：确定性策略（直接输出动作）
-        核心机制：双 Q 网络 + 延迟策略更新 + 目标策略平滑
-        优点：样本效率高、在确定性任务上性能强劲
-        缺点：确定性策略探索不足、超参数敏感
-        适用场景：动作空间高维、奖励稀疏的精细控制
+    TD3 (Twin Delayed DDPG) —— the "perfectionist" of deterministic policies
+        Type: off-policy
+        Policy: deterministic (outputs actions directly)
+        Core mechanism: twin Q-networks + delayed policy updates + target policy smoothing
+        Pros: high sample efficiency, strong performance on deterministic tasks
+        Cons: insufficient exploration from a deterministic policy, sensitive to hyperparameters
+        Use cases: high-dimensional action spaces, fine-grained control with sparse rewards
 
-    SAC（Soft Actor-Critic）—— 最大熵强化学习的"全能选手"
-        类型：异策略（off-policy）
-        策略：随机策略（高斯分布 + 熵正则化）
-        核心机制：熵正则化 + 自动温度调节 + 双 Q 网络
-        优点：样本效率高、探索充分、鲁棒性强
-        缺点：计算开销略大、理论上更复杂
-        适用场景：通用连续控制、需要强探索的场景
+    SAC (Soft Actor-Critic) —— the "all-rounder" of maximum entropy reinforcement learning
+        Type: off-policy
+        Policy: stochastic (Gaussian distribution + entropy regularization)
+        Core mechanism: entropy regularization + automatic temperature tuning + twin Q-networks
+        Pros: high sample efficiency, thorough exploration, strong robustness
+        Cons: slightly higher computational cost, more complex in theory
+        Use cases: general-purpose continuous control, scenarios that need strong exploration
 
-公平对比的关键：
-    - 相同环境（HalfCheetah-v4）
-    - 相同训练预算（50000 时间步）
-    - 相同随机种子
-    - 相同网络结构规模
+Keys to a fair comparison:
+    - Same environment (HalfCheetah-v4)
+    - Same training budget (50000 timesteps)
+    - Same random seed
+    - Same network architecture size
 """
 
 import os
@@ -46,29 +46,29 @@ from stable_baselines3 import PPO, TD3, SAC
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import BaseCallback
 
-# 创建输出目录
+# Create output directory
 os.makedirs("output", exist_ok=True)
 
-# 设置中文字体
+# Configure CJK font support
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 
 
 # ==========================================
-# 第一部分：通用训练回调 —— 记录回合奖励
+# Part 1: Shared training callback —— logs episode rewards
 # ==========================================
 class RewardCallback(BaseCallback):
     """
-    通用训练回调：记录每种算法训练过程中的回合奖励
+    Shared training callback: logs episode rewards during training for each algorithm
 
-    这个回调对所有 SB3 算法通用，因为回合奖励
-    是通过 info["episode"]["r"] 统一获取的。
+    This callback works for any SB3 algorithm because episode rewards
+    are consistently obtained via info["episode"]["r"].
     """
 
     def __init__(self, verbose=0):
         super().__init__(verbose)
         self.episode_rewards = []
-        self.episode_timesteps = []  # 记录每个回合结束时的时间步
+        self.episode_timesteps = []  # Timestep at which each episode ended
 
     def _on_step(self):
         for info in self.locals.get("infos", []):
@@ -79,56 +79,56 @@ class RewardCallback(BaseCallback):
 
 
 # ==========================================
-# 第二部分：环境配置
+# Part 2: Environment configuration
 # ==========================================
 print("=" * 60)
-print("第9章：连续控制算法大比拼 — PPO vs TD3 vs SAC")
+print("Chapter 9: Continuous Control Algorithm Showdown — PPO vs TD3 vs SAC")
 print("=" * 60)
 
-# 尝试使用 HalfCheetah-v4（需要 MuJoCo）
-# 如果 MuJoCo 不可用，回退到 Pendulum-v1
+# Try to use HalfCheetah-v4 (requires MuJoCo)
+# Fall back to Pendulum-v1 if MuJoCo is unavailable
 ENV_NAME = "HalfCheetah-v4"
 try:
     test_env = gym.make(ENV_NAME)
     test_env.reset()
     test_env.close()
-    print(f"\n使用环境: {ENV_NAME}（MuJoCo 连续控制）")
+    print(f"\nUsing environment: {ENV_NAME} (MuJoCo continuous control)")
 except Exception as e:
     ENV_NAME = "Pendulum-v1"
-    print(f"\nMuJoCo 不可用（{e}），回退到: {ENV_NAME}")
+    print(f"\nMuJoCo unavailable ({e}), falling back to: {ENV_NAME}")
 
-# 打印环境信息
+# Print environment info
 env = gym.make(ENV_NAME)
 state_dim = env.observation_space.shape[0]
 action_dim = env.action_space.shape[0]
-action_type = "连续" if isinstance(env.action_space, gym.spaces.Box) else "离散"
-print(f"  状态维度:   {state_dim}")
-print(f"  动作维度:   {action_dim}")
-print(f"  动作类型:   {action_type}")
+action_type = "continuous" if isinstance(env.action_space, gym.spaces.Box) else "discrete"
+print(f"  State dimension:  {state_dim}")
+print(f"  Action dimension: {action_dim}")
+print(f"  Action type:      {action_type}")
 env.close()
 
-# 统一训练参数
-TOTAL_TIMESTEPS = 50_000    # 训练预算（演示用，实际需 1M+）
-SEED = 42                   # 统一随机种子
-NET_ARCH = [256, 256]       # 统一网络结构
+# Shared training parameters
+TOTAL_TIMESTEPS = 50_000    # Training budget (for demonstration; real use needs 1M+)
+SEED = 42                   # Shared random seed
+NET_ARCH = [256, 256]       # Shared network architecture
 
 
 # ==========================================
-# 第三部分：训练三种算法
+# Part 3: Train the three algorithms
 # ==========================================
 
-# ---- 算法 1：PPO ----
+# ---- Algorithm 1: PPO ----
 print("\n" + "-" * 60)
-print("【1/3】训练 PPO（Proximal Policy Optimization）")
+print("[1/3] Training PPO (Proximal Policy Optimization)")
 print("-" * 60)
-print("  特点：同策略、裁剪目标、简单但样本效率低")
+print("  Characteristics: on-policy, clipped objective, simple but sample-inefficient")
 
-# PPO 的超参数要点：
-#   - n_steps=2048: 每次采集的步数，PPO 的"批大小"
-#   - batch_size=64: 小批量更新大小
-#   - n_epochs=10: 同一批数据复用 10 次
-#   - clip_range=0.2: 策略比率裁剪范围
-#   - ent_coef=0.01: 熵系数（手动设定，不像 SAC 自动调节）
+# Key PPO hyperparameters:
+#   - n_steps=2048: number of steps collected per rollout, PPO's "batch size"
+#   - batch_size=64: mini-batch update size
+#   - n_epochs=10: the same batch of data is reused 10 times
+#   - clip_range=0.2: clipping range for the policy ratio
+#   - ent_coef=0.01: entropy coefficient (set manually, unlike SAC's automatic tuning)
 ppo_model = PPO(
     policy="MlpPolicy",
     env=ENV_NAME,
@@ -152,23 +152,23 @@ ppo_model.learn(
     callback=ppo_callback,
     progress_bar=True,
 )
-print(f"  PPO 训练完成，共 {len(ppo_callback.episode_rewards)} 个回合")
+print(f"  PPO training complete, {len(ppo_callback.episode_rewards)} episodes total")
 
 
-# ---- 算法 2：TD3 ----
+# ---- Algorithm 2: TD3 ----
 print("\n" + "-" * 60)
-print("【2/3】训练 TD3（Twin Delayed DDPG）")
+print("[2/3] Training TD3 (Twin Delayed DDPG)")
 print("-" * 60)
-print("  特点：异策略、确定性策略、双Q网络、延迟更新")
+print("  Characteristics: off-policy, deterministic policy, twin Q-networks, delayed updates")
 
-# TD3 的三大核心改进（在 DDPG 基础上）：
-#   1. 双 Q 网络（Clipped Double-Q）：取两个 Q 值的较小值
-#      → 缓解 Q 值过估计问题
-#   2. 延迟策略更新（Delayed Policy Updates）：
-#      → Critic 更新多次后，Actor 才更新一次
-#      → policy_delay=2 表示每 2 次 Critic 更新，才做 1 次 Actor 更新
-#   3. 目标策略平滑（Target Policy Smoothing）：
-#      → 给目标动作加噪声，防止 Q 值在某些动作上出现尖峰
+# TD3's three core improvements (building on DDPG):
+#   1. Twin Q-networks (Clipped Double-Q): take the smaller of two Q-values
+#      → mitigates Q-value overestimation
+#   2. Delayed Policy Updates:
+#      → the actor is updated only after the critic has been updated several times
+#      → policy_delay=2 means the actor is updated once for every 2 critic updates
+#   3. Target Policy Smoothing:
+#      → adds noise to the target action to prevent sharp spikes in the Q-value at certain actions
 td3_model = TD3(
     policy="MlpPolicy",
     env=ENV_NAME,
@@ -177,8 +177,8 @@ td3_model = TD3(
     batch_size=256,
     tau=0.005,
     gamma=0.99,
-    policy_delay=2,           # 延迟策略更新：每 2 次 Critic 更新后才更新 Actor
-    action_noise=None,        # 动作噪声（TD3 内部会使用探索噪声）
+    policy_delay=2,           # Delayed policy update: update the actor once every 2 critic updates
+    action_noise=None,        # Action noise (TD3 uses its own internal exploration noise)
     verbose=0,
     seed=SEED,
     device="auto",
@@ -191,27 +191,27 @@ td3_model.learn(
     callback=td3_callback,
     progress_bar=True,
 )
-print(f"  TD3 训练完成，共 {len(td3_callback.episode_rewards)} 个回合")
+print(f"  TD3 training complete, {len(td3_callback.episode_rewards)} episodes total")
 
 
-# ---- 算法 3：SAC ----
+# ---- Algorithm 3: SAC ----
 print("\n" + "-" * 60)
-print("【3/3】训练 SAC（Soft Actor-Critic）")
+print("[3/3] Training SAC (Soft Actor-Critic)")
 print("-" * 60)
-print("  特点：异策略、随机策略、熵正则化、自动温度调节")
+print("  Characteristics: off-policy, stochastic policy, entropy regularization, automatic temperature tuning")
 
-# SAC 的核心创新 —— 最大熵框架：
-#   标准强化学习：max Σ r(s,a)
-#   最大熵强化学习：max Σ [r(s,a) + α * H(π(·|s))]
+# SAC's core innovation —— the maximum entropy framework:
+#   Standard RL: max Σ r(s,a)
+#   Maximum entropy RL: max Σ [r(s,a) + α * H(π(·|s))]
 #
-# 其中 H 是策略熵，α 是温度参数
-# 这使得 SAC 在追求高回报的同时，保持策略的随机性
+# where H is the policy entropy and α is the temperature parameter
+# This lets SAC pursue high returns while keeping the policy stochastic
 #
-# 自动温度调节原理：
-#   alpha 的优化目标是让策略熵接近目标熵
-#   目标熵 = -dim(A)（动作维度的负数）
-#   当策略过于确定（熵太低）→ alpha 增大 → 鼓励探索
-#   当策略过于随机（熵太高）→ alpha 减小 → 鼓励利用
+# How automatic temperature tuning works:
+#   alpha is optimized so that the policy entropy approaches the target entropy
+#   Target entropy = -dim(A) (negative of the action dimension)
+#   When the policy is too deterministic (entropy too low) → alpha increases → encourages exploration
+#   When the policy is too random (entropy too high) → alpha decreases → encourages exploitation
 sac_model = SAC(
     policy="MlpPolicy",
     env=ENV_NAME,
@@ -220,7 +220,7 @@ sac_model = SAC(
     batch_size=256,
     tau=0.005,
     gamma=0.99,
-    ent_coef="auto",          # 自动温度调节（SAC 的核心创新！）
+    ent_coef="auto",          # Automatic temperature tuning (SAC's core innovation!)
     train_freq=1,
     gradient_steps=1,
     verbose=0,
@@ -235,14 +235,14 @@ sac_model.learn(
     callback=sac_callback,
     progress_bar=True,
 )
-print(f"  SAC 训练完成，共 {len(sac_callback.episode_rewards)} 个回合")
+print(f"  SAC training complete, {len(sac_callback.episode_rewards)} episodes total")
 
 
 # ==========================================
-# 第四部分：评估所有模型
+# Part 4: Evaluate all models
 # ==========================================
 print("\n" + "=" * 60)
-print("评估阶段：每个算法测试 10 个回合")
+print("Evaluation phase: 10 test episodes per algorithm")
 print("=" * 60)
 
 eval_env = gym.make(ENV_NAME)
@@ -253,7 +253,7 @@ for name, model in [("PPO", ppo_model), ("TD3", td3_model), ("SAC", sac_model)]:
     mean_reward, std_reward = evaluate_policy(
         model, eval_env, n_eval_episodes=n_eval, deterministic=True
     )
-    # 逐回合测试
+    # Test episode by episode
     test_rewards = []
     for _ in range(n_eval):
         obs, _ = eval_env.reset()
@@ -270,34 +270,34 @@ for name, model in [("PPO", ppo_model), ("TD3", td3_model), ("SAC", sac_model)]:
         "std": std_reward,
         "rewards": test_rewards,
     }
-    print(f"  {name:4s}: 平均奖励 = {mean_reward:8.2f} ± {std_reward:6.2f}")
+    print(f"  {name:4s}: mean reward = {mean_reward:8.2f} ± {std_reward:6.2f}")
 
 eval_env.close()
 
 
 # ==========================================
-# 第五部分：绘制对比图
+# Part 5: Plot the comparison charts
 # ==========================================
-print("\n正在绘制对比图...")
+print("\nPlotting comparison charts...")
 
 fig, axes = plt.subplots(2, 2, figsize=(16, 12))
 fig.suptitle(
-    f"连续控制算法对比 — {ENV_NAME}（{TOTAL_TIMESTEPS:,} 时间步）",
+    f"Continuous Control Algorithm Comparison — {ENV_NAME} ({TOTAL_TIMESTEPS:,} timesteps)",
     fontsize=16, fontweight="bold",
 )
 
-# 颜色方案
+# Color scheme
 colors = {"PPO": "#2196F3", "TD3": "#F44336", "SAC": "#4CAF50"}
 
-# 子图1：训练曲线对比（原始值）
+# Subplot 1: training curve comparison (raw values)
 ax1 = axes[0, 0]
 for name, cb in [("PPO", ppo_callback), ("TD3", td3_callback), ("SAC", sac_callback)]:
     if cb.episode_rewards:
         ax1.plot(cb.episode_rewards, alpha=0.3, color=colors[name], linewidth=0.8)
-ax1.set_title("训练回合奖励（原始值）", fontsize=13)
-ax1.set_xlabel("回合")
-ax1.set_ylabel("累计奖励")
-# 手动添加图例
+ax1.set_title("Training Episode Reward (raw)", fontsize=13)
+ax1.set_xlabel("Episode")
+ax1.set_ylabel("Cumulative Reward")
+# Manually add the legend
 from matplotlib.lines import Line2D
 legend_elements = [
     Line2D([0], [0], color=colors[n], linewidth=2, label=n)
@@ -306,7 +306,7 @@ legend_elements = [
 ax1.legend(handles=legend_elements)
 ax1.grid(True, alpha=0.3)
 
-# 子图2：训练曲线对比（滑动平均）
+# Subplot 2: training curve comparison (moving average)
 ax2 = axes[0, 1]
 for name, cb in [("PPO", ppo_callback), ("TD3", td3_callback), ("SAC", sac_callback)]:
     if cb.episode_rewards:
@@ -316,13 +316,13 @@ for name, cb in [("PPO", ppo_callback), ("TD3", td3_callback), ("SAC", sac_callb
             smoothed = np.convolve(rewards, np.ones(window) / window, mode="valid")
             ax2.plot(range(window - 1, len(rewards)), smoothed,
                      color=colors[name], linewidth=2, label=f"{name}")
-ax2.set_title("训练回合奖励（滑动平均）", fontsize=13)
-ax2.set_xlabel("回合")
-ax2.set_ylabel("累计奖励")
+ax2.set_title("Training Episode Reward (moving average)", fontsize=13)
+ax2.set_xlabel("Episode")
+ax2.set_ylabel("Cumulative Reward")
 ax2.legend()
 ax2.grid(True, alpha=0.3)
 
-# 子图3：最终评估对比（柱状图）
+# Subplot 3: final evaluation comparison (bar chart)
 ax3 = axes[1, 0]
 algo_names = list(results.keys())
 means = [results[n]["mean"] for n in algo_names]
@@ -330,85 +330,85 @@ stds = [results[n]["std"] for n in algo_names]
 bar_colors = [colors[n] for n in algo_names]
 bars = ax3.bar(algo_names, means, yerr=stds, color=bar_colors,
                alpha=0.8, capsize=5, edgecolor="white", linewidth=1.5)
-ax3.set_title("最终评估对比（10 回合平均）", fontsize=13)
-ax3.set_ylabel("平均奖励")
-# 在柱子上标注数值
+ax3.set_title("Final Evaluation Comparison (10-episode average)", fontsize=13)
+ax3.set_ylabel("Mean Reward")
+# Annotate the bars with values
 for bar, mean, std in zip(bars, means, stds):
     ax3.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + std + 10,
              f"{mean:.0f}", ha="center", va="bottom", fontsize=11, fontweight="bold")
 ax3.grid(True, alpha=0.3, axis="y")
 
-# 子图4：测试回合奖励分布（箱线图）
+# Subplot 4: test episode reward distribution (box plot)
 ax4 = axes[1, 1]
 box_data = [results[n]["rewards"] for n in algo_names]
 bp = ax4.boxplot(box_data, labels=algo_names, patch_artist=True, widths=0.5)
 for patch, color in zip(bp["boxes"], bar_colors):
     patch.set_facecolor(color)
     patch.set_alpha(0.6)
-ax4.set_title("测试回合奖励分布", fontsize=13)
-ax4.set_ylabel("回合奖励")
+ax4.set_title("Test Episode Reward Distribution", fontsize=13)
+ax4.set_ylabel("Episode Reward")
 ax4.grid(True, alpha=0.3, axis="y")
 
 plt.tight_layout()
 plt.savefig("output/ppo_td3_sac_comparison.png", dpi=150, bbox_inches="tight")
-print("对比图已保存至: output/ppo_td3_sac_comparison.png")
+print("Comparison chart saved to: output/ppo_td3_sac_comparison.png")
 plt.show()
 
 
 # ==========================================
-# 第六部分：打印对比总结表
+# Part 6: Print the comparison summary table
 # ==========================================
 print("\n" + "=" * 60)
-print("算法对比总结表")
+print("Algorithm Comparison Summary Table")
 print("=" * 60)
 
-# 表头
-print(f"{'指标':<20s} {'PPO':>10s} {'TD3':>10s} {'SAC':>10s}")
+# Header
+print(f"{'Metric':<20s} {'PPO':>10s} {'TD3':>10s} {'SAC':>10s}")
 print("-" * 60)
 
-# 最终奖励
-print(f"{'最终平均奖励':<18s}", end="")
+# Final reward
+print(f"{'Final mean reward':<18s}", end="")
 for name in algo_names:
     print(f" {results[name]['mean']:>10.1f}", end="")
 print()
 
-# 奖励标准差
-print(f"{'奖励标准差':<18s}", end="")
+# Reward std dev
+print(f"{'Reward std dev':<18s}", end="")
 for name in algo_names:
     print(f" {results[name]['std']:>10.1f}", end="")
 print()
 
-# 训练回合数
-print(f"{'训练回合数':<18s}", end="")
+# Number of training episodes
+print(f"{'Training episodes':<18s}", end="")
 for cb in [ppo_callback, td3_callback, sac_callback]:
     print(f" {len(cb.episode_rewards):>10d}", end="")
 print()
 
-# 算法类型
-print(f"{'算法类型':<18s} {'同策略':>10s} {'异策略':>10s} {'异策略':>10s}")
+# Algorithm type
+print(f"{'Algorithm type':<18s} {'on-policy':>10s} {'off-policy':>10s} {'off-policy':>10s}")
 
-# 策略类型
-print(f"{'策略类型':<18s} {'随机':>10s} {'确定性':>10s} {'随机+熵':>10s}")
+# Policy type
+print(f"{'Policy type':<18s} {'stochastic':>10s} {'deterministic':>10s} {'stoch+entropy':>10s}")
 
-# 样本效率
-print(f"{'样本效率':<18s} {'低':>10s} {'高':>10s} {'最高':>10s}")
+# Sample efficiency
+print(f"{'Sample efficiency':<18s} {'low':>10s} {'high':>10s} {'highest':>10s}")
 
-# 探索机制
-print(f"{'探索机制':<18s} {'策略内在':>10s} {'动作噪声':>10s} {'熵正则化':>10s}")
+# Exploration mechanism
+print(f"{'Exploration':<18s} {'intrinsic':>10s} {'action noise':>10s} {'entropy reg.':>10s}")
 
-# 超参数敏感度
-print(f"{'超参数敏感度':<18s} {'低':>10s} {'中':>10s} {'低':>10s}")
+# Hyperparameter sensitivity
+print(f"{'Hyperparam sens.':<18s} {'low':>10s} {'medium':>10s} {'low':>10s}")
 
 print("-" * 60)
 
-# 确定赢家
+# Determine the winner
 winner = max(results.keys(), key=lambda k: results[k]["mean"])
-print(f"\n在本实验中，{winner} 获得了最高平均奖励！")
+print(f"\nIn this experiment, {winner} achieved the highest mean reward!")
 print()
-print("注意事项：")
-print("  - 50k 时间步仅用于演示，实际对比通常需要 1M+ 时间步")
-print("  - 不同环境上的排名可能不同")
-print("  - PPO 的同策略特性使其在分布式训练中有独特优势")
-print("  - SAC 在大多数 MuJoCo 环境上表现最好（尤其是在长训练后）")
-print("  - TD3 在需要精确控制的场景（如机器人操纵）上很有竞争力")
+print("Notes:")
+print("  - 50k timesteps is for demonstration only; real comparisons typically need 1M+ timesteps")
+print("  - Rankings may differ across environments")
+print("  - PPO's on-policy nature gives it unique advantages in distributed training")
+print("  - SAC performs best on most MuJoCo environments (especially with longer training)")
+print("  - TD3 is highly competitive in scenarios requiring precise control (e.g. robotic manipulation)")
 print("=" * 60)

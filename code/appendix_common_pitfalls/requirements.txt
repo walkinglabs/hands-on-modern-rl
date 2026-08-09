@@ -1,4 +1,4 @@
-# 附录A：常见坑与解法实验依赖
+# Appendix A: dependencies for the common pitfalls and solutions experiments
 gymnasium[classic-control]>=0.29.0
 torch>=2.0.0
 numpy>=1.24.0

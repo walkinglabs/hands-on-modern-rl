@@ -1,20 +1,20 @@
 """
-第7章：DPO 数学推理对齐 —— 用规则信号训练数学偏好
+Chapter 7: DPO Math Reasoning Alignment -- Training Math Preferences with Rule-Based Signals
 ==========================================================
 
-本脚本演示如何将 DPO 应用于数学推理领域：
-  1. 构造 GSM8K 风格的数学偏好数据（算术题）
-  2. 对每道题生成正确（chosen）和错误（rejected）的解题过程
-  3. 用 DPO 训练模型，使其更倾向于正确的推理路径
-  4. 在保留测试集上评估训练前后的准确率
-  5. 展示 DPO 如何从基于规则的偏好信号中学习
+This script demonstrates how to apply DPO to the math reasoning domain:
+  1. Construct GSM8K-style math preference data (arithmetic problems)
+  2. Generate a correct (chosen) and an incorrect (rejected) solution for each problem
+  3. Train a model with DPO so it favors the correct reasoning path
+  4. Evaluate accuracy before and after training on a held-out test set
+  5. Show how DPO learns from rule-based preference signals
 
-核心思想：
-  - 不需要人类标注"哪个回答更好"
-  - 用规则（答案是否正确）自动生成偏好标签
-  - DPO 从这些规则信号中学习正确的推理模式
+Core idea:
+  - No need for humans to label "which answer is better"
+  - Rules (whether the answer is correct) automatically generate preference labels
+  - DPO learns the correct reasoning pattern from these rule-based signals
 
-运行方式：
+How to run:
   pip install -r requirements.txt
   python dpo_math_reward.py
 """
@@ -28,19 +28,19 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import DPOTrainer, DPOConfig
 
 # ==========================================
-# 1. 构造 GSM8K 风格的数学偏好数据
+# 1. Construct GSM8K-style math preference data
 # ==========================================
-# 每条数据包含一道数学题，以及正确和错误的解题过程
-# 我们使用简单的算术题，便于自动验证答案
+# Each entry contains a math problem plus a correct and an incorrect solution process
+# We use simple arithmetic problems so answers can be verified automatically
 
 def create_math_preference_data():
     """
-    创建数学推理的偏好数据集
+    Create the preference dataset for math reasoning
 
-    每条数据包含：
-    - prompt: 数学问题
-    - chosen: 正确的、逐步推理的解答过程
-    - rejected: 包含推理错误的解答过程
+    Each entry contains:
+    - prompt: the math problem
+    - chosen: a correct, step-by-step solution process
+    - rejected: a solution process that contains a reasoning error
     """
 
     math_examples = [
@@ -110,13 +110,13 @@ def create_math_preference_data():
 
 
 # ==========================================
-# 2. 准备测试集数据（用于评估准确率）
+# 2. Prepare the test set data (used to evaluate accuracy)
 # ==========================================
 
 def create_test_data():
     """
-    创建独立的测试集，与训练数据不重叠
-    用于评估 DPO 训练前后的数学推理能力
+    Create an independent test set that does not overlap with the training data
+    Used to evaluate math reasoning ability before and after DPO training
     """
     test_examples = [
         {
@@ -144,12 +144,12 @@ def create_test_data():
 
 
 # ==========================================
-# 3. 定义辅助函数
+# 3. Define helper functions
 # ==========================================
 
 def extract_number(text):
-    """从模型回复中提取最终的数字答案"""
-    # 尝试匹配 "答：...是 X" 或 "答：X" 中的数字
+    """Extract the final numeric answer from the model's response"""
+    # Try to match the number in patterns like "答：...是 X" or "答：X" (i.e. "Answer: ... is X" / "Answer: X")
     patterns = [
         r"答[：:][^0-9]*?(\d+)",
         r"答案是\s*(\d+)",
@@ -159,23 +159,23 @@ def extract_number(text):
     for pattern in patterns:
         match = re.findall(pattern, text)
         if match:
-            return int(match[-1])  # 取最后一个匹配
+            return int(match[-1])  # take the last match
 
-    # 如果以上都没匹配到，尝试找文本中最后出现的数字
+    # If none of the above matched, try to find the last number that appears in the text
     numbers = re.findall(r"\d+", text)
     if numbers:
         return int(numbers[-1])
     return None
 
 
-def evaluate_math(model, tokenizer, test_data, label="模型"):
+def evaluate_math(model, tokenizer, test_data, label="Model"):
     """
-    在测试集上评估模型的数学推理准确率
+    Evaluate the model's math reasoning accuracy on the test set
 
-    对每道题生成回答，提取数字答案，与正确答案对比
+    Generate a response for each problem, extract the numeric answer, and compare it against the correct answer
     """
     print("=" * 60)
-    print(f"【{label}数学推理评估】")
+    print(f"[{label} Math Reasoning Evaluation]")
     print("=" * 60)
 
     correct = 0
@@ -185,7 +185,7 @@ def evaluate_math(model, tokenizer, test_data, label="模型"):
         prompt = item["prompt"]
         true_answer = item["answer"]
 
-        # 生成模型的回答
+        # Generate the model's response
         messages = [{"role": "user", "content": prompt}]
         text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         inputs = tokenizer([text], return_tensors="pt").to(model.device)
@@ -199,73 +199,73 @@ def evaluate_math(model, tokenizer, test_data, label="模型"):
         is_correct = predicted_answer == true_answer
         correct += int(is_correct)
 
-        status = "正确" if is_correct else "错误"
-        print(f"  题 {i+1}: {prompt[:30]}...")
-        print(f"    模型回答: {response[:80]}...")
-        print(f"    预测答案: {predicted_answer} | 正确答案: {true_answer} | {status}")
+        status = "Correct" if is_correct else "Incorrect"
+        print(f"  Problem {i+1}: {prompt[:30]}...")
+        print(f"    Model response: {response[:80]}...")
+        print(f"    Predicted answer: {predicted_answer} | Correct answer: {true_answer} | {status}")
         print()
 
     accuracy = correct / total * 100
-    print(f"  准确率: {correct}/{total} = {accuracy:.1f}%")
+    print(f"  Accuracy: {correct}/{total} = {accuracy:.1f}%")
     print("=" * 60)
     return accuracy
 
 
 # ==========================================
-# 4. 主流程开始
+# 4. Main workflow begins
 # ==========================================
 
 print("=" * 60)
-print("  DPO 数学推理对齐实验")
-print("  ——基于规则的偏好信号训练")
+print("  DPO Math Reasoning Alignment Experiment")
+print("  -- Training with Rule-Based Preference Signals")
 print("=" * 60)
 print()
 
-# 准备数据
+# Prepare the data
 math_data = create_math_preference_data()
 test_data = create_test_data()
 
-print(f"训练集大小: {len(math_data)} 条数学偏好数据")
-print(f"测试集大小: {len(test_data)} 道数学题")
+print(f"Training set size: {len(math_data)} math preference examples")
+print(f"Test set size: {len(test_data)} math problems")
 print()
-print("偏好数据的构造方式：")
-print("  - chosen:  正确的逐步推理过程（每一步计算都正确）")
-print("  - rejected: 包含推理错误的解答（某一步计算或公式出错）")
-print("  - 这种偏好信号无需人类标注，完全由规则自动生成")
+print("How the preference data is constructed:")
+print("  - chosen:  a correct, step-by-step reasoning process (every step of the computation is correct)")
+print("  - rejected: a solution that contains a reasoning error (a computation or formula is wrong at some step)")
+print("  - This preference signal requires no human labeling; it is generated entirely by rules")
 print()
 
 
 # ==========================================
-# 5. 加载模型并评估训练前表现
+# 5. Load the model and evaluate pre-training performance
 # ==========================================
 
 MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
 
-print(f"正在加载基础模型 {MODEL_NAME} ...")
+print(f"Loading base model {MODEL_NAME} ...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 tokenizer.pad_token = tokenizer.eos_token
 
 model_before = AutoModelForCausalLM.from_pretrained(MODEL_NAME, device_map="auto")
 
-before_accuracy = evaluate_math(model_before, tokenizer, test_data, label="训练前")
+before_accuracy = evaluate_math(model_before, tokenizer, test_data, label="Before Training")
 
-# 释放显存
+# Free up GPU memory
 del model_before
 torch.cuda.empty_cache() if torch.cuda.is_available() else None
 
 
 # ==========================================
-# 6. DPO 训练
+# 6. DPO training
 # ==========================================
 
-print("\n开始 DPO 训练，使用基于规则的数学偏好数据...")
+print("\nStarting DPO training with rule-based math preference data...")
 
-# 重新加载模型用于训练
+# Reload the model for training
 model = AutoModelForCausalLM.from_pretrained(MODEL_NAME)
 train_tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 train_tokenizer.pad_token = train_tokenizer.eos_token
 
-# 构造 HuggingFace Dataset
+# Build the HuggingFace Dataset
 data_dict = {
     "prompt": [item["prompt"] for item in math_data],
     "chosen": [item["chosen"] for item in math_data],
@@ -273,12 +273,12 @@ data_dict = {
 }
 train_dataset = Dataset.from_dict(data_dict)
 
-# 配置训练参数
+# Configure training arguments
 training_args = DPOConfig(
     output_dir="./dpo_math_results",
     per_device_train_batch_size=2,
     learning_rate=5e-5,
-    num_train_epochs=5,         # 数学推理需要更多轮次来学习推理模式
+    num_train_epochs=5,         # Math reasoning needs more epochs to learn the reasoning pattern
     logging_steps=2,
     save_strategy="no",
     bf16=torch.cuda.is_bf16_supported() if torch.cuda.is_available() else False,
@@ -286,7 +286,7 @@ training_args = DPOConfig(
     beta=0.1,
 )
 
-# 创建 DPOTrainer
+# Create the DPOTrainer
 trainer = DPOTrainer(
     model=model,
     args=training_args,
@@ -294,22 +294,22 @@ trainer = DPOTrainer(
     processing_class=train_tokenizer,
 )
 
-print("\n训练中... 请观察 loss 和 reward 的变化趋势\n")
+print("\nTraining... watch how loss and reward evolve\n")
 train_result = trainer.train()
 
 # ==========================================
-# 7. 打印训练指标
+# 7. Print training metrics
 # ==========================================
 
 print("\n" + "=" * 60)
-print("【训练指标详情】")
+print("[Training Metrics Detail]")
 print("=" * 60)
-print(f"最终训练 Loss: {train_result.training_loss:.4f}")
+print(f"Final training loss: {train_result.training_loss:.4f}")
 print()
 
-# 解析训练日志中的奖励信息
+# Parse the reward information from the training log
 log_history = trainer.state.log_history
-print("各步骤的训练指标：")
+print("Training metrics at each step:")
 print(f"{'Step':>6} | {'Loss':>8} | {'Chosen Reward':>14} | {'Rejected Reward':>16} | {'Margin':>8}")
 print("-" * 70)
 
@@ -321,7 +321,7 @@ for entry in log_history:
         rejected_r = entry.get("rewards/rejected", "N/A")
         margin = entry.get("rewards/margins", "N/A")
 
-        # 格式化输出
+        # Format the output
         if isinstance(chosen_r, float):
             chosen_r = f"{chosen_r:.4f}"
         if isinstance(rejected_r, float):
@@ -331,59 +331,60 @@ for entry in log_history:
 
         print(f"{step:>6} | {loss:>8.4f} | {chosen_r:>14} | {rejected_r:>16} | {margin:>8}")
 
-# 保存模型
+# Save the model
 save_path = "./dpo_math_results/final_model"
 trainer.save_model(save_path)
-print(f"\n模型已保存至 {save_path}")
+print(f"\nModel saved to {save_path}")
 
 
 # ==========================================
-# 8. 评估训练后的模型
+# 8. Evaluate the trained model
 # ==========================================
 
-# 加载训练后的模型进行评估
-print("\n加载训练后的模型进行评估...")
+# Load the trained model for evaluation
+print("\nLoading the trained model for evaluation...")
 model_after = AutoModelForCausalLM.from_pretrained(save_path, device_map="auto")
 eval_tokenizer = AutoTokenizer.from_pretrained(save_path)
 eval_tokenizer.pad_token = eval_tokenizer.eos_token
 
-after_accuracy = evaluate_math(model_after, eval_tokenizer, test_data, label="训练后")
+after_accuracy = evaluate_math(model_after, eval_tokenizer, test_data, label="After Training")
 
 
 # ==========================================
-# 9. 结果对比与总结
+# 9. Compare results and summarize
 # ==========================================
 
 print("\n" + "=" * 60)
-print("【DPO 数学推理对齐 — 最终结果对比】")
+print("[DPO Math Reasoning Alignment -- Final Results Comparison]")
 print("=" * 60)
 print()
-print(f"  训练前准确率: {before_accuracy:.1f}%")
-print(f"  训练后准确率: {after_accuracy:.1f}%")
-print(f"  提升幅度: {after_accuracy - before_accuracy:+.1f}%")
+print(f"  Accuracy before training: {before_accuracy:.1f}%")
+print(f"  Accuracy after training: {after_accuracy:.1f}%")
+print(f"  Improvement: {after_accuracy - before_accuracy:+.1f}%")
 print()
 
 print("=" * 60)
-print("【实验总结】")
+print("[Experiment Summary]")
 print("=" * 60)
 print("""
-1. 基于规则的偏好信号：
-   本实验不依赖人类标注，而是通过"答案是否正确"这一简单规则
-   自动生成 chosen/rejected 对。这种方法可大规模扩展到更多题目。
+1. Rule-based preference signals:
+   This experiment does not rely on human labeling. Instead, it uses the simple
+   rule "is the answer correct" to automatically generate chosen/rejected pairs.
+   This approach scales easily to many more problems.
 
-2. DPO 在数学推理中的效果：
-   - DPO 可以学习到正确的推理模式（如选择正确的运算符）
-   - 训练后模型在面对新题目时，更倾向于使用正确的解题策略
-   - 但 0.5B 参数量较小，对复杂推理的提升有限
+2. DPO's effect on math reasoning:
+   - DPO can learn correct reasoning patterns (such as choosing the right operator)
+   - After training, the model tends to favor correct solution strategies on new problems
+   - However, with only 0.5B parameters, the improvement on complex reasoning is limited
 
-3. 与 RLHF 的对比：
-   - 传统 RLHF: 需要训练奖励模型 → 用 PPO 优化策略
-   - DPO 方法: 直接用偏好数据优化，跳过奖励模型训练
-   - 对于规则明确的任务（如数学），DPO + 规则信号非常高效
+3. Comparison with RLHF:
+   - Traditional RLHF: requires training a reward model -> optimizing the policy with PPO
+   - DPO approach: optimizes directly from preference data, skipping reward model training
+   - For tasks with clear-cut rules (like math), DPO + rule-based signals is very efficient
 
-4. 实际扩展方向：
-   - 使用更大的模型（7B、14B）获得更好的推理能力
-   - 增加训练数据量（如完整的 GSM8K 数据集）
-   - 结合 Chain-of-Thought 提示提升推理深度
-   - 使用多个错误的 rejected 样本增强对比学习效果
+4. Directions for further extension:
+   - Use larger models (7B, 14B) for better reasoning ability
+   - Increase the amount of training data (e.g. the full GSM8K dataset)
+   - Combine with Chain-of-Thought prompting to deepen reasoning
+   - Use multiple incorrect rejected samples to strengthen contrastive learning
 """)

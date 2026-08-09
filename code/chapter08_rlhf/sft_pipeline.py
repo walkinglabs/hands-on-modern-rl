@@ -1,13 +1,14 @@
 """
-第8章：SFT（监督微调）流水线
-==============================
+Chapter 8: SFT (Supervised Fine-Tuning) Pipeline
+==================================================
 
-本脚本演示 RLHF 三阶段流水线的第一阶段 —— 监督微调（SFT）。
-内容包括：
-  1. 生成 Self-Instruct 风格的指令-回复训练数据
-  2. 加载 Qwen2.5-0.5B-Instruct 基础模型
-  3. 使用 SFTTrainer 进行监督微调
-  4. 对比微调前后的模型输出质量
+This script demonstrates the first stage of the three-stage RLHF pipeline —
+supervised fine-tuning (SFT).
+Contents:
+  1. Generate Self-Instruct-style instruction-response training data
+  2. Load the Qwen2.5-0.5B-Instruct base model
+  3. Perform supervised fine-tuning with SFTTrainer
+  4. Compare model output quality before and after fine-tuning
 """
 
 import os
@@ -17,21 +18,21 @@ from datasets import Dataset
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from trl import SFTTrainer, SFTConfig
 
-# 创建输出目录
+# Create the output directory
 os.makedirs("output", exist_ok=True)
 
 # ==========================================
-# 1. 生成 Self-Instruct 风格训练数据
+# 1. Generate Self-Instruct-style training data
 # ==========================================
 
 def generate_sft_data():
     """
-    生成用于 SFT 的指令-回复训练数据。
-    包含四类任务：数学、写作、编程、知识问答。
-    每条数据都是 (instruction, response) 的形式。
+    Generate instruction-response training data for SFT.
+    Covers four task categories: math, writing, coding, and knowledge Q&A.
+    Each entry is an (instruction, response) pair.
     """
     sft_pairs = [
-        # ---- 数学类 ----
+        # ---- Math ----
         {
             "instruction": "计算 (3 + 5) × 2 的结果。",
             "response": "我们来逐步计算：\n首先计算括号内的加法：3 + 5 = 8\n然后将结果乘以 2：8 × 2 = 16\n所以 (3 + 5) × 2 = 16。"
@@ -44,7 +45,7 @@ def generate_sft_data():
             "instruction": "把 3/4 和 2/5 相加，结果用分数表示。",
             "response": "首先找到公分母：4 和 5 的最小公倍数是 20。\n将两个分数通分：\n  3/4 = 15/20\n  2/5 = 8/20\n然后相加：15/20 + 8/20 = 23/20\n结果为 23/20（即 1 又 3/20）。"
         },
-        # ---- 写作类 ----
+        # ---- Writing ----
         {
             "instruction": "请用三句话描写春天的景色。",
             "response": "春风轻拂大地，樱花纷纷飘落在小径上，空气中弥漫着淡淡的花香。河边的柳树抽出嫩绿的新芽，在阳光下闪闪发光。孩子们在草地上奔跑嬉戏，欢笑声和鸟鸣声交织在一起，构成了一幅生机勃勃的画面。"
@@ -57,7 +58,7 @@ def generate_sft_data():
             "instruction": "请以'我的编程之旅'为题写一段短文，大约100字。",
             "response": "我的编程之旅始于大学第一堂 C 语言课。那时的我对着屏幕上跳动的字符感到既新奇又困惑。随着一行行代码从报错到成功运行，我逐渐体会到了创造的乐趣。从简单的计算器到复杂的 Web 应用，每一次调试成功都让我充满成就感。编程不仅教会了我逻辑思维，更让我学会了面对问题时的耐心与坚持。"
         },
-        # ---- 编程类 ----
+        # ---- Coding ----
         {
             "instruction": "用 Python 写一个函数，判断一个数是否为偶数。",
             "response": "```python\ndef is_even(n):\n    \"\"\"判断一个数是否为偶数\"\"\"\n    return n % 2 == 0\n\n# 测试\nprint(is_even(4))   # True\nprint(is_even(7))   # False\n```\n这个函数利用取模运算（%）来判断：如果一个数除以 2 的余数为 0，它就是偶数。"
@@ -70,7 +71,7 @@ def generate_sft_data():
             "instruction": "用 Python 实现一个简单的冒泡排序。",
             "response": "```python\ndef bubble_sort(arr):\n    \"\"\"冒泡排序：重复遍历列表，每次将最大的元素'冒泡'到最后\"\"\"\n    n = len(arr)\n    for i in range(n):\n        swapped = False\n        for j in range(0, n - i - 1):\n            if arr[j] > arr[j + 1]:\n                arr[j], arr[j + 1] = arr[j + 1], arr[j]\n                swapped = True\n        # 如果某一轮没有发生交换，说明已经有序\n        if not swapped:\n            break\n    return arr\n\n# 测试\nnumbers = [64, 34, 25, 12, 22, 11, 90]\nprint(\"排序前:\", numbers)\nprint(\"排序后:\", bubble_sort(numbers))\n```\n冒泡排序的时间复杂度为 O(n²)，适合小规模数据的排序教学。"
         },
-        # ---- 知识问答类 ----
+        # ---- Knowledge Q&A ----
         {
             "instruction": "解释什么是机器学习，用通俗的语言。",
             "response": "想象你在教一个小朋友认水果。你给他看了很多苹果和香蕉的照片，告诉他哪些是苹果、哪些是香蕉。看了几百张之后，小朋友自己就能分辨新的水果了——这就是机器学习的核心思想。\n\n用术语来说：机器学习是让计算机通过数据自动学习规律，而不是靠人手动编写每一条规则。常见类型包括：\n- **监督学习**：给模型带标签的数据（比如标记好的水果图片），让它学会预测。\n- **无监督学习**：只给数据不给标签，让模型自己发现数据中的模式。\n- **强化学习**：通过试错和奖励反馈来学习最优策略。"
@@ -97,13 +98,13 @@ def generate_sft_data():
 
 
 # ==========================================
-# 2. 格式化数据为对话格式
+# 2. Format data into conversational form
 # ==========================================
 
 def format_sft_dataset(sft_pairs, tokenizer):
     """
-    将 instruction-response 对转换为模型可训练的对话格式。
-    使用 chat template 将每条数据包装成多轮对话的格式。
+    Convert instruction-response pairs into a format the model can train on.
+    Uses the chat template to wrap each entry as a multi-turn conversation.
     """
     formatted_texts = []
     for pair in sft_pairs:
@@ -111,7 +112,7 @@ def format_sft_dataset(sft_pairs, tokenizer):
             {"role": "user", "content": pair["instruction"]},
             {"role": "assistant", "content": pair["response"]},
         ]
-        # 使用分词器的 chat_template 将对话格式化为训练文本
+        # Use the tokenizer's chat_template to format the conversation into training text
         text = tokenizer.apply_chat_template(
             messages,
             tokenize=False,
@@ -123,49 +124,49 @@ def format_sft_dataset(sft_pairs, tokenizer):
 
 
 # ==========================================
-# 3. 主流程：SFT 训练
+# 3. Main flow: SFT training
 # ==========================================
 
 def main():
     print("=" * 60)
-    print("第8章：SFT（监督微调）流水线")
+    print("Chapter 8: SFT (Supervised Fine-Tuning) Pipeline")
     print("=" * 60)
 
-    # ---- 3.1 生成并查看训练数据 ----
-    print("\n[步骤1] 生成 Self-Instruct 风格训练数据...")
+    # ---- 3.1 Generate and inspect training data ----
+    print("\n[Step 1] Generating Self-Instruct-style training data...")
     sft_pairs = generate_sft_data()
-    print(f"  共生成 {len(sft_pairs)} 条指令-回复训练数据")
-    print(f"  数据类别：数学({3}条)、写作({3}条)、编程({3}条)、知识问答({6}条)")
+    print(f"  Generated {len(sft_pairs)} instruction-response training examples")
+    print(f"  Categories: math ({3}), writing ({3}), coding ({3}), knowledge Q&A ({6})")
 
-    # 打印一条样本
+    # Print a sample
     sample = sft_pairs[0]
-    print(f"\n  样本示例：")
-    print(f"    指令：{sample['instruction']}")
-    print(f"    回复：{sample['response'][:50]}...")
+    print(f"\n  Sample example:")
+    print(f"    Instruction: {sample['instruction']}")
+    print(f"    Response: {sample['response'][:50]}...")
 
-    # ---- 3.2 加载模型和分词器 ----
-    print("\n[步骤2] 加载 Qwen2.5-0.5B-Instruct 模型...")
+    # ---- 3.2 Load model and tokenizer ----
+    print("\n[Step 2] Loading Qwen2.5-0.5B-Instruct model...")
     model_name = "Qwen/Qwen2.5-0.5B-Instruct"
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-    # 确保 pad_token 存在
+    # Ensure pad_token exists
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        torch_dtype=torch.float32,  # 使用 float32 以兼容 CPU
+        torch_dtype=torch.float32,  # Use float32 for CPU compatibility
     )
-    print(f"  模型加载完成：{model_name}")
+    print(f"  Model loaded: {model_name}")
 
-    # ---- 3.3 微调前测试 ----
-    print("\n[步骤3] 微调前模型输出测试...")
+    # ---- 3.3 Test before fine-tuning ----
+    print("\n[Step 3] Testing model output before fine-tuning...")
     test_instructions = [
         "用 Python 写一个判断奇偶数的函数。",
         "解释什么是递归。",
     ]
 
-    print("  --- 微调前的输出 ---")
+    print("  --- Output before fine-tuning ---")
     before_responses = []
     for inst in test_instructions:
         messages = [{"role": "user", "content": inst}]
@@ -189,15 +190,15 @@ def main():
         print(f"  A: {response[:80]}...")
         print()
 
-    # ---- 3.4 准备 SFT 训练数据集 ----
-    print("[步骤4] 格式化训练数据集...")
+    # ---- 3.4 Prepare the SFT training dataset ----
+    print("[Step 4] Formatting the training dataset...")
     train_dataset = format_sft_dataset(sft_pairs, tokenizer)
-    print(f"  数据集大小：{len(train_dataset)} 条")
-    print(f"  数据预览：{train_dataset[0]['text'][:100]}...")
+    print(f"  Dataset size: {len(train_dataset)} examples")
+    print(f"  Data preview: {train_dataset[0]['text'][:100]}...")
 
-    # ---- 3.5 配置并执行 SFT 训练 ----
-    print("\n[步骤5] 开始 SFT 训练...")
-    print("  超参数配置：")
+    # ---- 3.5 Configure and run SFT training ----
+    print("\n[Step 5] Starting SFT training...")
+    print("  Hyperparameters:")
     print("    - per_device_train_batch_size = 2")
     print("    - learning_rate = 2e-5")
     print("    - num_train_epochs = 2")
@@ -209,10 +210,10 @@ def main():
         learning_rate=2e-5,
         num_train_epochs=2,
         max_length=512,
-        logging_steps=1,          # 每一步都打印日志（数据量小）
-        save_strategy="epoch",    # 每个 epoch 保存一次
-        report_to="none",         # 不上传到 wandb 等
-        fp16=False,               # CPU 环境用 float32
+        logging_steps=1,          # Log every step (small dataset)
+        save_strategy="epoch",    # Save once per epoch
+        report_to="none",         # Don't upload to wandb, etc.
+        fp16=False,               # Use float32 on CPU
     )
 
     trainer = SFTTrainer(
@@ -222,16 +223,16 @@ def main():
         processing_class=tokenizer,
     )
 
-    # 开始训练
+    # Start training
     train_result = trainer.train()
 
-    # ---- 3.6 打印训练损失曲线数据 ----
-    print("\n[步骤6] 训练损失记录：")
+    # ---- 3.6 Print training loss curve data ----
+    print("\n[Step 6] Training loss log:")
     print("  " + "-" * 40)
     print("  Step | Training Loss")
     print("  " + "-" * 40)
 
-    # 从训练日志中提取损失数据
+    # Extract loss data from the training log
     if hasattr(trainer, "state") and trainer.state.log_history:
         for log_entry in trainer.state.log_history:
             if "loss" in log_entry:
@@ -239,15 +240,15 @@ def main():
                 loss = log_entry["loss"]
                 print(f"  {str(step).rjust(4)} | {loss:.4f}")
     else:
-        print(f"  最终训练损失：{train_result.training_loss:.4f}")
+        print(f"  Final training loss: {train_result.training_loss:.4f}")
 
     print("  " + "-" * 40)
 
-    # ---- 3.7 微调后测试 ----
-    print("\n[步骤7] 微调后模型输出测试...")
-    print("  --- 微调后的输出 ---")
+    # ---- 3.7 Test after fine-tuning ----
+    print("\n[Step 7] Testing model output after fine-tuning...")
+    print("  --- Output after fine-tuning ---")
 
-    # 加载微调后的模型进行推理
+    # Load the fine-tuned model for inference
     model.eval()
     after_responses = []
     for inst in test_instructions:
@@ -272,32 +273,32 @@ def main():
         print(f"  A: {response[:80]}...")
         print()
 
-    # ---- 3.8 前后对比总结 ----
+    # ---- 3.8 Before/after comparison summary ----
     print("=" * 60)
-    print("微调前后对比总结：")
+    print("Before/after fine-tuning comparison summary:")
     print("=" * 60)
     for i, inst in enumerate(test_instructions):
-        print(f"\n  指令：{inst}")
-        print(f"  微调前：{before_responses[i][:60]}...")
-        print(f"  微调后：{after_responses[i][:60]}...")
+        print(f"\n  Instruction: {inst}")
+        print(f"  Before: {before_responses[i][:60]}...")
+        print(f"  After: {after_responses[i][:60]}...")
 
-    # ---- 3.9 保存 SFT 模型 ----
-    print("\n[步骤8] 保存 SFT 模型...")
+    # ---- 3.9 Save the SFT model ----
+    print("\n[Step 8] Saving the SFT model...")
     save_path = "./output/sft_results/sft_model"
     trainer.save_model(save_path)
     tokenizer.save_pretrained(save_path)
-    print(f"  SFT 模型已保存至：{save_path}")
-    print("  该模型将在下一阶段（奖励模型训练 / PPO 对齐）中使用。")
+    print(f"  SFT model saved to: {save_path}")
+    print("  This model will be used in the next stage (reward model training / PPO alignment).")
 
-    # 同时保存训练数据供后续阶段使用
+    # Also save the training data for use in later stages
     data_save_path = "./output/sft_results/sft_training_data.json"
     with open(data_save_path, "w", encoding="utf-8") as f:
         json.dump(sft_pairs, f, ensure_ascii=False, indent=2)
-    print(f"  训练数据已保存至：{data_save_path}")
+    print(f"  Training data saved to: {data_save_path}")
 
     print("\n" + "=" * 60)
-    print("SFT 阶段完成！")
-    print("接下来请运行 reward_model_training.py 进行奖励模型训练。")
+    print("SFT stage complete!")
+    print("Next, run reward_model_training.py to train the reward model.")
     print("=" * 60)
 
 

@@ -1,16 +1,16 @@
 """
-第6章：用 A2C（Advantage Actor-Critic）训练 Pendulum-v1
-——展示 Actor-Critic 在连续动作空间中的高斯策略
+Chapter 6: Training Pendulum-v1 with A2C (Advantage Actor-Critic)
+-- Demonstrates the Gaussian policy Actor-Critic uses in a continuous action space
 
-运行方式：
+Usage:
     python actor_critic_pendulum.py
-    python actor_critic_pendulum.py --total-timesteps 20000     # 快速验证
-    python actor_critic_pendulum.py --total-timesteps 300000    # 充分训练
+    python actor_critic_pendulum.py --total-timesteps 20000     # quick sanity check
+    python actor_critic_pendulum.py --total-timesteps 300000    # full training
 
-Pendulum-v1 的教学意义：
-    1. 动作是 1 维连续力矩，范围 [-2, 2]
-    2. Actor 输出连续动作分布，而不是离散动作概率
-    3. Critic 估计 V(s)，用 advantage 降低策略梯度方差
+What Pendulum-v1 teaches:
+    1. The action is a 1-dimensional continuous torque in the range [-2, 2]
+    2. The Actor outputs a continuous action distribution rather than discrete action probabilities
+    3. The Critic estimates V(s), using the advantage to reduce policy gradient variance
 """
 
 import argparse
@@ -33,14 +33,14 @@ plt.rcParams["axes.unicode_minus"] = False
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="A2C 训练 Pendulum-v1")
+    parser = argparse.ArgumentParser(description="Train Pendulum-v1 with A2C")
     parser.add_argument("--total-timesteps", type=int, default=300_000,
-                        help="总训练步数（默认 300000）")
+                        help="Total number of training steps (default 300000)")
     parser.add_argument("--num-envs", type=int, default=8,
-                        help="并行环境数量（默认 8）")
-    parser.add_argument("--seed", type=int, default=42, help="随机种子")
+                        help="Number of parallel environments (default 8)")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--eval-episodes", type=int, default=20,
-                        help="最终评估回合数")
+                        help="Number of episodes for the final evaluation")
     return parser.parse_args()
 
 
@@ -56,7 +56,7 @@ def make_env(seed, rank):
 
 
 class TrainingMonitorCallback(BaseCallback):
-    """记录回合奖励、策略熵、价值损失和策略损失。"""
+    """Records episode rewards, policy entropy, value loss, and policy loss."""
 
     def __init__(self):
         super().__init__()
@@ -113,15 +113,15 @@ def save_plots(callback, output_dir):
         smooth_x, smooth_rewards = moving_average_xy(rewards, 20)
 
         fig, ax = plt.subplots(figsize=(10, 5))
-        ax.plot(episodes, rewards, color="#90CAF9", alpha=0.45, linewidth=1.0, label="原始回报")
+        ax.plot(episodes, rewards, color="#90CAF9", alpha=0.45, linewidth=1.0, label="Raw return")
         ax.plot(smooth_x, smooth_rewards, color="#1565C0", linewidth=2.0,
-                label="20回合滑动平均")
+                label="20-episode moving average")
         ax.axhline(y=-800, color="green", linestyle="--", alpha=0.6,
-                   label="A2C 基线参考线 (-800)")
+                   label="A2C baseline reference line (-800)")
         ax.axhline(y=0, color="gray", linestyle=":", alpha=0.35)
-        ax.set_title("A2C Pendulum-v1 回合奖励", fontsize=14, fontweight="bold")
-        ax.set_xlabel("回合")
-        ax.set_ylabel("累计奖励")
+        ax.set_title("A2C Pendulum-v1 Episode Reward", fontsize=14, fontweight="bold")
+        ax.set_xlabel("Episode")
+        ax.set_ylabel("Cumulative Reward")
         ax.legend()
         ax.grid(True, alpha=0.3)
         plt.tight_layout()
@@ -133,9 +133,9 @@ def save_plots(callback, output_dir):
         fig, ax = plt.subplots(figsize=(10, 5))
         ax.plot(callback.timesteps, callback.entropy_losses,
                 color="#EF6C00", linewidth=1.5)
-        ax.set_title("A2C Pendulum-v1 策略熵损失", fontsize=14, fontweight="bold")
-        ax.set_xlabel("时间步")
-        ax.set_ylabel("entropy_loss（负熵）")
+        ax.set_title("A2C Pendulum-v1 Policy Entropy Loss", fontsize=14, fontweight="bold")
+        ax.set_xlabel("Timestep")
+        ax.set_ylabel("entropy_loss (negative entropy)")
         ax.grid(True, alpha=0.3)
         plt.tight_layout()
         plt.savefig(output_dir / "actor_critic_pendulum_entropy.png",
@@ -148,9 +148,9 @@ def save_plots(callback, output_dir):
                 color="#00897B", linewidth=1.5, label="Policy loss")
         ax.plot(callback.timesteps, callback.value_losses,
                 color="#C62828", linewidth=1.5, label="Value loss")
-        ax.set_title("A2C Pendulum-v1 Actor/Critic 损失", fontsize=14, fontweight="bold")
-        ax.set_xlabel("时间步")
-        ax.set_ylabel("损失")
+        ax.set_title("A2C Pendulum-v1 Actor/Critic Loss", fontsize=14, fontweight="bold")
+        ax.set_xlabel("Timestep")
+        ax.set_ylabel("Loss")
         ax.legend()
         ax.grid(True, alpha=0.3)
         plt.tight_layout()
@@ -158,18 +158,18 @@ def save_plots(callback, output_dir):
                     dpi=150, bbox_inches="tight")
         plt.close()
 
-    print("训练曲线已保存到 output/actor_critic_pendulum_*.png")
+    print("Training curves saved to output/actor_critic_pendulum_*.png")
 
 
 def main():
     args = parse_args()
 
     print("=" * 50)
-    print("第6章：A2C 训练 Pendulum-v1")
+    print("Chapter 6: A2C Training on Pendulum-v1")
     print("=" * 50)
-    print(f"总时间步:   {args.total_timesteps:,}")
-    print(f"并行环境:   {args.num_envs}")
-    print("动作空间:   连续 1 维力矩 [-2, 2]")
+    print(f"Total timesteps: {args.total_timesteps:,}")
+    print(f"Parallel envs:   {args.num_envs}")
+    print("Action space:    continuous 1-dimensional torque [-2, 2]")
 
     vec_env = DummyVecEnv([make_env(args.seed, i) for i in range(args.num_envs)])
     vec_env = VecNormalize(vec_env, norm_obs=True, norm_reward=True, clip_obs=10.0)
@@ -193,8 +193,8 @@ def main():
     output_dir = Path("output")
     model.save(output_dir / "actor_critic_pendulum")
     vec_env.save(output_dir / "actor_critic_pendulum_vecnormalize.pkl")
-    print("\n模型已保存到 output/actor_critic_pendulum.zip")
-    print("归一化统计已保存到 output/actor_critic_pendulum_vecnormalize.pkl")
+    print("\nModel saved to output/actor_critic_pendulum.zip")
+    print("Normalization statistics saved to output/actor_critic_pendulum_vecnormalize.pkl")
     save_plots(callback, output_dir)
 
     eval_env = DummyVecEnv([lambda: Monitor(gym.make("Pendulum-v1"))])
@@ -217,11 +217,11 @@ def main():
         episode_rewards.append(total_reward)
 
     eval_env.close()
-    print("\n最终确定性策略评估：")
-    print(f"  平均奖励: {np.mean(episode_rewards):.1f}")
-    print(f"  标准差:   {np.std(episode_rewards):.1f}")
-    print(f"  最好一轮: {np.max(episode_rewards):.1f}")
-    print(f"  最差一轮: {np.min(episode_rewards):.1f}")
+    print("\nFinal deterministic policy evaluation:")
+    print(f"  Mean reward:   {np.mean(episode_rewards):.1f}")
+    print(f"  Std dev:       {np.std(episode_rewards):.1f}")
+    print(f"  Best episode:  {np.max(episode_rewards):.1f}")
+    print(f"  Worst episode: {np.min(episode_rewards):.1f}")
 
 
 if __name__ == "__main__":

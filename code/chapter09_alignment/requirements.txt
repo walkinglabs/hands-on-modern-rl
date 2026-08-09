@@ -1,4 +1,4 @@
-# 第7章：对齐方法族实验依赖
+# Chapter 7: Dependencies for the alignment method family experiments
 transformers==4.57.3
 trl==0.24.0
 torch>=2.0.0

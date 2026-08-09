@@ -1,9 +1,9 @@
 """
-第3章：双臂老虎机实验 —— 探索与利用的经典对比
-比较四种策略：随机、贪心、ε-贪心、UCB
-通过累计平均奖励和累计遗憾来评估各策略的表现
+Chapter 3: Two-armed bandit experiment -- the classic exploration vs. exploitation comparison
+Compare four strategies: random, greedy, epsilon-greedy, UCB
+Evaluate each strategy's performance via cumulative average reward and cumulative regret
 
-运行方式：
+How to run:
     python two_armed_bandit.py
 """
 
@@ -11,39 +11,40 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 创建输出目录
+# Create output directory
 os.makedirs("output", exist_ok=True)
 
 
 # ==========================================
-# 第一部分：双臂老虎机环境
+# Part 1: Two-armed bandit environment
 # ==========================================
 class TwoArmedBandit:
     """
-    双臂老虎机环境
-    - 拉杆 A：获奖概率 0.6（更好的选择）
-    - 拉杆 B：获奖概率 0.4
+    Two-armed bandit environment
+    - Arm A: win probability 0.6 (the better choice)
+    - Arm B: win probability 0.4
 
-    在强化学习中，这是一个最简化的决策问题：
-    状态只有一个（始终相同），动作有两个（A 和 B），
-    目标是最大化累计奖励。它虽然是 MDP 的退化形式，
-    但完美地展示了"探索 vs 利用"的核心矛盾。
+    In reinforcement learning, this is the simplest possible decision problem:
+    there is only one state (always the same), and two actions (A and B).
+    The goal is to maximize cumulative reward. Although it is a degenerate
+    form of an MDP, it perfectly illustrates the core "exploration vs.
+    exploitation" tension.
     """
 
     def __init__(self, prob_a=0.6, prob_b=0.4):
-        self.prob_a = prob_a  # 拉杆 A 的获奖概率
-        self.prob_b = prob_b  # 拉杆 B 的获奖概率
-        # 最优拉杆的概率，用于计算遗憾（regret）
+        self.prob_a = prob_a  # Win probability of arm A
+        self.prob_b = prob_b  # Win probability of arm B
+        # Probability of the best arm, used to compute regret
         self.best_prob = max(prob_a, prob_b)
 
     def pull(self, arm):
         """
-        拉动指定的拉杆，返回奖励（0 或 1）
+        Pull the specified arm, return the reward (0 or 1)
 
-        参数：
-            arm: 0 表示拉杆 A，1 表示拉杆 B
-        返回：
-            reward: 1 表示获奖，0 表示未获奖
+        Args:
+            arm: 0 for arm A, 1 for arm B
+        Returns:
+            reward: 1 for a win, 0 for no win
         """
         if arm == 0:
             return 1 if np.random.random() < self.prob_a else 0
@@ -52,20 +53,21 @@ class TwoArmedBandit:
 
 
 # ==========================================
-# 第二部分：四种策略的实现
+# Part 2: Implementation of the four strategies
 # ==========================================
 
 def strategy_random(bandit, n_steps):
     """
-    策略一：随机策略
-    每一步完全随机选择拉杆 A 或 B，不考虑历史信息。
+    Strategy 1: random strategy
+    Choose arm A or B completely at random at every step, ignoring history.
 
-    这是最基础的基线策略。因为它不做任何学习，
-    平均奖励应该接近两个拉杆概率的均值：(0.6 + 0.4) / 2 = 0.5
+    This is the most basic baseline strategy. Since it does no learning at
+    all, the average reward should be close to the mean of the two arms'
+    probabilities: (0.6 + 0.4) / 2 = 0.5
     """
     rewards = []
     for _ in range(n_steps):
-        arm = np.random.choice([0, 1])  # 等概率随机选择
+        arm = np.random.choice([0, 1])  # Choose randomly with equal probability
         reward = bandit.pull(arm)
         rewards.append(reward)
     return np.array(rewards)
@@ -73,25 +75,26 @@ def strategy_random(bandit, n_steps):
 
 def strategy_greedy(bandit, n_steps):
     """
-    策略二：贪心策略
-    始终选择当前估计值最高的拉杆。
+    Strategy 2: greedy strategy
+    Always choose the arm with the highest current estimate.
 
-    问题：初始估计值相同时，第一步随机选一个拉杆，
-    如果碰巧获奖，就永远只拉这个拉杆，不再探索另一个。
-    这就是"过早收敛"的典型例子。
+    Problem: since the initial estimates are equal, the first step picks an
+    arm at random; if it happens to win, that arm gets pulled forever and the
+    other arm is never explored again. This is the classic example of
+    "premature convergence".
     """
     rewards = []
-    # Q[a] 表示拉杆 a 的当前估计期望奖励
-    Q = np.zeros(2)       # 初始估计值
-    counts = np.zeros(2)  # 每个拉杆被拉的次数
+    # Q[a] denotes the current estimated expected reward of arm a
+    Q = np.zeros(2)       # Initial estimates
+    counts = np.zeros(2)  # Number of times each arm has been pulled
 
     for _ in range(n_steps):
-        # 始终选择当前估计值最高的拉杆（利用，不探索）
+        # Always choose the arm with the highest current estimate (exploit only)
         arm = np.argmax(Q)
         reward = bandit.pull(arm)
         rewards.append(reward)
 
-        # 更新该拉杆的估计值：增量式平均值
+        # Update that arm's estimate: incremental running average
         counts[arm] += 1
         Q[arm] += (reward - Q[arm]) / counts[arm]
 
@@ -100,24 +103,26 @@ def strategy_greedy(bandit, n_steps):
 
 def strategy_epsilon_greedy(bandit, n_steps, epsilon=0.1):
     """
-    策略三：ε-贪心策略 (ε = 0.1)
-    以概率 ε 随机探索，以概率 1-ε 选择当前最佳拉杆。
+    Strategy 3: epsilon-greedy strategy (epsilon = 0.1)
+    Explore randomly with probability epsilon, otherwise choose the current
+    best arm with probability 1-epsilon.
 
-    ε = 0.1 意味着大约 10% 的时间在做随机探索。
-    这是解决"探索 vs 利用"矛盾最常用的简单方法。
-    ε 太大 → 浪费太多时间在已知不好的选择上；
-    ε 太小 → 可能永远找不到最优拉杆。
+    epsilon = 0.1 means about 10% of the time is spent on random exploration.
+    This is the simplest and most common way to resolve the
+    "exploration vs. exploitation" tension.
+    epsilon too large → too much time wasted on known-bad choices;
+    epsilon too small → the optimal arm may never be found.
     """
     rewards = []
     Q = np.zeros(2)
     counts = np.zeros(2)
 
     for _ in range(n_steps):
-        # 以 ε 的概率随机探索，否则贪心选择
+        # Explore randomly with probability epsilon, otherwise choose greedily
         if np.random.random() < epsilon:
-            arm = np.random.choice([0, 1])  # 探索
+            arm = np.random.choice([0, 1])  # Explore
         else:
-            arm = np.argmax(Q)  # 利用
+            arm = np.argmax(Q)  # Exploit
 
         reward = bandit.pull(arm)
         rewards.append(reward)
@@ -130,33 +135,34 @@ def strategy_epsilon_greedy(bandit, n_steps, epsilon=0.1):
 
 def strategy_ucb(bandit, n_steps, c=2.0):
     """
-    策略四：上置信界策略 (UCB, Upper Confidence Bound)
-    选择 "估计值 + 不确定性上界" 最大的拉杆。
+    Strategy 4: Upper Confidence Bound strategy (UCB)
+    Choose the arm with the highest "estimate + uncertainty bound".
 
-    UCB 公式：Q(a) + c * sqrt(ln(t) / N(a))
-    - Q(a)：拉杆 a 的当前估计期望奖励
-    - c：控制探索程度的参数（通常 c=2）
-    - t：当前总步数
-    - N(a)：拉杆 a 被选择的次数
+    UCB formula: Q(a) + c * sqrt(ln(t) / N(a))
+    - Q(a): the current estimated expected reward of arm a
+    - c: parameter controlling the amount of exploration (typically c=2)
+    - t: current total step count
+    - N(a): number of times arm a has been chosen
 
-    核心思想：如果一个拉杆很少被选（N(a) 小），
-    那么对它的估计不确定，不确定性上界就大，
-    所以 UCB 会倾向于去尝试那些"还不确定"的拉杆。
-    随着尝试次数增加，不确定性降低，自然转向贪心。
+    Core idea: if an arm has rarely been chosen (N(a) is small), the estimate
+    for it is uncertain, so its uncertainty bound is large -- UCB therefore
+    tends to try the arms that are "still uncertain". As the number of trials
+    grows, uncertainty shrinks and the strategy naturally shifts toward
+    greedy behavior.
     """
     rewards = []
     Q = np.zeros(2)
     counts = np.zeros(2)
 
     for t in range(1, n_steps + 1):
-        # 前两步各拉一次，确保每个拉杆都被尝试过
+        # Pull each arm once in the first two steps, so every arm has been tried
         if t <= 2:
             arm = t - 1
         else:
-            # 计算 UCB 值
+            # Compute the UCB values
             ucb_values = np.zeros(2)
             for a in range(2):
-                # 不确定性上界：拉的次数越少，上界越大
+                # Uncertainty bound: fewer pulls means a larger bound
                 uncertainty = c * np.sqrt(np.log(t) / counts[a])
                 ucb_values[a] = Q[a] + uncertainty
             arm = np.argmax(ucb_values)
@@ -171,105 +177,105 @@ def strategy_ucb(bandit, n_steps, c=2.0):
 
 
 # ==========================================
-# 第三部分：实验运行与结果对比
+# Part 3: Running the experiment and comparing results
 # ==========================================
 def run_experiment():
     """
-    主实验：每种策略运行 n_runs 次，每次 n_steps 步，取平均
+    Main experiment: run each strategy n_runs times, n_steps steps each, then average
     """
-    n_steps = 1000  # 每次实验的步数
-    n_runs = 200    # 重复实验次数（用于平滑曲线）
+    n_steps = 1000  # Number of steps per run
+    n_runs = 200    # Number of repeated runs (for smoother curves)
 
-    # 用于累计各策略的结果
+    # Used to accumulate results for each strategy
     all_rewards = {
-        '随机策略': np.zeros(n_steps),
-        '贪心策略': np.zeros(n_steps),
-        'ε-贪心 (ε=0.1)': np.zeros(n_steps),
+        'Random': np.zeros(n_steps),
+        'Greedy': np.zeros(n_steps),
+        'ε-greedy (ε=0.1)': np.zeros(n_steps),
         'UCB (c=2)': np.zeros(n_steps),
     }
 
     print("=" * 60)
-    print("  双臂老虎机实验：探索与利用策略对比")
+    print("  Two-armed bandit experiment: comparing exploration/exploitation strategies")
     print("=" * 60)
-    print(f"  拉杆 A 获奖概率: 0.6（最优）")
-    print(f"  拉杆 B 获奖概率: 0.4")
-    print(f"  每次实验步数: {n_steps}")
-    print(f"  重复实验次数: {n_runs}")
+    print(f"  Arm A win probability: 0.6 (optimal)")
+    print(f"  Arm B win probability: 0.4")
+    print(f"  Steps per run: {n_steps}")
+    print(f"  Number of runs: {n_runs}")
     print("-" * 60)
-    print("正在运行实验...")
+    print("Running experiment...")
 
     for run in range(n_runs):
         bandit = TwoArmedBandit(prob_a=0.6, prob_b=0.4)
 
-        # 运行四种策略
-        all_rewards['随机策略'] += strategy_random(bandit, n_steps)
-        all_rewards['贪心策略'] += strategy_greedy(bandit, n_steps)
-        all_rewards['ε-贪心 (ε=0.1)'] += strategy_epsilon_greedy(bandit, n_steps)
+        # Run all four strategies
+        all_rewards['Random'] += strategy_random(bandit, n_steps)
+        all_rewards['Greedy'] += strategy_greedy(bandit, n_steps)
+        all_rewards['ε-greedy (ε=0.1)'] += strategy_epsilon_greedy(bandit, n_steps)
         all_rewards['UCB (c=2)'] += strategy_ucb(bandit, n_steps)
 
         if (run + 1) % 50 == 0:
-            print(f"  已完成 {run + 1}/{n_runs} 轮实验...")
+            print(f"  Completed {run + 1}/{n_runs} runs...")
 
-    # 计算平均值
+    # Compute the averages
     for key in all_rewards:
         all_rewards[key] /= n_runs
 
-    print("实验完成！")
+    print("Experiment complete!")
     print()
 
     # ==========================================
-    # 第四部分：绘制累计平均奖励曲线
+    # Part 4: Plot the cumulative average reward curves
     # ==========================================
     plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
     plt.rcParams['axes.unicode_minus'] = False
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
-    # 图1：累计平均奖励
+    # Figure 1: cumulative average reward
     ax1 = axes[0]
     colors = ['#9E9E9E', '#FF9800', '#2196F3', '#4CAF50']
     for (name, rewards), color in zip(all_rewards.items(), colors):
-        # 计算累计平均奖励
+        # Compute the cumulative average reward
         cumulative_avg = np.cumsum(rewards) / np.arange(1, n_steps + 1)
         ax1.plot(cumulative_avg, label=name, color=color, alpha=0.85)
 
-    ax1.axhline(y=0.6, color='red', linestyle='--', alpha=0.5, label='最优 (prob=0.6)')
-    ax1.axhline(y=0.5, color='gray', linestyle=':', alpha=0.5, label='随机基线 (0.5)')
-    ax1.set_xlabel('步数', fontsize=12)
-    ax1.set_ylabel('累计平均奖励', fontsize=12)
-    ax1.set_title('累计平均奖励对比', fontsize=14)
+    ax1.axhline(y=0.6, color='red', linestyle='--', alpha=0.5, label='Optimal (prob=0.6)')
+    ax1.axhline(y=0.5, color='gray', linestyle=':', alpha=0.5, label='Random baseline (0.5)')
+    ax1.set_xlabel('Step', fontsize=12)
+    ax1.set_ylabel('Cumulative average reward', fontsize=12)
+    ax1.set_title('Cumulative average reward comparison', fontsize=14)
     ax1.legend(fontsize=9, loc='right')
     ax1.set_ylim(0.35, 0.7)
     ax1.grid(True, alpha=0.3)
 
-    # 图2：累计遗憾（regret）
+    # Figure 2: cumulative regret
     ax2 = axes[1]
     best_prob = 0.6
     for (name, rewards), color in zip(all_rewards.items(), colors):
-        # 遗憾 = 每步最优奖励 - 实际获得的奖励
+        # Regret = optimal reward per step - actual reward obtained
         regret = best_prob - rewards
         cumulative_regret = np.cumsum(regret)
         ax2.plot(cumulative_regret, label=name, color=color, alpha=0.85)
 
-    ax2.set_xlabel('步数', fontsize=12)
-    ax2.set_ylabel('累计遗憾', fontsize=12)
-    ax2.set_title('累计遗憾对比（越低越好）', fontsize=14)
+    ax2.set_xlabel('Step', fontsize=12)
+    ax2.set_ylabel('Cumulative regret', fontsize=12)
+    ax2.set_title('Cumulative regret comparison (lower is better)', fontsize=14)
     ax2.legend(fontsize=9)
     ax2.grid(True, alpha=0.3)
 
     plt.tight_layout()
     plt.savefig('output/two_armed_bandit_results.png', dpi=150, bbox_inches='tight')
-    print("图表已保存至 output/two_armed_bandit_results.png")
+    print("Figure saved to output/two_armed_bandit_results.png")
     plt.show()
 
     # ==========================================
-    # 第五部分：打印结果汇总表
+    # Part 5: Print the results summary table
     # ==========================================
     print()
     print("=" * 60)
-    print("  实验结果汇总")
+    print("  Experiment results summary")
     print("=" * 60)
-    print(f"{'策略':<20s} {'累计平均奖励':<15s} {'最终平均奖励':<15s} {'总遗憾':<10s}")
+    print(f"{'Strategy':<20s} {'Cum. avg reward':<15s} {'Final avg reward':<15s} {'Total regret':<10s}")
     print("-" * 60)
 
     for (name, rewards), color in zip(all_rewards.items(), colors):
@@ -281,11 +287,11 @@ def run_experiment():
 
     print("-" * 60)
     print()
-    print("分析：")
-    print("  - 随机策略：不做学习，奖励稳定在 0.5 附近（两个拉杆概率均值）")
-    print("  - 贪心策略：可能过早锁定非最优拉杆，结果不稳定")
-    print("  - ε-贪心策略：在探索和利用之间取得平衡，表现良好")
-    print("  - UCB 策略：通过不确定性引导探索，通常表现最优")
+    print("Analysis:")
+    print("  - Random strategy: does no learning, reward stays near 0.5 (the mean of the two arm probabilities)")
+    print("  - Greedy strategy: may lock in prematurely on a suboptimal arm, results are unstable")
+    print("  - epsilon-greedy strategy: balances exploration and exploitation, performs well")
+    print("  - UCB strategy: guides exploration via uncertainty, usually performs best")
 
 
 if __name__ == "__main__":

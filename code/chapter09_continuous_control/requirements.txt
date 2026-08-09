@@ -1,4 +1,4 @@
-# 第9章：连续控制实验依赖
+# Chapter 9: Continuous control experiment dependencies
 gymnasium[mujoco]>=0.29.0
 stable-baselines3>=2.0.0
 torch>=2.0.0

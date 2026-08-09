@@ -1,14 +1,14 @@
 """
-第6章：用 Stable-Baselines3 的 PPO 训练 LunarLander-v3
-——理解 PPO 的核心超参数与训练监控
+Chapter 6: Training LunarLander-v3 with Stable-Baselines3's PPO
+——Understanding PPO's core hyperparameters and training monitoring
 
-运行方式：
+How to run:
     python ppo_lunar_lander.py
 
-PPO（近端策略优化）的核心思想：
-    1. 限制每次策略更新的幅度（clip），避免"步子迈太大"
-    2. 多轮复用同一批数据（epoch），提高样本效率
-    3. 同时优化策略网络和价值网络（Actor-Critic 架构）
+Core ideas of PPO (Proximal Policy Optimization):
+    1. Limit the magnitude of each policy update (clip), avoiding "taking too big a step"
+    2. Reuse the same batch of data across multiple rounds (epochs), improving sample efficiency
+    3. Jointly optimize the policy network and value network (Actor-Critic architecture)
 """
 
 import os
@@ -20,27 +20,27 @@ from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.vec_env import DummyVecEnv
 
-# 创建输出目录
+# Create output directory
 os.makedirs("output", exist_ok=True)
 
-# 设置中文字体
+# Set Chinese font
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 
 
 # ==========================================
-# 第一部分：自定义训练回调 —— 记录关键指标
+# Part 1: Custom training callback — record key metrics
 # ==========================================
 class TrainingMonitorCallback(BaseCallback):
     """
-    自定义回调：在每次 rollout 结束后记录 PPO 的关键训练指标
-    包括：回合奖励、策略熵、裁剪比例、近似 KL 散度
+    Custom callback: records PPO's key training metrics after each rollout ends
+    Includes: episode reward, policy entropy, clip fraction, approximate KL divergence
     """
 
     def __init__(self, check_freq=2048, verbose=1):
         super().__init__(verbose)
         self.check_freq = check_freq
-        # 记录训练过程中的指标
+        # Record metrics during training
         self.episode_rewards = []
         self.entropy_list = []
         self.clip_fraction_list = []
@@ -48,17 +48,17 @@ class TrainingMonitorCallback(BaseCallback):
         self.timesteps_list = []
 
     def _on_step(self):
-        # 从信息字典中提取回合奖励（当回合结束时）
+        # Extract episode reward from the info dict (when an episode ends)
         for info in self.locals.get("infos", []):
             if "episode" in info:
                 self.episode_rewards.append(info["episode"]["r"])
 
-        # 每次 rollout 结束后记录策略指标
+        # Record policy metrics after each rollout ends
         if self.num_timesteps % self.check_freq == 0 and self.num_timesteps > 0:
-            # 获取 PPO 内部记录的统计信息
-            # entropy: 策略的熵，衡量探索程度
-            # clip_fraction: 被裁剪的比例，衡量策略更新幅度
-            # approx_kl: 近似 KL 散度，衡量新旧策略的差异
+            # Get the statistics logged internally by PPO
+            # entropy: policy entropy, measures exploration level
+            # clip_fraction: fraction clipped, measures the magnitude of the policy update
+            # approx_kl: approximate KL divergence, measures the difference between old and new policies
             logger = self.model.logger
             if hasattr(logger, "name_to_value"):
                 name_to_value = logger.name_to_value
@@ -76,18 +76,18 @@ class TrainingMonitorCallback(BaseCallback):
 
 
 # ==========================================
-# 第二部分：创建向量化环境
+# Part 2: Create the vectorized environment
 # ==========================================
 print("=" * 50)
-print("第6章：PPO 训练 LunarLander-v3")
+print("Chapter 6: Training LunarLander-v3 with PPO")
 print("=" * 50)
 
-print("\n正在创建向量化环境（4 个并行环境）...")
+print("\nCreating vectorized environment (4 parallel envs)...")
 
-# 使用 DummyVecEnv 创建 4 个并行环境
-# 向量化环境可以同时采集多个环境的数据，提高采样效率
+# Use DummyVecEnv to create 4 parallel environments
+# A vectorized environment lets you collect data from multiple environments at once, improving sampling efficiency
 def make_env():
-    """环境工厂函数，用于创建多个独立的环境实例"""
+    """Environment factory function, used to create multiple independent environment instances"""
     def _init():
         env = gym.make("LunarLander-v3")
         return env
@@ -95,50 +95,50 @@ def make_env():
 
 num_envs = 4
 vec_env = DummyVecEnv([make_env() for _ in range(num_envs)])
-print(f"已创建 {num_envs} 个并行环境")
+print(f"Created {num_envs} parallel environments")
 
 
 # ==========================================
-# 第三部分：配置 PPO 超参数
+# Part 3: Configure PPO hyperparameters
 # ==========================================
-print("\n配置 PPO 超参数...")
+print("\nConfiguring PPO hyperparameters...")
 
 model = PPO(
-    policy="MlpPolicy",       # 使用多层感知机策略
-    env=vec_env,              # 向量化环境
-    learning_rate=3e-4,       # 学习率：Adam 优化器的步长
-    n_steps=2048,             # 每次 rollout 采集的步数（每个环境）
-    batch_size=64,            # 小批量大小：每次更新的样本数
-    n_epochs=10,              # 每批数据的更新轮数
-    clip_range=0.2,           # PPO 裁剪范围：限制策略比率在 [0.8, 1.2] 内
-    ent_coef=0.01,            # 熵系数：鼓励探索的正则化项
-    vf_coef=0.5,              # 价值函数损失系数
-    gamma=0.99,               # 折扣因子
-    gae_lambda=0.95,          # GAE lambda：偏差-方差权衡参数
+    policy="MlpPolicy",       # Use a multi-layer perceptron policy
+    env=vec_env,              # Vectorized environment
+    learning_rate=3e-4,       # Learning rate: step size for the Adam optimizer
+    n_steps=2048,             # Steps collected per rollout (per environment)
+    batch_size=64,            # Mini-batch size: number of samples per update
+    n_epochs=10,              # Update rounds per batch of data
+    clip_range=0.2,           # PPO clip range: limits the policy ratio to within [0.8, 1.2]
+    ent_coef=0.01,            # Entropy coefficient: regularization term encouraging exploration
+    vf_coef=0.5,              # Value function loss coefficient
+    gamma=0.99,               # Discount factor
+    gae_lambda=0.95,          # GAE lambda: bias-variance tradeoff parameter
     verbose=1,
     seed=42,
     device="auto",
 )
 
-print(f"  学习率:       {model.learning_rate}")
-print(f"  Rollout 步数: {model.n_steps}")
-print(f"  批量大小:     {model.batch_size}")
-print(f"  更新轮数:     {model.n_epochs}")
-print(f"  裁剪范围:     [{1 - model.clip_range:.1f}, {1 + model.clip_range:.1f}]")
-print(f"  熵系数:       {model.ent_coef}")
-print(f"  价值系数:     {model.vf_coef}")
+print(f"  Learning rate:  {model.learning_rate}")
+print(f"  Rollout steps:  {model.n_steps}")
+print(f"  Batch size:     {model.batch_size}")
+print(f"  Update epochs:  {model.n_epochs}")
+print(f"  Clip range:     [{1 - model.clip_range:.1f}, {1 + model.clip_range:.1f}]")
+print(f"  Entropy coef:   {model.ent_coef}")
+print(f"  Value coef:     {model.vf_coef}")
 
 
 # ==========================================
-# 第四部分：训练模型
+# Part 4: Train the model
 # ==========================================
-print("\n开始训练（200000 时间步）...")
+print("\nStarting training (200000 timesteps)...")
 print("-" * 50)
 
-# 创建训练监控回调
+# Create the training monitor callback
 callback = TrainingMonitorCallback(check_freq=2048)
 
-# 训练 200,000 个时间步
+# Train for 200,000 timesteps
 total_timesteps = 200_000
 model.learn(
     total_timesteps=total_timesteps,
@@ -147,85 +147,85 @@ model.learn(
 )
 
 print("-" * 50)
-print("训练完成！")
+print("Training complete!")
 
 
 # ==========================================
-# 第五部分：绘制训练曲线
+# Part 5: Plot training curves
 # ==========================================
-print("\n正在绘制训练曲线...")
+print("\nPlotting training curves...")
 
 fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-fig.suptitle("PPO 训练 LunarLander-v3 — 训练指标监控", fontsize=16, fontweight="bold")
+fig.suptitle("PPO Training on LunarLander-v3 — Training Metrics Monitor", fontsize=16, fontweight="bold")
 
-# 子图1：回合奖励曲线
+# Subplot 1: episode reward curve
 ax1 = axes[0, 0]
 if callback.episode_rewards:
-    # 使用滑动平均平滑曲线
+    # Smooth the curve using a moving average
     rewards = callback.episode_rewards
     window = min(20, len(rewards))
     smoothed = np.convolve(rewards, np.ones(window) / window, mode="valid")
     ax1.plot(smoothed, color="#2196F3", alpha=0.8, linewidth=1.5)
-    ax1.set_title("回合奖励（滑动平均）", fontsize=13)
-    ax1.set_xlabel("回合")
-    ax1.set_ylabel("累计奖励")
+    ax1.set_title("Episode reward (moving average)", fontsize=13)
+    ax1.set_xlabel("Episode")
+    ax1.set_ylabel("Cumulative reward")
     ax1.grid(True, alpha=0.3)
 
-# 子图2：策略熵
+# Subplot 2: policy entropy
 ax2 = axes[0, 1]
 if callback.entropy_list:
     ax2.plot(callback.timesteps_list, callback.entropy_list,
              color="#FF9800", alpha=0.8, linewidth=1.5)
-    ax2.set_title("策略熵（探索程度）", fontsize=13)
-    ax2.set_xlabel("时间步")
-    ax2.set_ylabel("熵")
+    ax2.set_title("Policy entropy (exploration level)", fontsize=13)
+    ax2.set_xlabel("Timestep")
+    ax2.set_ylabel("Entropy")
     ax2.grid(True, alpha=0.3)
-    # 标注：熵越高 = 探索越多
+    # Annotation: higher entropy = more exploration
 
-# 子图3：裁剪比例
+# Subplot 3: clip fraction
 ax3 = axes[1, 0]
 if callback.clip_fraction_list:
     ax3.plot(callback.timesteps_list, callback.clip_fraction_list,
              color="#F44336", alpha=0.8, linewidth=1.5)
     ax3.axhline(y=0.2, color="gray", linestyle="--", alpha=0.5, label="clip_range=0.2")
-    ax3.set_title("裁剪比例（clip fraction）", fontsize=13)
-    ax3.set_xlabel("时间步")
-    ax3.set_ylabel("被裁剪的比例")
+    ax3.set_title("Clip fraction", fontsize=13)
+    ax3.set_xlabel("Timestep")
+    ax3.set_ylabel("Fraction clipped")
     ax3.legend()
     ax3.grid(True, alpha=0.3)
 
-# 子图4：近似 KL 散度
+# Subplot 4: approximate KL divergence
 ax4 = axes[1, 1]
 if callback.approx_kl_list:
     ax4.plot(callback.timesteps_list, callback.approx_kl_list,
              color="#4CAF50", alpha=0.8, linewidth=1.5)
-    ax4.set_title("近似 KL 散度（新旧策略差异）", fontsize=13)
-    ax4.set_xlabel("时间步")
-    ax4.set_ylabel("KL 散度")
+    ax4.set_title("Approximate KL divergence (old vs. new policy difference)", fontsize=13)
+    ax4.set_xlabel("Timestep")
+    ax4.set_ylabel("KL divergence")
     ax4.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.savefig("output/ppo_lunar_lander_curves.png", dpi=150, bbox_inches="tight")
-print("训练曲线已保存至: output/ppo_lunar_lander_curves.png")
+print("Training curves saved to: output/ppo_lunar_lander_curves.png")
 plt.show()
 
 
 # ==========================================
-# 第六部分：评估训练好的模型
+# Part 6: Evaluate the trained model
 # ==========================================
-print("\n正在评估最终模型（20 个测试回合）...")
+print("\nEvaluating the final model (20 test episodes)...")
 print("-" * 50)
 
-# 创建评估用的独立环境
+# Create a separate environment for evaluation
 eval_env = gym.make("LunarLander-v3")
 mean_reward, std_reward = evaluate_policy(
     model, eval_env, n_eval_episodes=20, deterministic=True
 )
-print(f"20 回合测试结果：")
-print(f"  平均奖励: {mean_reward:.2f}")
-print(f"  标准差:   {std_reward:.2f}")
+print(f"20-episode test result:")
+print(f"  Mean reward: {mean_reward:.2f}")
+print(f"  Std dev:     {std_reward:.2f}")
 
-# 逐回合测试，展示详细结果
+# Test episode by episode, showing detailed results
 test_rewards = []
 for ep in range(20):
     obs, _ = eval_env.reset()
@@ -237,18 +237,18 @@ for ep in range(20):
         total_reward += reward
     test_rewards.append(total_reward)
 
-print(f"\n逐回合奖励：")
+print(f"\nPer-episode rewards:")
 for i, r in enumerate(test_rewards):
-    status = "达标" if r >= 200 else "未达标"
-    print(f"  回合 {i + 1:2d}: {r:8.2f}  [{status}]")
+    status = "solved" if r >= 200 else "not solved"
+    print(f"  Episode {i + 1:2d}: {r:8.2f}  [{status}]")
 
-print(f"\n达标率（>= 200 分）: {sum(1 for r in test_rewards if r >= 200)}/20")
+print(f"\nSolve rate (>= 200 points): {sum(1 for r in test_rewards if r >= 200)}/20")
 eval_env.close()
 
 
 # ==========================================
-# 第七部分：保存模型
+# Part 7: Save the model
 # ==========================================
 model.save("output/ppo_lunar_lander")
-print(f"\n模型已保存至: output/ppo_lunar_lander.zip")
+print(f"\nModel saved to: output/ppo_lunar_lander.zip")
 print("=" * 50)

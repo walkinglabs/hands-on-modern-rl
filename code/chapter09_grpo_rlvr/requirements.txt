@@ -1,4 +1,4 @@
-# 第9章：GRPO 与 RLVR 实验依赖
+# Chapter 9: GRPO and RLVR experiment dependencies
 transformers==4.57.3
 trl==0.24.0
 torch>=2.0.0

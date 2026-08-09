@@ -1,7 +1,7 @@
 {
   "name": "hands-on-modern-rl",
   "version": "1.0.0",
-  "description": "现代强化学习实战——从代码到原理",
+  "description": "Modern Reinforcement Learning in Practice -- From Code to Theory",
   "type": "module",
   "scripts": {
     "dev": "npm run assets:optimize && vitepress dev docs",

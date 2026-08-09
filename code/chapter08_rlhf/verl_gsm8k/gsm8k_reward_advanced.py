@@ -6,7 +6,7 @@ REWARD_TYPE = "sequential"
 
 
 def format_reward(response: str) -> float:
-    """检查回答是否包含规范的推理过程。"""
+    """Check whether the response contains a well-formed reasoning process."""
     lines = [line.strip() for line in response.strip().split("\n") if line.strip()]
     has_reasoning = len(lines) >= 2
     has_answer_marker = bool(re.search(r"####|\\boxed|<answer>", response))
@@ -20,7 +20,7 @@ def format_reward(response: str) -> float:
 
 
 def accuracy_reward(response: str, ground_truth: str) -> float:
-    """检查最终答案是否正确。"""
+    """Check whether the final answer is correct."""
     answer_match = re.search(r"####\s*(.+)", response)
     if answer_match:
         predicted = answer_match.group(1).strip()
@@ -40,7 +40,7 @@ def accuracy_reward(response: str, ground_truth: str) -> float:
 
 
 def compute_score(reward_input: dict[str, Any], **kwargs) -> dict[str, float]:
-    """veRL 自定义 reward 入口：accuracy 占 75%，format 占 25%。"""
+    """veRL custom reward entry point: accuracy weighted 75%, format weighted 25%."""
     response = reward_input["response"]
     ground_truth = reward_input["ground_truth"]
 

@@ -1,25 +1,26 @@
 """
-第11章：VLM GRPO 训练模拟演示
+Chapter 11: VLM GRPO Training Simulation Demo
 ==========================================================
 
-本脚本模拟 VLM（视觉语言模型）上的 GRPO 训练过程：
-  1. 构造几何图形计数任务的训练数据
-  2. 模拟 GRPO 训练循环（组采样 → 奖励计算 → 归一化 → 策略更新）
-  3. 展示 VLM GRPO 与纯文本 GRPO 的关键区别
-  4. 跟踪训练指标：准确率、平均奖励、响应质量
-  5. 训练前后对比
+This script simulates the GRPO training process on a VLM (Vision-Language Model):
+  1. Build training data for the geometry shape counting task
+  2. Simulate the GRPO training loop (group sampling → reward computation → normalization → policy update)
+  3. Show the key differences between VLM GRPO and text-only GRPO
+  4. Track training metrics: accuracy, average reward, response quality
+  5. Compare before and after training
 
-重要说明：
-  本脚本是**简化演示版**，使用模拟数据而非真实 VLM 模型。
-  完整的 VLM GRPO 训练需要：
-    - GPU 显存 >= 40GB（如 A100）
-    - transformers 库中的 VLM 模型（如 Qwen2-VL、LLaVA）
-    - 图像编码器 + 视觉 token 处理
-    - 分布式训练框架（如 DeepSpeed）
+Important note:
+  This script is a **simplified demo**, using simulated data instead of a real VLM model.
+  A full VLM GRPO training run would require:
+    - GPU memory >= 40GB (e.g. an A100)
+    - A VLM model from the transformers library (e.g. Qwen2-VL, LLaVA)
+    - An image encoder + vision token processing
+    - A distributed training framework (e.g. DeepSpeed)
 
-  本脚本的目的是帮助理解 VLM GRPO 的训练流程和关键概念。
+  The purpose of this script is to help you understand the VLM GRPO training
+  workflow and its key concepts.
 
-运行方式：
+How to run:
   python vlm_grpo_train.py
 """
 
@@ -29,69 +30,72 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 创建输出目录
+# Create output directory
 os.makedirs("output", exist_ok=True)
 
-# 设置中文字体，确保图表标题和标签正常显示
+# Set a CJK-capable font to ensure chart titles and labels render correctly
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 
 
 # ==========================================
-# 第一部分：VLM GRPO 与纯文本 GRPO 的区别
+# Part 1: Differences between VLM GRPO and text-only GRPO
 # ==========================================
-# VLM GRPO 的独特之处在于：
-#   1. 输入包含图像 → 需要图像编码器（Vision Encoder）
-#   2. 图像被编码为视觉 token → 与文本 token 拼接后送入 LLM
-#   3. 奖励函数需要考虑视觉定位能力
-#   4. 训练时需要同时处理图像和文本数据
+# What makes VLM GRPO unique:
+#   1. The input includes images → requires an image encoder (Vision Encoder)
+#   2. Images are encoded as vision tokens → concatenated with text tokens before feeding into the LLM
+#   3. The reward function needs to account for visual grounding ability
+#   4. Training must process both image and text data simultaneously
 
 def print_vlm_grpo_overview():
     """
-    打印 VLM GRPO 与纯文本 GRPO 的架构对比
+    Print an architecture comparison between VLM GRPO and text-only GRPO
     """
     print("=" * 70)
-    print("  VLM GRPO vs 纯文本 GRPO — 架构对比")
+    print("  VLM GRPO vs Text-only GRPO — Architecture Comparison")
     print("=" * 70)
     print()
-    print("  纯文本 GRPO 流程：")
+    print("  Text-only GRPO pipeline:")
     print("  ┌──────────┐    ┌──────────┐    ┌──────────┐")
-    print("  │ 文本提示  │ → │ LLM 采样  │ → │ 文本奖励  │")
+    print("  │ Text     │ → │ LLM      │ → │ Text     │")
+    print("  │ prompt   │    │ sampling │    │ reward   │")
     print("  │ (prompt) │    │ (group)  │    │ (score)  │")
     print("  └──────────┘    └──────────┘    └──────────┘")
     print()
-    print("  VLM GRPO 流程：")
+    print("  VLM GRPO pipeline:")
     print("  ┌──────┐ ┌──────────┐    ┌──────────────┐    ┌──────────────┐")
-    print("  │ 图像 │→│ 视觉编码  │→│ VLM 采样      │→│ 多模态奖励    │")
-    print("  │(img) │ │(Encoder) │    │(vision+text) │    │(correct+vis) │")
+    print("  │Image │→│ Vision    │→│ VLM sampling  │→│ Multi-modal  │")
+    print("  │(img) │ │ encoding  │    │(vision+text) │    │ reward       │")
+    print("  │      │ │(Encoder) │    │              │    │(correct+vis) │")
     print("  └──────┘ └──────────┘    └──────────────┘    └──────────────┘")
     print("  ┌──────────┐     ↑")
-    print("  │ 文本提示  │ ────┘")
+    print("  │ Text     │ ────┘")
+    print("  │ prompt   │")
     print("  │ (prompt) │")
     print("  └──────────┘")
     print()
-    print("  关键区别：")
-    print("    1. 输入：纯文本 prompt → (图像, 文本 prompt) 对")
-    print("    2. 模型：LLM → VLM（LLM + Vision Encoder + 投影层）")
-    print("    3. Token：仅文本 token → 文本 token + 视觉 token")
-    print("    4. 奖励：仅文本质量 → 文本质量 + 视觉定位能力")
-    print("    5. 显存：较小 → 显著增加（图像编码 + 更长序列）")
+    print("  Key differences:")
+    print("    1. Input: text-only prompt → (image, text prompt) pair")
+    print("    2. Model: LLM → VLM (LLM + Vision Encoder + projection layer)")
+    print("    3. Tokens: text tokens only → text tokens + vision tokens")
+    print("    4. Reward: text quality only → text quality + visual grounding ability")
+    print("    5. Memory: smaller → significantly higher (image encoding + longer sequences)")
     print()
 
 
 # ==========================================
-# 第二部分：模拟数据与响应生成
+# Part 2: Simulated data and response generation
 # ==========================================
-# 由于完整 VLM 推理需要大量 GPU 资源，
-# 这里使用预设模板模拟不同质量的模型响应
+# Since full VLM inference would require substantial GPU resources,
+# preset templates are used here to simulate model responses of varying quality
 
-# 几何图形计数任务的标准提示词
+# Standard prompt for the geometry shape counting task
 STANDARD_PROMPT = "请数一下图片中有多少个三角形、圆形和正方形"
 
-# 模拟不同质量水平的响应模板
-# 每个模板包含一个函数，根据 ground_truth 生成响应
+# Templates simulating responses of varying quality levels
+# Each template is a function that generates a response from the ground_truth
 def generate_correct_response(gt):
-    """生成完全正确的响应（含推理过程）"""
+    """Generate a fully correct response (including reasoning)"""
     shapes_desc = []
     for shape, count in gt.items():
         if count > 0:
@@ -109,15 +113,15 @@ def generate_correct_response(gt):
 
 
 def generate_short_correct_response(gt):
-    """生成正确但简短的响应"""
+    """Generate a correct but short response"""
     return f"三角形{gt['三角形']}个，圆形{gt['圆形']}个，正方形{gt['正方形']}个。"
 
 
 def generate_wrong_response(gt):
-    """生成有错误的响应（随机修改一个数字）"""
+    """Generate a response with an error (randomly modify one number)"""
     wrong_gt = dict(gt)
     shape_to_modify = random.choice(list(gt.keys()))
-    # 随机增加或减少 1~2
+    # Randomly increase or decrease by 1~2
     delta = random.choice([-2, -1, 1, 2])
     wrong_gt[shape_to_modify] = max(0, wrong_gt[shape_to_modify] + delta)
     return (
@@ -128,9 +132,9 @@ def generate_wrong_response(gt):
 
 
 def generate_partially_correct_response(gt):
-    """生成部分正确的响应（只有一部分形状数对了）"""
+    """Generate a partially correct response (only some shape counts are right)"""
     shapes = list(gt.keys())
-    # 选择一个形状保持正确，其他随机修改
+    # Keep one shape's count correct, randomly modify the others
     correct_shape = random.choice(shapes)
     wrong_gt = {}
     for s in shapes:
@@ -142,28 +146,28 @@ def generate_partially_correct_response(gt):
 
 
 def generate_low_quality_response(gt):
-    """生成低质量响应（无格式、无推理）"""
+    """Generate a low-quality response (no formatting, no reasoning)"""
     shapes = list(gt.keys())
     random.shuffle(shapes)
     nums = [max(0, gt[s] + random.choice([-2, -1, 0, 1, 2])) for s in shapes]
     return f"大概有{shapes[0]}{nums[0]}个{shapes[1]}{nums[1]}个{shapes[2]}{nums[2]}个吧"
 
 
-# 响应生成器列表，按质量从高到低排列
+# List of response generators, ordered from highest to lowest quality
 RESPONSE_GENERATORS = [
-    generate_correct_response,           # 质量：高
-    generate_short_correct_response,     # 质量：中高（正确但无推理）
-    generate_wrong_response,             # 质量：中低（有推理但错误）
-    generate_partially_correct_response, # 质量：低（部分正确）
-    generate_low_quality_response,       # 质量：很低
+    generate_correct_response,           # quality: high
+    generate_short_correct_response,     # quality: medium-high (correct but no reasoning)
+    generate_wrong_response,             # quality: medium-low (has reasoning but wrong)
+    generate_partially_correct_response, # quality: low (partially correct)
+    generate_low_quality_response,       # quality: very low
 ]
 
 
 # ==========================================
-# 第三部分：奖励函数（简化版，复用 multi_modal_reward.py 的逻辑）
+# Part 3: Reward function (simplified version, reuses the logic from multi_modal_reward.py)
 # ==========================================
 def extract_numbers(response, shape_names):
-    """从响应中提取每种形状对应的数字"""
+    """Extract the number corresponding to each shape from the response"""
     import re
     extracted = {}
     for shape_name in shape_names:
@@ -181,20 +185,20 @@ def extract_numbers(response, shape_names):
 
 def simple_reward(response, ground_truth):
     """
-    简化版奖励函数：计算响应的综合得分
+    Simplified reward function: computes a composite score for the response
 
-    组成部分：
-      - 正确性（0.0 或 1.0）：答案完全正确
-      - 推理加分（0.0~0.3）：包含推理步骤
-      - 格式加分（0.0~0.2）：格式规范
+    Components:
+      - Correctness (0.0 or 1.0): the answer is fully correct
+      - Reasoning bonus (0.0~0.3): includes reasoning steps
+      - Format bonus (0.0~0.2): well-formatted output
 
-    总分范围：0.0 ~ 1.5
+    Total score range: 0.0 ~ 1.5
     """
     import re
 
     score = 0.0
 
-    # 正确性
+    # Correctness
     extracted = extract_numbers(response, ['三角形', '圆形', '正方形'])
     all_correct = True
     for shape, expected in ground_truth.items():
@@ -204,12 +208,12 @@ def simple_reward(response, ground_truth):
     if all_correct and len(extracted) == len(ground_truth):
         score += 1.0
 
-    # 推理加分
+    # Reasoning bonus
     step_keywords = ['首先', '然后', '接着', '最后', '分析', '观察', '因为', '所以']
     step_count = sum(1 for kw in step_keywords if kw in response)
     score += min(step_count * 0.06, 0.3)
 
-    # 格式加分
+    # Format bonus
     if all(s in response for s in ['三角形', '圆形', '正方形']):
         score += 0.1
     if re.search(r'答[：:]', response):
@@ -219,28 +223,28 @@ def simple_reward(response, ground_truth):
 
 
 # ==========================================
-# 第四部分：GRPO 训练数据准备
+# Part 4: GRPO training data preparation
 # ==========================================
 def create_training_samples(num_samples=20, seed=42):
     """
-    创建模拟的训练样本
+    Create simulated training samples
 
-    每个样本包含：
-      - 图像标识（模拟）
-      - 文本提示
-      - ground_truth（每种形状的正确数量）
+    Each sample contains:
+      - Image identifier (simulated)
+      - Text prompt
+      - ground_truth (the correct count for each shape)
 
-    参数：
-        num_samples: 样本数量
-        seed: 随机种子
-    返回：
-        list[dict]: 训练样本列表
+    Args:
+        num_samples: number of samples
+        seed: random seed
+    Returns:
+        list[dict]: list of training samples
     """
     random.seed(seed)
     samples = []
 
     for i in range(num_samples):
-        # 随机生成每种形状的数量（0~5）
+        # Randomly generate the count of each shape (0~5)
         gt = {
             '三角形': random.randint(0, 5),
             '圆形': random.randint(0, 5),
@@ -257,60 +261,60 @@ def create_training_samples(num_samples=20, seed=42):
 
 
 # ==========================================
-# 第五部分：模拟 GRPO 训练循环
+# Part 5: Simulated GRPO training loop
 # ==========================================
 def simulate_grpo_training(samples, group_size=4, num_epochs=5,
                            initial_quality=0.3, seed=42):
     """
-    模拟 VLM GRPO 的训练过程
+    Simulate the VLM GRPO training process
 
-    GRPO 训练循环（每个 epoch）：
-      1. 对每个训练样本，生成 group_size 个响应
-      2. 用奖励函数给每个响应打分
-      3. 计算组内归一化优势（advantage）
-      4. 用优势值更新策略（模拟）
-      5. 随着训练进行，模型响应质量逐步提升
+    GRPO training loop (per epoch):
+      1. For each training sample, generate group_size responses
+      2. Score each response with the reward function
+      3. Compute the within-group normalized advantage
+      4. Update the policy using the advantage values (simulated)
+      5. As training proceeds, the model's response quality gradually improves
 
-    参数：
-        samples: 训练样本列表
-        group_size: 每个问题的采样数（GRPO 论文推荐 4~16）
-        num_epochs: 训练轮数
-        initial_quality: 初始响应质量（0~1，越高表示初始模型越好）
-        seed: 随机种子
-    返回：
-        dict: 训练历史记录
+    Args:
+        samples: list of training samples
+        group_size: number of samples per question (the GRPO paper recommends 4~16)
+        num_epochs: number of training epochs
+        initial_quality: initial response quality (0~1, higher means a stronger initial model)
+        seed: random seed
+    Returns:
+        dict: training history
     """
     random.seed(seed)
     np.random.seed(seed)
 
     print("=" * 70)
-    print("  VLM GRPO 训练模拟")
+    print("  VLM GRPO Training Simulation")
     print("=" * 70)
     print()
-    print(f"训练配置：")
-    print(f"  训练样本数: {len(samples)}")
-    print(f"  组大小 (group_size): {group_size}")
-    print(f"  训练轮数: {num_epochs}")
-    print(f"  初始响应质量: {initial_quality:.1f}")
+    print(f"Training configuration:")
+    print(f"  Number of training samples: {len(samples)}")
+    print(f"  Group size (group_size): {group_size}")
+    print(f"  Number of epochs: {num_epochs}")
+    print(f"  Initial response quality: {initial_quality:.1f}")
     print()
-    print("注意：这是模拟训练，完整的 VLM GRPO 需要：")
-    print("  - VLM 模型（如 Qwen2-VL、LLaVA）")
-    print("  - 图像编码器和视觉 token 处理")
-    print("  - GPU 显存 >= 40GB")
-    print("  - DeepSpeed 或 FSDP 分布式训练框架")
+    print("Note: this is a simulated training run. Full VLM GRPO requires:")
+    print("  - A VLM model (e.g. Qwen2-VL, LLaVA)")
+    print("  - An image encoder and vision token processing")
+    print("  - GPU memory >= 40GB")
+    print("  - DeepSpeed or FSDP for distributed training")
     print()
 
-    # 记录训练历史
+    # Track training history
     history = {
         'epoch': [],
-        'accuracy': [],         # 完全正确的比例
-        'avg_reward': [],       # 平均奖励
-        'best_reward': [],      # 最佳响应的平均奖励
-        'avg_advantage_std': [],# 平均优势标准差（衡量区分度）
+        'accuracy': [],         # proportion fully correct
+        'avg_reward': [],       # average reward
+        'best_reward': [],      # average reward of the best response
+        'avg_advantage_std': [],# average advantage std (measures discriminability)
     }
 
-    # 模拟训练过程：随着 epoch 增加，模型质量逐步提升
-    # quality_factor 从 initial_quality 线性增长到接近 1.0
+    # Simulate the training process: model quality gradually improves as epochs increase
+    # quality_factor grows linearly from initial_quality toward ~1.0
     for epoch in range(num_epochs):
         quality_factor = initial_quality + (1.0 - initial_quality) * (epoch / max(num_epochs - 1, 1))
 
@@ -322,19 +326,19 @@ def simulate_grpo_training(samples, group_size=4, num_epochs=5,
         for sample in samples:
             gt = sample['ground_truth']
 
-            # 模拟生成 group_size 个响应
+            # Simulate generating group_size responses
             group_rewards = []
             for g in range(group_size):
-                # 根据质量因子决定是否生成正确响应
-                # 质量因子越高，正确响应的概率越大
+                # Decide whether to generate a correct response based on the quality factor
+                # The higher the quality factor, the higher the probability of a correct response
                 if random.random() < quality_factor:
-                    # 生成正确或接近正确的响应
+                    # Generate a correct or near-correct response
                     if random.random() < 0.7:
                         response = generate_correct_response(gt)
                     else:
                         response = generate_short_correct_response(gt)
                 else:
-                    # 生成有缺陷的响应
+                    # Generate a flawed response
                     choice = random.random()
                     if choice < 0.4:
                         response = generate_wrong_response(gt)
@@ -343,27 +347,27 @@ def simulate_grpo_training(samples, group_size=4, num_epochs=5,
                     else:
                         response = generate_low_quality_response(gt)
 
-                # 计算奖励
+                # Compute the reward
                 reward = simple_reward(response, gt)
                 group_rewards.append(reward)
 
-            # GRPO 核心：组内归一化
+            # GRPO core: within-group normalization
             rewards_arr = np.array(group_rewards)
             mean_r = rewards_arr.mean()
             std_r = rewards_arr.std() + 1e-8
             advantages = (rewards_arr - mean_r) / std_r
 
-            # 记录统计量
+            # Record statistics
             epoch_rewards.extend(group_rewards)
             epoch_best_rewards.append(max(group_rewards))
             epoch_adv_stds.append(std_r)
 
-            # 检查最佳响应是否正确
+            # Check whether the best response is correct
             best_idx = np.argmax(rewards_arr)
             if rewards_arr[best_idx] >= 1.0:
                 epoch_correct += 1
 
-        # 计算本 epoch 的指标
+        # Compute this epoch's metrics
         accuracy = epoch_correct / len(samples)
         avg_reward = np.mean(epoch_rewards)
         best_reward = np.mean(epoch_best_rewards)
@@ -375,66 +379,66 @@ def simulate_grpo_training(samples, group_size=4, num_epochs=5,
         history['best_reward'].append(best_reward)
         history['avg_advantage_std'].append(avg_adv_std)
 
-        # 打印本 epoch 的训练日志
+        # Print this epoch's training log
         print(f"  Epoch {epoch+1}/{num_epochs} | "
-              f"准确率: {accuracy:.3f} | "
-              f"平均奖励: {avg_reward:.3f} | "
-              f"最佳响应奖励: {best_reward:.3f} | "
-              f"优势std: {avg_adv_std:.3f}")
+              f"Accuracy: {accuracy:.3f} | "
+              f"Avg reward: {avg_reward:.3f} | "
+              f"Best response reward: {best_reward:.3f} | "
+              f"Advantage std: {avg_adv_std:.3f}")
 
     return history
 
 
 # ==========================================
-# 第六部分：训练前后对比
+# Part 6: Before/after training comparison
 # ==========================================
 def print_before_after_comparison(samples, history, seed=42):
     """
-    打印训练前后的对比结果
+    Print a comparison of results before and after training
 
-    展示：
-      1. 训练前后在相同样本上的表现差异
-      2. 几个具体样本的响应对比
+    Shows:
+      1. Differences in performance on the same samples before and after training
+      2. Response comparisons for a few specific samples
     """
     random.seed(seed)
 
     print("\n" + "=" * 70)
-    print("  训练前后对比")
+    print("  Before/After Training Comparison")
     print("=" * 70)
 
-    # 选取 5 个样本展示对比
+    # Select 5 samples to display the comparison
     display_samples = samples[:5]
 
-    print("\n--- 训练前（低质量模型）的响应示例 ---")
+    print("\n--- Response examples before training (low-quality model) ---")
     for i, sample in enumerate(display_samples):
         gt = sample['ground_truth']
-        # 训练前：低质量响应
+        # Before training: low-quality response
         response = generate_wrong_response(gt)
         reward = simple_reward(response, gt)
         extracted = extract_numbers(response, ['三角形', '圆形', '正方形'])
         is_correct = all(extracted.get(s, -1) == gt[s] for s in gt)
-        print(f"\n  样本 {i+1} (GT: 三角形={gt['三角形']}, 圆形={gt['圆形']}, "
-              f"正方形={gt['正方形']})")
-        print(f"    回答: {response[:60]}...")
-        print(f"    奖励: {reward:.2f} | {'正确' if is_correct else '错误'}")
+        print(f"\n  Sample {i+1} (GT: triangles={gt['三角形']}, circles={gt['圆形']}, "
+              f"squares={gt['正方形']})")
+        print(f"    Response: {response[:60]}...")
+        print(f"    Reward: {reward:.2f} | {'correct' if is_correct else 'incorrect'}")
 
-    print("\n\n--- 训练后（高质量模型）的响应示例 ---")
+    print("\n\n--- Response examples after training (high-quality model) ---")
     for i, sample in enumerate(display_samples):
         gt = sample['ground_truth']
-        # 训练后：高质量响应
+        # After training: high-quality response
         response = generate_correct_response(gt)
         reward = simple_reward(response, gt)
         extracted = extract_numbers(response, ['三角形', '圆形', '正方形'])
         is_correct = all(extracted.get(s, -1) == gt[s] for s in gt)
-        print(f"\n  样本 {i+1} (GT: 三角形={gt['三角形']}, 圆形={gt['圆形']}, "
-              f"正方形={gt['正方形']})")
-        print(f"    回答: {response[:60]}...")
-        print(f"    奖励: {reward:.2f} | {'正确' if is_correct else '错误'}")
+        print(f"\n  Sample {i+1} (GT: triangles={gt['三角形']}, circles={gt['圆形']}, "
+              f"squares={gt['正方形']})")
+        print(f"    Response: {response[:60]}...")
+        print(f"    Reward: {reward:.2f} | {'correct' if is_correct else 'incorrect'}")
 
-    # 汇总
+    # Summary
     print("\n" + "-" * 70)
-    print("  汇总对比：")
-    print(f"  {'指标':>12s}  {'训练前':>10s}  {'训练后':>10s}  {'变化':>10s}")
+    print("  Summary comparison:")
+    print(f"  {'Metric':>12s}  {'Before':>10s}  {'After':>10s}  {'Change':>10s}")
     print(f"  {'----':>12s}  {'------':>10s}  {'------':>10s}  {'----':>10s}")
 
     before_acc = history['accuracy'][0]
@@ -444,70 +448,70 @@ def print_before_after_comparison(samples, history, seed=42):
     before_best = history['best_reward'][0]
     after_best = history['best_reward'][-1]
 
-    print(f"  {'准确率':>12s}  {before_acc:>10.3f}  {after_acc:>10.3f}  {after_acc - before_acc:>+10.3f}")
-    print(f"  {'平均奖励':>12s}  {before_reward:>10.3f}  {after_reward:>10.3f}  {after_reward - before_reward:>+10.3f}")
-    print(f"  {'最佳奖励':>12s}  {before_best:>10.3f}  {after_best:>10.3f}  {after_best - before_best:>+10.3f}")
+    print(f"  {'Accuracy':>12s}  {before_acc:>10.3f}  {after_acc:>10.3f}  {after_acc - before_acc:>+10.3f}")
+    print(f"  {'Avg reward':>12s}  {before_reward:>10.3f}  {after_reward:>10.3f}  {after_reward - before_reward:>+10.3f}")
+    print(f"  {'Best reward':>12s}  {before_best:>10.3f}  {after_best:>10.3f}  {after_best - before_best:>+10.3f}")
 
 
 # ==========================================
-# 第七部分：绘制训练曲线
+# Part 7: Plot training curves
 # ==========================================
 def plot_training_curves(history):
     """
-    绘制 VLM GRPO 训练曲线
+    Plot the VLM GRPO training curves
 
-    包含 4 个子图：
-      1. 准确率随训练轮次的变化
-      2. 平均奖励随训练轮次的变化
-      3. 最佳响应奖励的变化
-      4. 优势标准差的变化（衡量组内区分度）
+    Contains 4 subplots:
+      1. Accuracy over training epochs
+      2. Average reward over training epochs
+      3. Best response reward over time
+      4. Advantage standard deviation over time (measures within-group discriminability)
     """
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-    fig.suptitle("VLM GRPO 训练曲线（模拟）", fontsize=16, fontweight='bold')
+    fig.suptitle("VLM GRPO Training Curves (Simulated)", fontsize=16, fontweight='bold')
 
     epochs = history['epoch']
 
-    # 子图1：准确率
+    # Subplot 1: accuracy
     ax1 = axes[0, 0]
     ax1.plot(epochs, history['accuracy'], 'o-', color='#2196F3', linewidth=2,
-             markersize=8, label='准确率')
+             markersize=8, label='Accuracy')
     ax1.fill_between(epochs, 0, history['accuracy'], alpha=0.1, color='#2196F3')
-    ax1.set_title('准确率', fontsize=13)
-    ax1.set_xlabel('训练轮次 (Epoch)')
-    ax1.set_ylabel('准确率')
+    ax1.set_title('Accuracy', fontsize=13)
+    ax1.set_xlabel('Training Epoch')
+    ax1.set_ylabel('Accuracy')
     ax1.set_ylim(0, 1.05)
     ax1.legend()
     ax1.grid(True, alpha=0.3)
 
-    # 子图2：平均奖励
+    # Subplot 2: average reward
     ax2 = axes[0, 1]
     ax2.plot(epochs, history['avg_reward'], 's-', color='#FF9800', linewidth=2,
-             markersize=8, label='平均奖励')
+             markersize=8, label='Average Reward')
     ax2.fill_between(epochs, 0, history['avg_reward'], alpha=0.1, color='#FF9800')
-    ax2.set_title('平均奖励', fontsize=13)
-    ax2.set_xlabel('训练轮次 (Epoch)')
-    ax2.set_ylabel('平均奖励')
+    ax2.set_title('Average Reward', fontsize=13)
+    ax2.set_xlabel('Training Epoch')
+    ax2.set_ylabel('Average Reward')
     ax2.legend()
     ax2.grid(True, alpha=0.3)
 
-    # 子图3：最佳响应奖励
+    # Subplot 3: best response reward
     ax3 = axes[1, 0]
     ax3.plot(epochs, history['best_reward'], 'D-', color='#4CAF50', linewidth=2,
-             markersize=8, label='最佳响应奖励')
-    ax3.set_title('每组最佳响应的平均奖励', fontsize=13)
-    ax3.set_xlabel('训练轮次 (Epoch)')
-    ax3.set_ylabel('奖励分数')
+             markersize=8, label='Best Response Reward')
+    ax3.set_title('Average Reward of the Best Response per Group', fontsize=13)
+    ax3.set_xlabel('Training Epoch')
+    ax3.set_ylabel('Reward Score')
     ax3.legend()
     ax3.grid(True, alpha=0.3)
 
-    # 子图4：优势标准差
+    # Subplot 4: advantage standard deviation
     ax4 = axes[1, 1]
     ax4.plot(epochs, history['avg_advantage_std'], '^-', color='#9C27B0', linewidth=2,
-             markersize=8, label='平均优势标准差')
-    ax4.set_title('组内优势标准差（区分度）', fontsize=13)
-    ax4.set_xlabel('训练轮次 (Epoch)')
-    ax4.set_ylabel('标准差')
-    ax4.annotate('std 下降 = 组内响应质量趋同\n（模型变得更稳定）',
+             markersize=8, label='Average Advantage Std')
+    ax4.set_title('Within-Group Advantage Std (Discriminability)', fontsize=13)
+    ax4.set_xlabel('Training Epoch')
+    ax4.set_ylabel('Standard Deviation')
+    ax4.annotate('Decreasing std = responses within a group converge in quality\n(the model becomes more stable)',
                  xy=(epochs[-1] * 0.5, max(history['avg_advantage_std']) * 0.8),
                  fontsize=9, color='gray', style='italic')
     ax4.legend()
@@ -515,105 +519,105 @@ def plot_training_curves(history):
 
     plt.tight_layout()
     plt.savefig('output/vlm_grpo_training_curves.png', dpi=150, bbox_inches='tight')
-    print("\n  训练曲线已保存为 output/vlm_grpo_training_curves.png")
+    print("\n  Training curves saved as output/vlm_grpo_training_curves.png")
     plt.show()
 
 
 # ==========================================
-# 第八部分：GRPO 核心计算演示
+# Part 8: GRPO core computation demo
 # ==========================================
 def demonstrate_grpo_normalization():
     """
-    用一个具体例子演示 GRPO 的组内归一化过程
+    Demonstrate GRPO's within-group normalization process with a concrete example
 
-    展示：对同一个图像，VLM 生成 4 个不同质量的响应，
-    GRPO 如何通过组内比较来决定每个响应的"好坏"
+    Shows: for a single image, the VLM generates 4 responses of varying quality,
+    and how GRPO determines how "good" each response is through within-group comparison
     """
     print("\n" + "=" * 70)
-    print("  GRPO 组内归一化演示（VLM 场景）")
+    print("  GRPO Within-Group Normalization Demo (VLM Scenario)")
     print("=" * 70)
 
-    # 模拟一个样本的 ground truth
+    # Simulate the ground truth for one sample
     gt = {'三角形': 3, '圆形': 1, '正方形': 2}
 
-    print(f"\n输入图像包含：三角形={gt['三角形']}，圆形={gt['圆形']}，正方形={gt['正方形']}")
-    print(f"提示词：{STANDARD_PROMPT}")
+    print(f"\nInput image contains: triangles={gt['三角形']}, circles={gt['圆形']}, squares={gt['正方形']}")
+    print(f"Prompt: {STANDARD_PROMPT}")
     print()
 
-    # 模拟 4 个响应及其奖励
+    # Simulate 4 responses and their rewards
     responses = [
-        ("正确+推理完整", generate_correct_response(gt)),
-        ("正确但简短", generate_short_correct_response(gt)),
-        ("有推理但错误", generate_wrong_response(gt)),
-        ("低质量", generate_low_quality_response(gt)),
+        ("correct + full reasoning", generate_correct_response(gt)),
+        ("correct but short", generate_short_correct_response(gt)),
+        ("has reasoning but wrong", generate_wrong_response(gt)),
+        ("low quality", generate_low_quality_response(gt)),
     ]
 
     rewards = []
-    print("生成的响应及奖励：")
+    print("Generated responses and their rewards:")
     print("-" * 70)
     for i, (desc, resp) in enumerate(responses):
         r = simple_reward(resp, gt)
         rewards.append(r)
-        print(f"  响应 {i+1} ({desc})")
-        print(f"    内容: {resp[:70]}...")
-        print(f"    奖励: {r:.3f}")
+        print(f"  Response {i+1} ({desc})")
+        print(f"    Content: {resp[:70]}...")
+        print(f"    Reward: {r:.3f}")
         print()
 
-    # GRPO 归一化
+    # GRPO normalization
     rewards_arr = np.array(rewards)
     mean_r = rewards_arr.mean()
     std_r = rewards_arr.std() + 1e-8
     advantages = (rewards_arr - mean_r) / std_r
 
     print("-" * 70)
-    print("GRPO 归一化过程：")
-    print(f"  组内均值: {mean_r:.4f}")
-    print(f"  组内标准差: {std_r:.4f}")
+    print("GRPO normalization process:")
+    print(f"  Group mean: {mean_r:.4f}")
+    print(f"  Group std: {std_r:.4f}")
     print()
-    print(f"  {'响应':>4s}  {'原始奖励':>8s}  {'GRPO优势':>10s}  {'含义'}")
+    print(f"  {'Resp':>4s}  {'Raw Reward':>8s}  {'GRPO Adv':>10s}  {'Meaning'}")
     print(f"  {'----':>4s}  {'--------':>8s}  {'----------':>10s}  {'----'}")
     for i in range(len(responses)):
         adv = advantages[i]
         if adv > 0.5:
-            meaning = "显著优于组内平均，强烈鼓励"
+            meaning = "significantly above the group average, strongly encouraged"
         elif adv > 0:
-            meaning = "略优于组内平均，适度鼓励"
+            meaning = "slightly above the group average, moderately encouraged"
         elif adv > -0.5:
-            meaning = "略低于组内平均，适度抑制"
+            meaning = "slightly below the group average, moderately suppressed"
         else:
-            meaning = "显著低于组内平均，强烈抑制"
+            meaning = "significantly below the group average, strongly suppressed"
         print(f"  {i+1:>4d}  {rewards[i]:>8.4f}  {adv:>+10.4f}  {meaning}")
 
     print()
-    print("  关键：GRPO 不需要绝对奖励值，只需要组内的相对排序！")
-    print("  这就是为什么 GRPO 不需要训练 Critic 网络来估计基线。")
+    print("  Key point: GRPO doesn't need absolute reward values, only the within-group relative ranking!")
+    print("  This is why GRPO doesn't need to train a Critic network to estimate a baseline.")
 
 
 # ==========================================
-# 程序入口
+# Entry point
 # ==========================================
 if __name__ == "__main__":
-    # 第一步：打印 VLM GRPO 概述
+    # Step 1: print the VLM GRPO overview
     print_vlm_grpo_overview()
 
-    # 第二步：GRPO 核心计算演示
+    # Step 2: GRPO core computation demo
     demonstrate_grpo_normalization()
 
-    # 第三步：创建训练数据
+    # Step 3: create training data
     print("\n" + "=" * 70)
-    print("  创建模拟训练数据")
+    print("  Creating Simulated Training Data")
     print("=" * 70)
     samples = create_training_samples(num_samples=20, seed=42)
-    print(f"  已创建 {len(samples)} 个训练样本")
+    print(f"  Created {len(samples)} training samples")
 
-    # 打印几个样本的 ground truth
-    print("\n  样本示例：")
+    # Print the ground truth for a few samples
+    print("\n  Sample examples:")
     for i, s in enumerate(samples[:5]):
         gt = s['ground_truth']
-        print(f"    样本 {i+1}: 三角形={gt['三角形']}, 圆形={gt['圆形']}, 正方形={gt['正方形']}, "
-              f"总计={sum(gt.values())}")
+        print(f"    Sample {i+1}: triangles={gt['三角形']}, circles={gt['圆形']}, squares={gt['正方形']}, "
+              f"total={sum(gt.values())}")
 
-    # 第四步：模拟 GRPO 训练
+    # Step 4: simulate GRPO training
     print()
     history = simulate_grpo_training(
         samples,
@@ -623,51 +627,52 @@ if __name__ == "__main__":
         seed=42,
     )
 
-    # 第五步：训练前后对比
+    # Step 5: before/after training comparison
     print_before_after_comparison(samples, history, seed=42)
 
-    # 第六步：绘制训练曲线
+    # Step 6: plot training curves
     print("\n" + "=" * 70)
-    print("  开始生成可视化图表...")
+    print("  Generating Visualization Charts...")
     print("=" * 70)
     plot_training_curves(history)
 
-    # 最终总结
+    # Final summary
     print("\n" + "=" * 70)
-    print("  VLM GRPO 训练模拟总结")
+    print("  VLM GRPO Training Simulation Summary")
     print("=" * 70)
     print("""
-  本脚本模拟了 VLM GRPO 的训练流程，展示了以下关键概念：
+  This script simulated the VLM GRPO training workflow and demonstrated the
+  following key concepts:
 
-  1. VLM GRPO 与纯文本 GRPO 的区别：
-     - 输入从纯文本变为 (图像, 文本) 对
-     - 需要视觉编码器将图像转换为视觉 token
-     - 视觉 token 与文本 token 拼接后送入 LLM
-     - 奖励函数需要考虑视觉定位能力
+  1. Differences between VLM GRPO and text-only GRPO:
+     - Input goes from plain text to (image, text) pairs
+     - A vision encoder is needed to convert images into vision tokens
+     - Vision tokens are concatenated with text tokens before being fed into the LLM
+     - The reward function needs to account for visual grounding ability
 
-  2. GRPO 核心机制：
-     - 对同一图像生成多个响应（group）
-     - 用奖励函数打分，组内归一化得到优势
-     - 正优势的响应被鼓励，负优势的被抑制
-     - 不需要额外训练 Critic 网络
+  2. GRPO core mechanism:
+     - Generate multiple responses (a group) for the same image
+     - Score with the reward function, normalize within the group to get advantages
+     - Responses with positive advantage are encouraged, negative ones are suppressed
+     - No need to train an additional Critic network
 
-  3. 完整 VLM GRPO 的实现要点：
-     - 使用 transformers 库中的 VLM 模型
-       例: Qwen2VLForConditionalGeneration
-     - 图像通过 Vision Transformer 编码
-     - 视觉特征通过投影层映射到 LLM 的嵌入空间
-     - 训练时需要处理更长的序列（视觉 token 占用额外长度）
-     - 建议使用 DeepSpeed ZeRO-3 或 FSDP 进行分布式训练
+  3. Key implementation points for full VLM GRPO:
+     - Use a VLM model from the transformers library
+       e.g.: Qwen2VLForConditionalGeneration
+     - Images are encoded via a Vision Transformer
+     - Visual features are mapped into the LLM's embedding space through a projection layer
+     - Training must handle longer sequences (vision tokens consume extra length)
+     - DeepSpeed ZeRO-3 or FSDP is recommended for distributed training
 
-  4. VLM GRPO 的应用场景：
-     - 视觉问答（VQA）的推理能力提升
-     - 图像描述（Image Captioning）的质量优化
-     - 多模态数学推理（结合图像和文本的推理）
-     - 具身智能（机器人视觉-语言-动作联合训练）
+  4. Application scenarios for VLM GRPO:
+     - Improving reasoning ability in Visual Question Answering (VQA)
+     - Optimizing quality in Image Captioning
+     - Multi-modal mathematical reasoning (reasoning combining images and text)
+     - Embodied intelligence (joint vision-language-action training for robots)
 
-  5. 关键超参数：
-     - group_size: 每个问题的采样数（推荐 4~16）
-     - clip_ratio: PPO 风格的裁剪范围（推荐 0.2）
-     - learning_rate: 学习率（推荐 1e-6 ~ 5e-6）
-     -KL_coefficient: KL 散度惩罚系数（推荐 0.01~0.1）
+  5. Key hyperparameters:
+     - group_size: number of samples per question (recommended 4~16)
+     - clip_ratio: PPO-style clipping range (recommended 0.2)
+     - learning_rate: learning rate (recommended 1e-6 ~ 5e-6)
+     - KL_coefficient: KL divergence penalty coefficient (recommended 0.01~0.1)
     """)

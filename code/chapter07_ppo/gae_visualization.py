@@ -1,20 +1,20 @@
 """
-第6章：GAE（广义优势估计）可视化
-——直观理解 λ 和 γ 如何控制偏差-方差权衡
+Chapter 6: GAE (Generalized Advantage Estimation) Visualization
+——Building intuition for how λ and γ control the bias-variance tradeoff
 
-GAE 公式：
-    δ_t = r_t + γ * V(s_{t+1}) - V(s_t)           # TD 误差
-    A_t^GAE(γ,λ) = Σ_{l=0}^{∞} (γλ)^l * δ_{t+l}   # GAE 优势
+GAE formula:
+    δ_t = r_t + γ * V(s_{t+1}) - V(s_t)           # TD error
+    A_t^GAE(γ,λ) = Σ_{l=0}^{∞} (γλ)^l * δ_{t+l}   # GAE advantage
 
-λ 的含义：
-    λ → 0: 高偏差、低方差（只看一步 TD 误差）
-    λ → 1: 低偏差、高方差（趋向蒙特卡洛回报）
+Meaning of λ:
+    λ → 0: high bias, low variance (only looks at single-step TD error)
+    λ → 1: low bias, high variance (tends toward Monte Carlo return)
 
-γ 的含义：
-    γ → 0: 短视（只看即时奖励）
-    γ → 1: 远见（重视长期累计奖励）
+Meaning of γ:
+    γ → 0: short-sighted (only cares about immediate reward)
+    γ → 1: far-sighted (values long-term cumulative reward)
 
-运行方式：
+How to run:
     python gae_visualization.py
 """
 
@@ -22,56 +22,56 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 创建输出目录
+# Create output directory
 os.makedirs("output", exist_ok=True)
 
-# 设置中文字体
+# Set Chinese font
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 
 
 # ==========================================
-# 第一部分：GAE 计算函数
+# Part 1: GAE computation function
 # ==========================================
 def compute_gae(rewards, values, dones, gamma=0.99, lam=0.95):
     """
-    计算广义优势估计 (GAE)
+    Compute Generalized Advantage Estimation (GAE)
 
-    参数：
-        rewards: 奖励列表
-        values:  价值估计列表 V(s)
-        dones:   回合结束标志列表
-        gamma:   折扣因子
+    Args:
+        rewards: list of rewards
+        values:  list of value estimates V(s)
+        dones:   list of episode-done flags
+        gamma:   discount factor
         lam:     GAE lambda
 
-    返回：
-        advantages: 优势估计列表
-        returns:    目标回报列表
+    Returns:
+        advantages: list of advantage estimates
+        returns:    list of target returns
     """
     advantages = []
     gae = 0
 
-    # 在末尾追加一个 V(s_T+1)=0
+    # Append a V(s_T+1)=0 at the end
     values = list(values) + [0.0]
 
-    # 从后往前倒推计算 GAE
+    # Iterate backwards to compute GAE
     for t in reversed(range(len(rewards))):
         if dones[t]:
-            # 回合结束，重置
+            # Episode ended, reset
             gae = 0
             next_value = 0.0
         else:
             next_value = values[t + 1]
 
-        # TD 误差：δ_t = r_t + γ * V(s_{t+1}) - V(s_t)
+        # TD error: δ_t = r_t + γ * V(s_{t+1}) - V(s_t)
         delta = rewards[t] + gamma * next_value - values[t]
 
-        # GAE 累加：A_t = δ_t + γλ * A_{t+1}
+        # GAE accumulation: A_t = δ_t + γλ * A_{t+1}
         gae = delta + gamma * lam * gae
 
         advantages.insert(0, gae)
 
-    # 目标回报 = 优势 + 价值
+    # Target return = advantage + value
     returns = [a + v for a, v in zip(advantages, values[:-1])]
 
     return advantages, returns
@@ -79,8 +79,8 @@ def compute_gae(rewards, values, dones, gamma=0.99, lam=0.95):
 
 def compute_mc_returns(rewards, gamma=0.99):
     """
-    计算蒙特卡洛回报（从后往前累计折扣奖励）
-    用于对比参考
+    Compute Monte Carlo returns (accumulate discounted rewards from the end)
+    Used as a reference for comparison
     """
     returns = []
     G = 0
@@ -92,7 +92,7 @@ def compute_mc_returns(rewards, gamma=0.99):
 
 def compute_td_residuals(rewards, values, gamma=0.99):
     """
-    计算单步 TD 误差
+    Compute single-step TD error
     δ_t = r_t + γ * V(s_{t+1}) - V(s_t)
     """
     values = list(values) + [0.0]
@@ -104,50 +104,50 @@ def compute_td_residuals(rewards, values, gamma=0.99):
 
 
 # ==========================================
-# 第二部分：创建合成奖励序列
+# Part 2: Create a synthetic reward sequence
 # ==========================================
 print("=" * 60)
-print("第6章：GAE（广义优势估计）可视化")
+print("Chapter 6: GAE (Generalized Advantage Estimation) Visualization")
 print("=" * 60)
 
-# 场景：一个5步的稀疏奖励序列
-# 前4步没有奖励，最后一步获得奖励 +1
-# 这模拟了真实 RL 中的"延迟奖励"问题
+# Scenario: a 5-step sparse-reward sequence
+# No reward for the first 4 steps, +1 reward on the last step
+# This mimics the "delayed reward" problem seen in real RL
 rewards = [0.0, 0.0, 0.0, 0.0, 1.0]
 n_steps = len(rewards)
 
-# 假设价值函数的估计（不完美但大致正确）
-# V(s) 在接近目标状态时逐渐增大
+# Assumed value function estimates (imperfect but roughly correct)
+# V(s) gradually increases as it approaches the goal state
 values = [0.1, 0.2, 0.4, 0.6, 0.9]
 
-# 假设没有提前结束
+# Assume no early termination
 dones = [False] * n_steps
 
-print(f"\n合成场景设定:")
-print(f"  奖励序列:     {rewards}")
-print(f"  价值估计:     {values}")
-print(f"  特点: 稀疏奖励 — 只有最后一步有奖励")
+print(f"\nSynthetic scenario setup:")
+print(f"  Reward sequence: {rewards}")
+print(f"  Value estimates: {values}")
+print(f"  Feature: sparse reward — only the last step gets a reward")
 
-# 计算蒙特卡洛回报（参考基线）
+# Compute Monte Carlo returns (reference baseline)
 mc_returns = compute_mc_returns(rewards, gamma=0.99)
-print(f"  MC 回报:      {[f'{r:.4f}' for r in mc_returns]}")
+print(f"  MC returns:      {[f'{r:.4f}' for r in mc_returns]}")
 
-# 计算单步 TD 误差
+# Compute single-step TD error
 td_residuals = compute_td_residuals(rewards, values, gamma=0.99)
-print(f"  TD 误差:      {[f'{r:.4f}' for r in td_residuals]}")
+print(f"  TD errors:       {[f'{r:.4f}' for r in td_residuals]}")
 
 
 # ==========================================
-# 第三部分：不同 λ 值的 GAE 对比
+# Part 3: Comparing GAE across different λ values
 # ==========================================
 print("\n" + "=" * 60)
-print("不同 λ 值的 GAE 优势估计对比")
+print("Comparison of GAE advantage estimates across different λ values")
 print("=" * 60)
 
 lambda_values = [0.0, 0.5, 0.9, 0.95, 1.0]
 gamma_fixed = 0.99
 
-# 存储不同 λ 的优势值
+# Store advantage values for different λ
 advantages_by_lambda = {}
 returns_by_lambda = {}
 
@@ -156,10 +156,10 @@ for lam in lambda_values:
     advantages_by_lambda[lam] = adv
     returns_by_lambda[lam] = ret
 
-# 打印对比表格
-print(f"\n{'λ 值':<8}", end="")
+# Print comparison table
+print(f"\n{'λ value':<8}", end="")
 for t in range(n_steps):
-    print(f"{'步骤 ' + str(t):>12}", end="")
+    print(f"{'Step ' + str(t):>12}", end="")
 print()
 print("-" * (8 + 12 * n_steps))
 
@@ -170,17 +170,17 @@ for lam in lambda_values:
         print(f"{advantages_by_lambda[lam][t]:>12.4f}", end="")
     print()
 
-print(f"\n解释:")
-print(f"  λ=0.0: 仅看单步 TD 误差 → 高偏差、低方差")
-print(f"  λ=1.0: 等同于蒙特卡洛   → 低偏差、高方差")
-print(f"  λ=0.95: PPO 的常用设置  → 折中方案")
+print(f"\nExplanation:")
+print(f"  λ=0.0: only looks at single-step TD error → high bias, low variance")
+print(f"  λ=1.0: equivalent to Monte Carlo → low bias, high variance")
+print(f"  λ=0.95: common PPO setting → a middle-ground compromise")
 
 
 # ==========================================
-# 第四部分：不同 γ 值的 GAE 对比
+# Part 4: Comparing GAE across different γ values
 # ==========================================
 print("\n" + "=" * 60)
-print("不同 γ 值的 GAE 优势估计对比（固定 λ=0.95）")
+print("Comparison of GAE advantage estimates across different γ values (λ=0.95 fixed)")
 print("=" * 60)
 
 gamma_values = [0.5, 0.9, 0.95, 0.99, 1.0]
@@ -194,10 +194,10 @@ for gamma in gamma_values:
     advantages_by_gamma[gamma] = adv
     returns_by_gamma[gamma] = ret
 
-# 打印对比表格
-print(f"\n{'γ 值':<8}", end="")
+# Print comparison table
+print(f"\n{'γ value':<8}", end="")
 for t in range(n_steps):
-    print(f"{'步骤 ' + str(t):>12}", end="")
+    print(f"{'Step ' + str(t):>12}", end="")
 print()
 print("-" * (8 + 12 * n_steps))
 
@@ -208,29 +208,29 @@ for gamma in gamma_values:
         print(f"{advantages_by_gamma[gamma][t]:>12.4f}", end="")
     print()
 
-print(f"\n解释:")
-print(f"  γ=0.5:  短视 — 只关心近期奖励")
-print(f"  γ=0.99: PPO 常用 — 重视长期回报")
-print(f"  γ=1.0:  完全远视 — 不折扣未来奖励")
+print(f"\nExplanation:")
+print(f"  γ=0.5:  short-sighted — only cares about near-term rewards")
+print(f"  γ=0.99: common PPO setting — values long-term return")
+print(f"  γ=1.0:  fully far-sighted — no discounting of future rewards")
 
 
 # ==========================================
-# 第五部分：绘制可视化图表
+# Part 5: Plot the visualization
 # ==========================================
-print("\n正在生成可视化图表...")
+print("\nGenerating visualization plots...")
 
-# 创建图表：2行2列
+# Create figure: 2 rows x 2 columns
 fig, axes = plt.subplots(2, 2, figsize=(16, 12))
-fig.suptitle("GAE 广义优势估计 — 偏差与方差的权衡", fontsize=18, fontweight="bold")
+fig.suptitle("GAE Generalized Advantage Estimation — Bias-Variance Tradeoff", fontsize=18, fontweight="bold")
 
-# 颜色方案
+# Color scheme
 colors_lambda = ["#F44336", "#FF9800", "#4CAF50", "#2196F3", "#9C27B0"]
 colors_gamma = ["#E91E63", "#FF5722", "#009688", "#3F51B5", "#000000"]
 
 steps = np.arange(n_steps)
-step_labels = [f"步骤 {i}\n(r={rewards[i]})" for i in range(n_steps)]
+step_labels = [f"Step {i}\n(r={rewards[i]})" for i in range(n_steps)]
 
-# ---- 子图1：不同 λ 的优势曲线 ----
+# ---- Subplot 1: advantage curves for different λ ----
 ax1 = axes[0, 0]
 for i, lam in enumerate(lambda_values):
     adv = advantages_by_lambda[lam]
@@ -239,21 +239,21 @@ for i, lam in enumerate(lambda_values):
 
 ax1.set_xticks(steps)
 ax1.set_xticklabels(step_labels)
-ax1.set_title("不同 λ 值的优势估计", fontsize=14, fontweight="bold")
-ax1.set_ylabel("优势值 A(s)", fontsize=12)
+ax1.set_title("Advantage estimates for different λ values", fontsize=14, fontweight="bold")
+ax1.set_ylabel("Advantage A(s)", fontsize=12)
 ax1.legend(fontsize=11, loc="upper left")
 ax1.grid(True, alpha=0.3)
 ax1.axhline(y=0, color="gray", linestyle="-", alpha=0.3)
 
-# 添加注释说明 λ 的含义
-ax1.annotate("λ→0: 高偏差、低方差\n（单步 TD）", xy=(0.5, 0.02),
+# Add annotations explaining the meaning of λ
+ax1.annotate("λ→0: high bias, low variance\n(single-step TD)", xy=(0.5, 0.02),
              xycoords="axes fraction", fontsize=10, color="#F44336",
              style="italic", ha="left")
-ax1.annotate("λ→1: 低偏差、高方差\n（蒙特卡洛）", xy=(0.5, 0.15),
+ax1.annotate("λ→1: low bias, high variance\n(Monte Carlo)", xy=(0.5, 0.15),
              xycoords="axes fraction", fontsize=10, color="#9C27B0",
              style="italic", ha="left")
 
-# ---- 子图2：不同 γ 的优势曲线 ----
+# ---- Subplot 2: advantage curves for different γ ----
 ax2 = axes[0, 1]
 for i, gamma in enumerate(gamma_values):
     adv = advantages_by_gamma[gamma]
@@ -262,98 +262,98 @@ for i, gamma in enumerate(gamma_values):
 
 ax2.set_xticks(steps)
 ax2.set_xticklabels(step_labels)
-ax2.set_title("不同 γ 值的优势估计（λ=0.95）", fontsize=14, fontweight="bold")
-ax2.set_ylabel("优势值 A(s)", fontsize=12)
+ax2.set_title("Advantage estimates for different γ values (λ=0.95)", fontsize=14, fontweight="bold")
+ax2.set_ylabel("Advantage A(s)", fontsize=12)
 ax2.legend(fontsize=11, loc="upper left")
 ax2.grid(True, alpha=0.3)
 ax2.axhline(y=0, color="gray", linestyle="-", alpha=0.3)
 
-# 添加注释说明 γ 的含义
-ax2.annotate("γ→0: 短视\n（只看即时奖励）", xy=(0.02, 0.02),
+# Add annotations explaining the meaning of γ
+ax2.annotate("γ→0: short-sighted\n(only immediate reward)", xy=(0.02, 0.02),
              xycoords="axes fraction", fontsize=10, color="#E91E63",
              style="italic", ha="left")
-ax2.annotate("γ→1: 远见\n（重视长期回报）", xy=(0.02, 0.15),
+ax2.annotate("γ→1: far-sighted\n(values long-term return)", xy=(0.02, 0.15),
              xycoords="axes fraction", fontsize=10, color="#000000",
              style="italic", ha="left")
 
-# ---- 子图3：不同 λ 的目标回报 ----
+# ---- Subplot 3: target returns for different λ ----
 ax3 = axes[1, 0]
 for i, lam in enumerate(lambda_values):
     ret = returns_by_lambda[lam]
     ax3.plot(steps, ret, marker="o", linewidth=2.5, markersize=8,
              color=colors_lambda[i], label=f"λ = {lam}")
 
-# 同时画出 MC 回报作为参考
+# Also plot MC returns as a reference
 ax3.plot(steps, mc_returns, marker="*", linewidth=2, markersize=12,
-         color="black", linestyle="--", label="MC 回报 (参考)")
+         color="black", linestyle="--", label="MC return (reference)")
 
 ax3.set_xticks(steps)
 ax3.set_xticklabels(step_labels)
-ax3.set_title("不同 λ 值的目标回报", fontsize=14, fontweight="bold")
-ax3.set_xlabel("时间步", fontsize=12)
-ax3.set_ylabel("目标回报 G(s)", fontsize=12)
+ax3.set_title("Target returns for different λ values", fontsize=14, fontweight="bold")
+ax3.set_xlabel("Time step", fontsize=12)
+ax3.set_ylabel("Target return G(s)", fontsize=12)
 ax3.legend(fontsize=10, loc="upper left")
 ax3.grid(True, alpha=0.3)
 
-# ---- 子图4：偏差-方差权衡示意图 ----
+# ---- Subplot 4: bias-variance tradeoff illustration ----
 ax4 = axes[1, 1]
 
-# 创建偏差和方差的理论曲线
+# Create theoretical bias and variance curves
 lams = np.linspace(0, 1, 100)
-# 偏差随 λ 增大而减小（示意）
+# Bias decreases as λ increases (illustrative)
 bias = np.exp(-3 * lams) * 1.0
-# 方差随 λ 增大而增大（示意）
+# Variance increases as λ increases (illustrative)
 variance = (np.exp(2 * lams) - 1) / (np.exp(2) - 1) * 1.0
-# 总误差 = 偏差² + 方差
+# Total error = bias^2 + variance
 total_error = bias ** 2 + variance
 
-ax4.fill_between(lams, 0, bias ** 2, alpha=0.3, color="#2196F3", label="偏差²")
-ax4.fill_between(lams, bias ** 2, bias ** 2 + variance, alpha=0.3, color="#F44336", label="方差")
-ax4.plot(lams, total_error, color="black", linewidth=2.5, label="总误差")
+ax4.fill_between(lams, 0, bias ** 2, alpha=0.3, color="#2196F3", label="Bias²")
+ax4.fill_between(lams, bias ** 2, bias ** 2 + variance, alpha=0.3, color="#F44336", label="Variance")
+ax4.plot(lams, total_error, color="black", linewidth=2.5, label="Total error")
 
-# 标注最优 λ 的位置
+# Mark the location of the optimal λ
 optimal_idx = np.argmin(total_error)
 optimal_lam = lams[optimal_idx]
 ax4.axvline(x=optimal_lam, color="green", linestyle="--", linewidth=2, alpha=0.8)
-ax4.annotate(f"最优 λ ≈ {optimal_lam:.2f}", xy=(optimal_lam, total_error[optimal_idx]),
+ax4.annotate(f"Optimal λ ≈ {optimal_lam:.2f}", xy=(optimal_lam, total_error[optimal_idx]),
              xytext=(optimal_lam + 0.15, total_error[optimal_idx] + 0.3),
              fontsize=12, color="green", fontweight="bold",
              arrowprops=dict(arrowstyle="->", color="green", lw=2))
 
-# 标注常用范围
-ax4.axvspan(0.9, 0.97, alpha=0.15, color="gold", label="PPO 常用范围 (0.9~0.97)")
+# Mark the commonly used range
+ax4.axvspan(0.9, 0.97, alpha=0.15, color="gold", label="Common PPO range (0.9~0.97)")
 
-ax4.set_xlabel("λ 值", fontsize=13)
-ax4.set_ylabel("误差", fontsize=13)
-ax4.set_title("偏差-方差权衡（示意）", fontsize=14, fontweight="bold")
+ax4.set_xlabel("λ value", fontsize=13)
+ax4.set_ylabel("Error", fontsize=13)
+ax4.set_title("Bias-variance tradeoff (illustrative)", fontsize=14, fontweight="bold")
 ax4.legend(fontsize=11, loc="center right")
 ax4.set_xlim(0, 1)
 ax4.grid(True, alpha=0.3)
 
 plt.tight_layout()
 plt.savefig("output/gae_visualization.png", dpi=150, bbox_inches="tight")
-print("图表已保存至: output/gae_visualization.png")
+print("Plot saved to: output/gae_visualization.png")
 plt.show()
 
 
 # ==========================================
-# 第六部分：打印完整对比表
+# Part 6: Print the full comparison table
 # ==========================================
 print("\n" + "=" * 60)
-print("完整对比表：不同 (γ, λ) 组合的优势值")
+print("Full comparison table: advantage values for different (γ, λ) combinations")
 print("=" * 60)
 
-# 精选组合
+# Selected combinations
 combos = [
-    (0.99, 0.0,  "高偏差低方差极端"),
-    (0.99, 0.5,  "中等平衡"),
-    (0.99, 0.95, "PPO 推荐配置"),
-    (0.99, 1.0,  "低偏差高方差极端"),
-    (0.5,  0.95, "短视 + GAE"),
-    (1.0,  0.95, "不折扣 + GAE"),
+    (0.99, 0.0,  "high bias / low variance extreme"),
+    (0.99, 0.5,  "moderate balance"),
+    (0.99, 0.95, "recommended PPO config"),
+    (0.99, 1.0,  "low bias / high variance extreme"),
+    (0.5,  0.95, "short-sighted + GAE"),
+    (1.0,  0.95, "undiscounted + GAE"),
 ]
 
-print(f"\n{'配置':<20} {'γ':>5} {'λ':>5}", end="")
+print(f"\n{'Config':<20} {'γ':>5} {'λ':>5}", end="")
 for t in range(n_steps):
     print(f"  {'A(s'+str(t)+')':>8}", end="")
 print()
@@ -367,9 +367,9 @@ for gamma, lam, desc in combos:
     print()
 
 print("\n" + "=" * 60)
-print("关键结论:")
-print("  1. λ 控制优势估计的偏差-方差权衡")
-print("  2. γ 控制对未来奖励的重视程度")
-print("  3. PPO 常用配置: γ=0.99, λ=0.95")
-print("  4. λ=0 → 一步 TD，λ=1 → 蒙特卡洛回报")
+print("Key takeaways:")
+print("  1. λ controls the bias-variance tradeoff of the advantage estimate")
+print("  2. γ controls how much weight is given to future rewards")
+print("  3. Common PPO config: γ=0.99, λ=0.95")
+print("  4. λ=0 → one-step TD, λ=1 → Monte Carlo return")
 print("=" * 60)

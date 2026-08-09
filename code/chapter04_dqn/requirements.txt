@@ -1,4 +1,4 @@
-# 第4章：深度强化学习 DQN 实验依赖
+# Chapter 4: Deep Reinforcement Learning DQN experiment dependencies
 gymnasium[classic-control]>=0.29.0
 gymnasium[atari,accept-rom-license]>=1.0.0
 ale-py>=0.10.0
@@ -11,4 +11,4 @@ tensorboard>=2.14.0
 swanlab>=0.3.0
 pyboy>=2.0.0
 
-# Pokemon Red DQN 实验需要自行准备合法 ROM；本仓库不分发游戏文件。
+# The Pokemon Red DQN experiment requires you to provide your own legally obtained ROM; this repository does not distribute game files.

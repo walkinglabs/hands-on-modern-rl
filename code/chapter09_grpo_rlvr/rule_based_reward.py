@@ -1,17 +1,18 @@
 """
-第9章：可验证奖励函数 —— RLVR 的核心组件
+Chapter 9: Verifiable Reward Function — The Core Component of RLVR
 ==========================================================
 
-本脚本实现了 RLVR (Reinforcement Learning with Verifiable Rewards) 中
-常用的规则奖励函数，用于自动评估模型生成的推理过程和最终答案。
+This script implements the rule-based reward functions commonly used in
+RLVR (Reinforcement Learning with Verifiable Rewards), for automatically
+evaluating a model's generated reasoning process and final answer.
 
-奖励函数组件：
-  1. check_answer_correctness  —— 检查最终答案是否正确
-  2. check_format              —— 检查回复格式是否规范
-  3. check_reasoning_quality   —— 评估推理过程的质量
-  4. compute_total_reward      —— 加权组合以上各项，计算总奖励
+Reward function components:
+  1. check_answer_correctness  —— checks whether the final answer is correct
+  2. check_format               —— checks whether the response format is well-structured
+  3. check_reasoning_quality    —— evaluates the quality of the reasoning process
+  4. compute_total_reward       —— weighted combination of the above, computing the total reward
 
-运行方式：
+How to run:
   python rule_based_reward.py
 """
 
@@ -19,53 +20,54 @@ import re
 
 
 # ==========================================
-# 第一部分：答案正确性检查
+# Part 1: Answer correctness check
 # ==========================================
 def check_answer_correctness(response, ground_truth):
     """
-    从模型回复中提取最终答案并与标准答案对比
+    Extract the final answer from the model's response and compare it against the ground truth
 
-    提取规则：
-      1. 优先从 \\boxed{...} 中提取（LaTeX 格式）
-      2. 如果没有 boxed，尝试匹配"答案是..."、"最终答案为..."等模式
-      3. 支持整数、小数、分数、百分数、负数等格式
+    Extraction rules:
+      1. Prefer extracting from \\boxed{...} (LaTeX format)
+      2. If there's no boxed answer, try to match patterns like "答案是..." ("the answer is..."),
+         "最终答案为..." ("the final answer is...")
+      3. Supports integers, decimals, fractions, percentages, negative numbers, etc.
 
-    参数：
-        response: 模型生成的回复文本
-        ground_truth: 标准答案（字符串或数字）
-    返回：
+    Args:
+        response: the model-generated response text
+        ground_truth: the standard answer (string or number)
+    Returns:
         dict: {
-            "score": float (0.0 或 1.0),
-            "extracted": str (提取到的答案),
-            "method": str (提取方法),
-            "correct": bool (是否正确),
+            "score": float (0.0 or 1.0),
+            "extracted": str (the extracted answer),
+            "method": str (the extraction method used),
+            "correct": bool (whether it is correct),
         }
     """
     extracted = None
-    method = "未提取到答案"
+    method = "no answer extracted"
 
-    # 方法1：从 \boxed{...} 中提取
+    # Method 1: extract from \boxed{...}
     boxed_match = re.search(r'\\boxed\{([^}]+)\}', response)
     if boxed_match:
         extracted = boxed_match.group(1).strip()
-        method = "\\boxed{} 提取"
+        method = "\\boxed{} extraction"
 
-    # 方法2：匹配"答案是/为/："等中文模式
+    # Method 2: match Chinese patterns like "答案是/为/：" ("the answer is/:")
     if extracted is None:
         cn_patterns = [
-            r'答案[是为：:]\s*([+-]?\d+\.?\d*)',       # "答案是 42"
-            r'最终答案[是为：:]\s*([+-]?\d+\.?\d*)',    # "最终答案为 42"
-            r'结果[是为：:]\s*([+-]?\d+\.?\d*)',         # "结果是 42"
-            r'所以[，,]\s*(?:答案[是为])?\s*([+-]?\d+\.?\d*)',  # "所以答案是 42"
+            r'答案[是为：:]\s*([+-]?\d+\.?\d*)',       # "答案是 42" ("the answer is 42")
+            r'最终答案[是为：:]\s*([+-]?\d+\.?\d*)',    # "最终答案为 42" ("the final answer is 42")
+            r'结果[是为：:]\s*([+-]?\d+\.?\d*)',         # "结果是 42" ("the result is 42")
+            r'所以[，,]\s*(?:答案[是为])?\s*([+-]?\d+\.?\d*)',  # "所以答案是 42" ("so the answer is 42")
         ]
         for pattern in cn_patterns:
             match = re.search(pattern, response)
             if match:
                 extracted = match.group(1).strip()
-                method = "中文模式匹配"
+                method = "Chinese pattern match"
                 break
 
-    # 方法3：匹配 "The answer is ..." 等英文模式
+    # Method 3: match English patterns like "The answer is ..."
     if extracted is None:
         en_patterns = [
             r'[Tt]he answer is\s*([+-]?\d+\.?\d*)',
@@ -76,100 +78,100 @@ def check_answer_correctness(response, ground_truth):
             match = re.search(pattern, response)
             if match:
                 extracted = match.group(1).strip()
-                method = "英文模式匹配"
+                method = "English pattern match"
                 break
 
-    # 方法4：提取最后一个独立数字（最后的手段）
+    # Method 4: extract the last standalone number (last resort)
     if extracted is None:
         all_numbers = re.findall(r'([+-]?\d+\.?\d*)', response)
         if all_numbers:
             extracted = all_numbers[-1]
-            method = "最后一个数字（兜底）"
+            method = "last number (fallback)"
 
-    # 对比答案
+    # Compare the answers
     correct = False
     if extracted is not None:
         try:
-            # 统一转为浮点数比较，支持容差
+            # Convert both to float for comparison, with tolerance
             extracted_num = float(extracted)
             truth_num = float(ground_truth)
             correct = abs(extracted_num - truth_num) < 1e-6
         except (ValueError, TypeError):
-            # 如果无法转为数字，做字符串精确匹配
+            # If conversion to a number fails, do an exact string match
             correct = str(extracted).strip() == str(ground_truth).strip()
 
     score = 1.0 if correct else 0.0
 
     return {
         "score": score,
-        "extracted": extracted if extracted else "（未提取到）",
+        "extracted": extracted if extracted else "(not extracted)",
         "method": method,
         "correct": correct,
     }
 
 
 # ==========================================
-# 第二部分：格式规范性检查
+# Part 2: Format compliance check
 # ==========================================
 def check_format(response):
     """
-    检查回复是否具有规范的推理格式
+    Check whether the response has a well-structured reasoning format
 
-    检查项目：
-      1. 是否包含推理步骤（步骤标记，如"步骤"、"第X步"、"Step"等）
-      2. 是否包含最终答案标记（如"答案"、"\\boxed{}"等）
-      3. 回复长度是否合理（不能太短也不能太长）
-      4. 是否包含数学表达式
+    Checks performed:
+      1. Whether it contains reasoning step markers (e.g. "步骤" ("step"), "第X步" ("step X"), "Step", etc.)
+      2. Whether it contains a final-answer marker (e.g. "答案" ("answer"), "\\boxed{}", etc.)
+      3. Whether the response length is reasonable (not too short, not too long)
+      4. Whether it contains a mathematical expression
 
-    参数：
-        response: 模型生成的回复文本
-    返回：
+    Args:
+        response: the model-generated response text
+    Returns:
         dict: {
             "score": float (0.0 ~ 1.0),
-            "details": dict (各检查项的详细得分),
+            "details": dict (a detailed score for each check),
         }
     """
     details = {}
 
-    # 检查1：推理步骤标记（0.25 分）
+    # Check 1: reasoning step markers (0.25 points)
     step_patterns = [
-        r'步骤\s*\d',         # "步骤1"
-        r'第\s*\d+\s*步',     # "第1步"
+        r'步骤\s*\d',         # "步骤1" ("step 1")
+        r'第\s*\d+\s*步',     # "第1步" ("step 1")
         r'[Ss]tep\s*\d',      # "Step 1"
         r'\d+\)\s',           # "1) "
-        r'首先|然后|接着|最后',  # 中文连接词
+        r'首先|然后|接着|最后',  # Chinese connective words (first/then/next/finally)
     ]
     has_steps = any(re.search(p, response) for p in step_patterns)
-    details["有步骤标记"] = 0.25 if has_steps else 0.0
+    details["has_step_markers"] = 0.25 if has_steps else 0.0
 
-    # 检查2：最终答案标记（0.25 分）
+    # Check 2: final-answer marker (0.25 points)
     answer_patterns = [
-        r'\\boxed\{',         # LaTeX 格式
-        r'答案[是为：:]',       # 中文标记
-        r'[Tt]he answer is',  # 英文标记
-        r'最终结果',           # 中文标记
+        r'\\boxed\{',         # LaTeX format
+        r'答案[是为：:]',       # Chinese marker ("the answer is:")
+        r'[Tt]he answer is',  # English marker
+        r'最终结果',           # Chinese marker ("final result")
     ]
     has_answer = any(re.search(p, response) for p in answer_patterns)
-    details["有答案标记"] = 0.25 if has_answer else 0.0
+    details["has_answer_marker"] = 0.25 if has_answer else 0.0
 
-    # 检查3：回复长度合理（0.25 分）
+    # Check 3: reasonable response length (0.25 points)
     length = len(response)
     if 20 <= length <= 2000:
-        details["长度合理"] = 0.25
+        details["reasonable_length"] = 0.25
     elif 10 <= length < 20 or 2000 < length <= 5000:
-        details["长度合理"] = 0.10
+        details["reasonable_length"] = 0.10
     else:
-        details["长度合理"] = 0.0
+        details["reasonable_length"] = 0.0
 
-    # 检查4：包含数学表达式（0.25 分）
+    # Check 4: contains a math expression (0.25 points)
     math_patterns = [
-        r'\d+\s*[+\-*/×÷]\s*\d+',   # 算术运算：3 + 5
-        r'\d+\s*[=＝]\s*\d+',        # 等式：x = 10
-        r'[（(][^)]*[)）]',          # 括号表达式
-        r'\\frac|\\sqrt|\\times',     # LaTeX 数学命令
+        r'\d+\s*[+\-*/×÷]\s*\d+',   # arithmetic operation: 3 + 5
+        r'\d+\s*[=＝]\s*\d+',        # equation: x = 10
+        r'[（(][^)]*[)）]',          # parenthesized expression
+        r'\\frac|\\sqrt|\\times',     # LaTeX math commands
     ]
     has_math = any(re.search(p, response) for p in math_patterns)
-    details["有数学表达式"] = 0.25 if has_math else 0.0
+    details["has_math_expression"] = 0.25 if has_math else 0.0
 
     total_score = sum(details.values())
     return {
@@ -179,59 +181,59 @@ def check_format(response):
 
 
 # ==========================================
-# 第三部分：推理质量评估
+# Part 3: Reasoning quality evaluation
 # ==========================================
 def check_reasoning_quality(response):
     """
-    基于启发式规则评估推理过程的基本质量
+    Evaluate the basic quality of the reasoning process using heuristic rules
 
-    评估维度：
-      1. 推理步骤数量 —— 步骤越多（在一定范围内），推理越详细
-      2. 数值计算的连贯性 —— 是否有中间计算结果
-      3. 逻辑连接词的使用 —— 是否有因果/递进关系
-      4. 是否存在明显错误 —— 如除以零、负数开方等
+    Dimensions evaluated:
+      1. Number of reasoning steps — more steps (within a reasonable range) means more detailed reasoning
+      2. Coherence of numeric computation — whether there are intermediate results
+      3. Use of logical connectives — whether there is causal/sequential structure
+      4. Presence of obvious errors — e.g. dividing by zero, square root of a negative number
 
-    参数：
-        response: 模型生成的回复文本
-    返回：
+    Args:
+        response: the model-generated response text
+    Returns:
         dict: {
             "score": float (0.0 ~ 1.0),
-            "details": dict (各维度的详细得分),
+            "details": dict (a detailed score for each dimension),
         }
     """
     details = {}
 
-    # 维度1：推理步骤数量（0 ~ 0.3 分）
-    # 计算回复中包含的句子/行数作为推理步骤的代理指标
+    # Dimension 1: number of reasoning steps (0 ~ 0.3 points)
+    # Use the number of sentences/lines in the response as a proxy for reasoning steps
     sentences = re.split(r'[。.！!？?\n]', response)
     sentences = [s.strip() for s in sentences if len(s.strip()) > 3]
     num_steps = len(sentences)
     if num_steps >= 5:
-        details["步骤数量"] = 0.30
+        details["step_count"] = 0.30
     elif num_steps >= 3:
-        details["步骤数量"] = 0.20
+        details["step_count"] = 0.20
     elif num_steps >= 1:
-        details["步骤数量"] = 0.10
+        details["step_count"] = 0.10
     else:
-        details["步骤数量"] = 0.0
+        details["step_count"] = 0.0
 
-    # 维度2：中间计算结果（0 ~ 0.3 分）
-    # 检查是否包含 "=" 或 "得" 等计算标记
+    # Dimension 2: intermediate computation results (0 ~ 0.3 points)
+    # Check for "=" or other computation markers
     calc_patterns = [
-        r'\d+\s*[+－\-]\s*\d+\s*[=＝]\s*\d+',   # 加减法
-        r'\d+\s*[*×]\s*\d+\s*[=＝]\s*\d+',       # 乘法
-        r'\d+\s*[/÷]\s*\d+\s*[=＝]\s*[\d.]+',   # 除法
-        r'=+\s*\d+',                              # 等号后跟数字
+        r'\d+\s*[+－\-]\s*\d+\s*[=＝]\s*\d+',   # addition/subtraction
+        r'\d+\s*[*×]\s*\d+\s*[=＝]\s*\d+',       # multiplication
+        r'\d+\s*[/÷]\s*\d+\s*[=＝]\s*[\d.]+',   # division
+        r'=+\s*\d+',                              # "=" followed by a number
     ]
     calc_count = sum(len(re.findall(p, response)) for p in calc_patterns)
     if calc_count >= 3:
-        details["中间计算"] = 0.30
+        details["intermediate_calc"] = 0.30
     elif calc_count >= 1:
-        details["中间计算"] = 0.15
+        details["intermediate_calc"] = 0.15
     else:
-        details["中间计算"] = 0.0
+        details["intermediate_calc"] = 0.0
 
-    # 维度3：逻辑连接词（0 ~ 0.2 分）
+    # Dimension 3: logical connectives (0 ~ 0.2 points)
     logic_words = [
         '因此', '所以', '因为', '由于', '于是',
         '那么', '从而', '也就是说', '换句话说',
@@ -240,23 +242,23 @@ def check_reasoning_quality(response):
     ]
     logic_count = sum(1 for word in logic_words if word in response)
     if logic_count >= 3:
-        details["逻辑连接"] = 0.20
+        details["logical_connectives"] = 0.20
     elif logic_count >= 1:
-        details["逻辑连接"] = 0.10
+        details["logical_connectives"] = 0.10
     else:
-        details["逻辑连接"] = 0.0
+        details["logical_connectives"] = 0.0
 
-    # 维度4：无明显错误（0 ~ 0.2 分）
-    # 检查常见的推理错误
+    # Dimension 4: no obvious errors (0 ~ 0.2 points)
+    # Check for common reasoning errors
     error_patterns = [
-        r'除以\s*0',           # 除以零
-        r'÷\s*0',             # 除以零（符号形式）
-        r'/\s*0(?!\d)',        # 除以零（斜杠形式）
-        r'负数.*开方',         # 负数开方
-        r'负数.*开根号',       # 负数开根号
+        r'除以\s*0',           # divide by zero (Chinese)
+        r'÷\s*0',             # divide by zero (symbol form)
+        r'/\s*0(?!\d)',        # divide by zero (slash form)
+        r'负数.*开方',         # square root of a negative number
+        r'负数.*开根号',       # square root of a negative number (alt phrasing)
     ]
     has_errors = any(re.search(p, response) for p in error_patterns)
-    details["无错误"] = 0.0 if has_errors else 0.20
+    details["no_errors"] = 0.0 if has_errors else 0.20
 
     total_score = sum(details.values())
     return {
@@ -266,24 +268,24 @@ def check_reasoning_quality(response):
 
 
 # ==========================================
-# 第四部分：加权总奖励计算
+# Part 4: Weighted total reward computation
 # ==========================================
 def compute_total_reward(response, ground_truth, weights=None):
     """
-    加权组合各项奖励，计算最终总奖励
+    Combine the individual reward components with weights to compute the final total reward
 
-    总奖励 = w1 * 答案正确性 + w2 * 格式规范性 + w3 * 推理质量
+    total_reward = w1 * correctness + w2 * format + w3 * reasoning_quality
 
-    默认权重：
-        - 答案正确性（w1 = 0.6）：最重要，答案对不对
-        - 格式规范性（w2 = 0.15）：格式是否规范
-        - 推理质量  （w3 = 0.25）：推理过程是否合理
+    Default weights:
+        - Answer correctness (w1 = 0.6): the most important — is the answer right or wrong
+        - Format compliance (w2 = 0.15): whether the format is well-structured
+        - Reasoning quality (w3 = 0.25): whether the reasoning process is sound
 
-    参数：
-        response: 模型生成的回复文本
-        ground_truth: 标准答案
-        weights: 权重字典 {"correctness": w1, "format": w2, "reasoning": w3}
-    返回：
+    Args:
+        response: the model-generated response text
+        ground_truth: the standard answer
+        weights: a weight dict {"correctness": w1, "format": w2, "reasoning": w3}
+    Returns:
         dict: {
             "total_reward": float (0.0 ~ 1.0),
             "answer_check": dict,
@@ -298,12 +300,12 @@ def compute_total_reward(response, ground_truth, weights=None):
             "reasoning": 0.25,
         }
 
-    # 分别计算各项得分
+    # Compute each component score
     answer_result = check_answer_correctness(response, ground_truth)
     format_result = check_format(response)
     reasoning_result = check_reasoning_quality(response)
 
-    # 加权求和
+    # Weighted sum
     total_reward = (
         weights["correctness"] * answer_result["score"]
         + weights["format"] * format_result["score"]
@@ -320,28 +322,28 @@ def compute_total_reward(response, ground_truth, weights=None):
 
 
 # ==========================================
-# 第五部分：打印奖励分解
+# Part 5: Print reward breakdown
 # ==========================================
 def print_reward_breakdown(result, response_label=""):
     """
-    以清晰的格式打印奖励分解
+    Print a clearly formatted breakdown of the reward
 
-    参数：
-        result: compute_total_reward 的返回值
-        response_label: 回复的标签（用于区分不同测试用例）
+    Args:
+        result: the return value of compute_total_reward
+        response_label: a label for the response (used to distinguish test cases)
     """
-    print(f"  【{response_label}】总奖励: {result['total_reward']:.4f}")
-    print(f"  ├── 答案正确性 ({result['weights']['correctness']:.0%} 权重): "
+    print(f"  [{response_label}] Total reward: {result['total_reward']:.4f}")
+    print(f"  ├── Answer correctness ({result['weights']['correctness']:.0%} weight): "
           f"{result['answer_check']['score']:.2f}")
-    print(f"  │   ├── 提取到的答案: {result['answer_check']['extracted']}")
-    print(f"  │   ├── 提取方法: {result['answer_check']['method']}")
-    print(f"  │   └── 是否正确: {'是' if result['answer_check']['correct'] else '否'}")
-    print(f"  ├── 格式规范性 ({result['weights']['format']:.0%} 权重): "
+    print(f"  │   ├── Extracted answer: {result['answer_check']['extracted']}")
+    print(f"  │   ├── Extraction method: {result['answer_check']['method']}")
+    print(f"  │   └── Correct: {'yes' if result['answer_check']['correct'] else 'no'}")
+    print(f"  ├── Format compliance ({result['weights']['format']:.0%} weight): "
           f"{result['format_check']['score']:.2f}")
     for item, score in result['format_check']['details'].items():
         icon = "+" if score > 0 else "-"
         print(f"  │   ├── [{icon}] {item}: {score:.2f}")
-    print(f"  └── 推理质量 ({result['weights']['reasoning']:.0%} 权重): "
+    print(f"  └── Reasoning quality ({result['weights']['reasoning']:.0%} weight): "
           f"{result['reasoning_check']['score']:.2f}")
     for item, score in result['reasoning_check']['details'].items():
         icon = "+" if score > 0 else "-"
@@ -350,27 +352,27 @@ def print_reward_breakdown(result, response_label=""):
 
 
 # ==========================================
-# 第六部分：测试用例
+# Part 6: Test cases
 # ==========================================
 def run_tests():
     """
-    在多个测试用例上验证奖励函数的行为
+    Validate the reward function's behavior on several test cases
 
-    测试场景覆盖：
-      1. 完美回答 —— 答案正确、格式规范、推理详尽
-      2. 答案正确但格式差 —— 没有步骤标记和答案标记
-      3. 答案错误但推理详细 —— 格式好但最终答案算错
-      4. 完全不合规的回答 —— 太短，无推理，无格式
-      5. LaTeX 格式的回答 —— 用 \\boxed{} 标注答案
+    Test scenarios covered:
+      1. Perfect answer — correct answer, well-structured format, thorough reasoning
+      2. Correct answer but poor format — no step markers or answer markers
+      3. Incorrect answer but detailed reasoning — good format but a miscalculated final answer
+      4. Fully non-compliant answer — too short, no reasoning, no format
+      5. LaTeX-formatted answer — uses \\boxed{} to mark the answer
     """
     print("=" * 70)
-    print("  可验证奖励函数测试")
+    print("  Verifiable Reward Function Tests")
     print("=" * 70)
 
-    # 定义测试用例
+    # Define the test cases
     test_cases = [
         {
-            "label": "完美回答",
+            "label": "Perfect answer",
             "ground_truth": "42",
             "response": (
                 "我们来一步步解决这个问题。\n"
@@ -381,12 +383,12 @@ def run_tests():
             ),
         },
         {
-            "label": "答案正确但格式差",
+            "label": "Correct answer but poor format",
             "ground_truth": "42",
             "response": "42",
         },
         {
-            "label": "答案错误但推理详细",
+            "label": "Incorrect answer but detailed reasoning",
             "ground_truth": "42",
             "response": (
                 "首先，我们需要计算苹果的总数。\n"
@@ -398,12 +400,12 @@ def run_tests():
             ),
         },
         {
-            "label": "完全不合规",
+            "label": "Fully non-compliant",
             "ground_truth": "42",
             "response": "不知道",
         },
         {
-            "label": "LaTeX 格式回答",
+            "label": "LaTeX-formatted answer",
             "ground_truth": "36",
             "response": (
                 "首先，根据题意我们需要计算 4 × 9。\n"
@@ -413,13 +415,13 @@ def run_tests():
         },
     ]
 
-    # 运行测试并打印结果
+    # Run the tests and print results
     results = []
     for tc in test_cases:
         print(f"\n{'─' * 70}")
-        print(f"  测试用例: {tc['label']}")
-        print(f"  标准答案: {tc['ground_truth']}")
-        print(f"  模型回复: {tc['response'][:80]}{'...' if len(tc['response']) > 80 else ''}")
+        print(f"  Test case: {tc['label']}")
+        print(f"  Ground truth: {tc['ground_truth']}")
+        print(f"  Model response: {tc['response'][:80]}{'...' if len(tc['response']) > 80 else ''}")
         print(f"{'─' * 70}")
 
         result = compute_total_reward(tc["response"], tc["ground_truth"])
@@ -427,13 +429,13 @@ def run_tests():
         results.append((tc["label"], result))
 
     # ==========================================
-    # 第七部分：汇总对比
+    # Part 7: Summary comparison
     # ==========================================
     print("=" * 70)
-    print("  奖励汇总对比")
+    print("  Reward Summary Comparison")
     print("=" * 70)
     print()
-    print(f"  {'测试用例':<20s}  {'总奖励':>8s}  {'正确性':>8s}  {'格式':>8s}  {'推理':>8s}")
+    print(f"  {'Test case':<20s}  {'Total':>8s}  {'Correct':>8s}  {'Format':>8s}  {'Reason':>8s}")
     print(f"  {'─' * 20}  {'─' * 8}  {'─' * 8}  {'─' * 8}  {'─' * 8}")
     for label, result in results:
         total = result["total_reward"]
@@ -444,33 +446,33 @@ def run_tests():
 
     print()
     print("=" * 70)
-    print("  奖励函数设计总结")
+    print("  Reward Function Design Summary")
     print("=" * 70)
     print("""
-  1. 答案正确性（权重 60%）
-     - 最终判断标准：答案对了就是对的
-     - 支持多种答案提取方式，提高鲁棒性
-     - 这是 RLVR 中最重要的信号
+  1. Answer correctness (60% weight)
+     - The ultimate criterion: a correct answer is correct
+     - Supports multiple answer-extraction methods for robustness
+     - This is the most important signal in RLVR
 
-  2. 格式规范性（权重 15%）
-     - 鼓励模型输出结构化的推理过程
-     - 包含步骤标记、答案标记、数学表达式
-     - 不强制要求特定格式，但给予适当奖励
+  2. Format compliance (15% weight)
+     - Encourages the model to produce structured reasoning
+     - Includes step markers, answer markers, and math expressions
+     - Doesn't force a specific format, but gives a modest bonus for one
 
-  3. 推理质量（权重 25%）
-     - 鼓励详细的中间计算步骤
-     - 检查逻辑连接词的使用
-     - 检测明显的数学错误
+  3. Reasoning quality (25% weight)
+     - Encourages detailed intermediate computation steps
+     - Checks for the use of logical connectives
+     - Detects obvious mathematical errors
 
-  权重设计理念：
-     - 答案正确性是最重要的（60%），但不是唯一的
-     - 推理过程的质量也很重要（25%），防止模型"蒙对"
-     - 格式规范给予少量奖励（15%），引导模型养成好习惯
+  Weight design rationale:
+     - Answer correctness is the most important factor (60%), but not the only one
+     - The quality of the reasoning process also matters (25%), to discourage the model from "getting lucky"
+     - Format compliance earns a small bonus (15%), nudging the model toward good habits
     """)
 
 
 # ==========================================
-# 程序入口
+# Entry point
 # ==========================================
 if __name__ == "__main__":
     run_tests()

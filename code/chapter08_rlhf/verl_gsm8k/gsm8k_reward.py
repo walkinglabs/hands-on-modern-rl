@@ -6,7 +6,7 @@ REWARD_TYPE = "sequential"
 
 
 def extract_answer(response: str) -> str | None:
-    """从模型输出中提取最终答案。"""
+    """Extract the final answer from the model output."""
     boxed = re.findall(r"\\boxed\{([^}]+)\}", response)
     if boxed:
         return boxed[-1].strip()
@@ -25,7 +25,7 @@ def extract_answer(response: str) -> str | None:
 
 
 def check_answer(predicted: str | None, ground_truth: str) -> float:
-    """比较预测答案和标准答案。"""
+    """Compare the predicted answer against the ground truth."""
     if predicted is None:
         return 0.0
 
@@ -38,7 +38,7 @@ def check_answer(predicted: str | None, ground_truth: str) -> float:
 
 
 def compute_score(reward_input: dict[str, Any], **kwargs) -> dict[str, float]:
-    """veRL 自定义 reward 入口。"""
+    """veRL custom reward entry point."""
     response = reward_input["response"]
     ground_truth = reward_input["ground_truth"]
 

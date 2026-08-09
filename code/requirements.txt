@@ -1,14 +1,14 @@
-# 全局依赖汇总（所有章节合并去重）
-# 建议按章节单独安装，避免不必要的依赖
+# Global dependency summary (merged and deduplicated across all chapters)
+# It is recommended to install dependencies per chapter to avoid unnecessary installs
 
-# 基础科学计算
+# Basic scientific computing
 numpy>=1.24.0
 matplotlib>=3.7.0
 
-# 深度学习
+# Deep learning
 torch>=2.0.0
 
-# 强化学习环境
+# Reinforcement learning environments
 gymnasium[classic-control]>=0.29.0
 gymnasium[mujoco]>=0.29.0
 gymnasium[atari,accept-rom-license]>=1.0.0
@@ -16,20 +16,20 @@ ale-py>=0.10.0
 opencv-python>=4.8.0
 pyboy>=2.0.0
 
-# 强化学习算法库
+# Reinforcement learning algorithm libraries
 stable-baselines3>=2.0.0
 
-# 大语言模型与对齐
+# Large language models and alignment
 transformers==4.57.3
 trl==0.24.0
 datasets==4.4.1
 accelerate==1.10.1
 
-# 图像处理（VLM 章节）
+# Image processing (VLM chapter)
 Pillow>=10.0.0
 
-# 工具（Agentic RL）
+# Tools (Agentic RL)
 json5>=0.9.0
 
-# 可视化与日志
+# Visualization and logging
 tensorboard>=2.14.0

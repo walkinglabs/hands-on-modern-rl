@@ -1,8 +1,8 @@
 """
-第7章：渲染训练好的 PPO 智能体在 BipedalWalker-v3 上的回放
-——将每个 episode 保存为独立 GIF
+Chapter 7: Render a playback of a trained PPO agent on BipedalWalker-v3
+——Saves each episode as an independent GIF
 
-运行方式：
+How to run:
     python render_bipedal_walker.py --model output/ppo_bipedal_walker.zip
     python render_bipedal_walker.py --model output/ppo_bipedal_walker.zip --episodes 5 --seeds 0 1 2 3 4
 """
@@ -16,7 +16,7 @@ from stable_baselines3 import PPO
 
 
 def render_episode(model, max_steps=1600, seed=None):
-    """渲染一个完整 episode，返回帧列表、总奖励和步数"""
+    """Render one full episode, return the list of frames, total reward, and step count"""
     env = gym.make("BipedalWalker-v3", render_mode="rgb_array")
     state, _ = env.reset(seed=seed)
     frames = []
@@ -36,7 +36,7 @@ def render_episode(model, max_steps=1600, seed=None):
 
 
 def downsample_frames(frames, max_frames):
-    """如果帧数超过 max_frames，均匀采样降帧"""
+    """If the frame count exceeds max_frames, downsample evenly"""
     if max_frames is None or max_frames <= 0 or len(frames) <= max_frames:
         return frames
     indices = np.linspace(0, len(frames) - 1, max_frames, dtype=int)
@@ -44,21 +44,21 @@ def downsample_frames(frames, max_frames):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="渲染 BipedalWalker PPO 回放")
-    parser.add_argument("--model", type=str, required=True, help="训练好的 PPO 模型路径")
+    parser = argparse.ArgumentParser(description="Render a BipedalWalker PPO playback")
+    parser.add_argument("--model", type=str, required=True, help="Path to the trained PPO model")
     parser.add_argument("--output-dir", type=str, default="output/bipedalwalker_episodes",
-                        help="GIF 输出目录")
-    parser.add_argument("--episodes", type=int, default=3, help="渲染的 episode 数量")
-    parser.add_argument("--fps", type=int, default=30, help="GIF 帧率")
+                        help="GIF output directory")
+    parser.add_argument("--episodes", type=int, default=3, help="Number of episodes to render")
+    parser.add_argument("--fps", type=int, default=30, help="GIF frame rate")
     parser.add_argument("--seeds", type=int, nargs="*", default=None,
-                        help="每个 episode 的 seed（可选）")
+                        help="Seed for each episode (optional)")
     parser.add_argument("--max-steps", type=int, default=1600,
-                        help="每个 episode 最大步数")
+                        help="Max steps per episode")
     parser.add_argument("--max-frames", type=int, default=200,
-                        help="GIF 最大帧数（超过则均匀降帧）")
+                        help="Max GIF frame count (downsampled evenly if exceeded)")
     args = parser.parse_args()
 
-    print(f"加载模型: {args.model}")
+    print(f"Loading model: {args.model}")
     model = PPO.load(args.model)
 
     output_dir = Path(args.output_dir)
@@ -78,7 +78,7 @@ def main():
         imageio.mimsave(out_path, gif_frames, duration=1000 / args.fps, loop=0)
         print(f"  Saved to {out_path}")
 
-    print(f"\n所有 GIF 已保存至: {output_dir}")
+    print(f"\nAll GIFs saved to: {output_dir}")
 
 
 if __name__ == "__main__":

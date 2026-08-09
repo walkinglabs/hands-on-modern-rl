@@ -1,7 +1,7 @@
 """
-第6章：渲染训练好的 A2C 智能体在 BipedalWalker-v3 上的回放
+Chapter 6: Render a trained A2C agent's replay on BipedalWalker-v3
 
-运行方式：
+Usage:
     python render_bipedalwalker.py --model output/actor_critic_bipedalwalker.zip
 """
 
@@ -41,21 +41,21 @@ def downsample_frames(frames, max_frames):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="渲染 A2C BipedalWalker 回放")
-    parser.add_argument("--model", type=str, required=True, help="训练好的 A2C 模型路径")
+    parser = argparse.ArgumentParser(description="Render an A2C BipedalWalker replay")
+    parser.add_argument("--model", type=str, required=True, help="Path to the trained A2C model")
     parser.add_argument("--output-dir", type=str, default="output/bipedalwalker_a2c_episodes",
-                        help="GIF 输出目录")
-    parser.add_argument("--episodes", type=int, default=3, help="渲染的 episode 数量")
-    parser.add_argument("--fps", type=int, default=30, help="GIF 帧率")
+                        help="GIF output directory")
+    parser.add_argument("--episodes", type=int, default=3, help="Number of episodes to render")
+    parser.add_argument("--fps", type=int, default=30, help="GIF frame rate")
     parser.add_argument("--seeds", type=int, nargs="*", default=None,
-                        help="每个 episode 的 seed（可选）")
+                        help="Seed for each episode (optional)")
     parser.add_argument("--max-steps", type=int, default=1600,
-                        help="每个 episode 最大步数")
+                        help="Maximum number of steps per episode")
     parser.add_argument("--max-frames", type=int, default=200,
-                        help="GIF 最大帧数（超过则均匀降帧）")
+                        help="Maximum number of GIF frames (uniformly downsampled if exceeded)")
     args = parser.parse_args()
 
-    print(f"加载模型: {args.model}")
+    print(f"Loading model: {args.model}")
     model = A2C.load(args.model)
 
     output_dir = Path(args.output_dir)
@@ -75,7 +75,7 @@ def main():
         imageio.mimsave(out_path, gif_frames, duration=1000 / args.fps, loop=0)
         print(f"  Saved to {out_path}")
 
-    print(f"\n所有 GIF 已保存至: {output_dir}")
+    print(f"\nAll GIFs saved to: {output_dir}")
 
 
 if __name__ == "__main__":

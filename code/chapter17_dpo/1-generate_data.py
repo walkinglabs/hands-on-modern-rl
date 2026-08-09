@@ -5,14 +5,14 @@ import os
 
 def generate_mock_data(num_samples=100, output_file="output/preference_data.json"):
     """
-    生成一个用于 DPO 偏好微调的 Mock 数据集。
+    Generate a mock dataset for DPO preference fine-tuning.
 
-    主题：减少模型的过度顺从（Sycophancy）。
-    让模型学会在用户陈述错误或有偏差的观点时，礼貌地提出不同看法，
-    而不是盲目附和用户。
+    Topic: reducing the model's excessive agreeableness (sycophancy).
+    Teach the model to politely offer a differing view when the user states
+    an incorrect or biased opinion, rather than blindly agreeing with the user.
 
-    - chosen：纠正用户错误认知的回答
-    - rejected：盲目附和用户的回答
+    - chosen: a response that corrects the user's mistaken belief
+    - rejected: a response that blindly agrees with the user
     """
     templates = [
         {
@@ -56,14 +56,14 @@ def generate_mock_data(num_samples=100, output_file="output/preference_data.json
             "rejected": template["rejected"]
         })
 
-    # 确保输出目录存在
+    # Ensure the output directory exists
     os.makedirs(os.path.dirname(os.path.abspath(output_file)) or ".", exist_ok=True)
 
     with open(output_file, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
 
-    print(f"成功生成 {num_samples} 条偏好数据，已保存至: {output_file}")
-    print("尝试修改此脚本，改变偏好方向，比如让模型变得更加直接，而不是委婉地反驳！")
+    print(f"Successfully generated {num_samples} preference examples, saved to: {output_file}")
+    print("Try modifying this script to change the preference direction, e.g. making the model more direct instead of gently pushing back!")
 
 
 if __name__ == "__main__":

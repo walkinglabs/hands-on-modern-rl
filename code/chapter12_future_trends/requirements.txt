@@ -1,4 +1,4 @@
-# 第13章：未来趋势实验依赖
+# Chapter 13: Future Trends experiment dependencies
 stable-baselines3>=2.0.0
 torch>=2.0.0
 numpy>=1.24.0

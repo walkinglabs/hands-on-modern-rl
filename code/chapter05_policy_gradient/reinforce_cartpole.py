@@ -1,17 +1,19 @@
 """
-第5章：REINFORCE 策略梯度算法 —— CartPole-v1
-从零实现最经典的策略梯度方法，理解"好动作多做，坏动作少做"
+Chapter 5: REINFORCE policy gradient algorithm -- CartPole-v1
+Implements the most classic policy gradient method from scratch, illustrating
+"do more of the good actions, do less of the bad ones"
 
-算法核心思想：
-    策略梯度的直观理解 —— 如果一个回合得分很高，
-    那么这个回合里的每个动作都应该被"鼓励"（增大概率）；
-    反之则应该被"抑制"（降低概率）。
+Core algorithmic idea:
+    An intuitive view of the policy gradient -- if an episode scores highly,
+    then every action taken in that episode should be "encouraged" (its
+    probability increased); otherwise it should be "suppressed" (its
+    probability decreased).
 
-REINFORCE 公式：
-    ∇J(θ) ≈ Σ_t [∇log π(a_t|s_t)] * G_t
-    其中 G_t 是从时间步 t 开始的折扣累计回报
+REINFORCE formula:
+    grad J(theta) ~= sum_t [grad log pi(a_t|s_t)] * G_t
+    where G_t is the discounted cumulative return starting from time step t
 
-运行方式：
+How to run:
     python reinforce_cartpole.py
 """
 
@@ -24,46 +26,46 @@ import gymnasium as gym
 import matplotlib.pyplot as plt
 from collections import deque
 
-# 创建输出目录
+# Create the output directory
 os.makedirs("output", exist_ok=True)
 
-# 设置中文字体，确保图表标题和标签正常显示
+# Configure Chinese fonts to ensure chart titles and labels render correctly
 plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 
 
 # ==========================================
-# 第一部分：策略网络（Policy Network）
+# Part 1: Policy Network
 # ==========================================
 class PolicyNetwork(nn.Module):
     """
-    策略网络：将状态映射为动作概率分布
+    Policy network: maps a state to an action probability distribution
 
-    结构：4 (状态维度) → 128 → 128 → 2 (动作维度)
-    输出经过 Softmax 归一化，得到合法的概率分布
+    Architecture: 4 (state dim) -> 128 -> 128 -> 2 (action dim)
+    The output is normalized with Softmax to give a valid probability distribution
 
-    CartPole 的状态空间：[小车位置, 小车速度, 杆子角度, 杆子角速度]
-    CartPole 的动作空间：[向左推, 向右推]
+    CartPole's state space: [cart position, cart velocity, pole angle, pole angular velocity]
+    CartPole's action space: [push left, push right]
     """
 
     def __init__(self, state_dim=4, action_dim=2, hidden_dim=128):
         super(PolicyNetwork, self).__init__()
         self.network = nn.Sequential(
-            nn.Linear(state_dim, hidden_dim),   # 输入层 → 第一个隐藏层
+            nn.Linear(state_dim, hidden_dim),   # Input layer -> first hidden layer
             nn.ReLU(),
-            nn.Linear(hidden_dim, hidden_dim),   # 第一个隐藏层 → 第二个隐藏层
+            nn.Linear(hidden_dim, hidden_dim),   # First hidden layer -> second hidden layer
             nn.ReLU(),
-            nn.Linear(hidden_dim, action_dim),   # 第二个隐藏层 → 输出层（logits）
+            nn.Linear(hidden_dim, action_dim),   # Second hidden layer -> output layer (logits)
         )
 
     def forward(self, x):
         """
-        前向传播：状态 → 动作概率
+        Forward pass: state -> action probabilities
 
-        参数：
-            x: 状态张量，形状 [batch_size, state_dim]
-        返回：
-            probs: 动作概率，形状 [batch_size, action_dim]，已经过 Softmax
+        Args:
+            x: state tensor, shape [batch_size, state_dim]
+        Returns:
+            probs: action probabilities, shape [batch_size, action_dim], after Softmax
         """
         logits = self.network(x)
         probs = torch.softmax(logits, dim=-1)
@@ -71,54 +73,56 @@ class PolicyNetwork(nn.Module):
 
 
 # ==========================================
-# 第二部分：计算折扣累计回报（Returns）
+# Part 2: Compute discounted cumulative returns
 # ==========================================
 def compute_returns(rewards, gamma=0.99):
     """
-    从后向前计算每一步的折扣累计回报 G_t
+    Compute the discounted cumulative return G_t for each step, working backward
 
-    公式：G_t = r_t + γ * r_{t+1} + γ² * r_{t+2} + ...
+    Formula: G_t = r_t + gamma * r_{t+1} + gamma^2 * r_{t+2} + ...
 
-    示例（gamma=0.99）：
+    Example (gamma=0.99):
         rewards = [1, 1, 1, 1, 1]
-        G_0 = 1 + 0.99*1 + 0.99²*1 + ... ≈ 4.90
+        G_0 = 1 + 0.99*1 + 0.99^2*1 + ... ~= 4.90
         G_4 = 1
 
-    参数：
-        rewards: 每一步的即时奖励列表
-        gamma: 折扣因子，越接近1越重视未来奖励
-    返回：
-        returns: 每一步的折扣累计回报列表
+    Args:
+        rewards: list of immediate rewards at each step
+        gamma: discount factor; closer to 1 means future rewards matter more
+    Returns:
+        returns: list of discounted cumulative returns at each step
     """
     returns = []
-    G = 0  # 累计回报
+    G = 0  # Cumulative return
 
-    # 从后向前遍历：利用 G_t = r_t + gamma * G_{t+1} 的递推关系
+    # Iterate from back to front, using the recurrence G_t = r_t + gamma * G_{t+1}
     for reward in reversed(rewards):
         G = reward + gamma * G
-        returns.insert(0, G)  # 在列表头部插入，保持时间顺序
+        returns.insert(0, G)  # Insert at the head of the list to preserve time order
 
     return returns
 
 
 # ==========================================
-# 第三部分：收集完整回合轨迹
+# Part 3: Collect a full episode trajectory
 # ==========================================
 def collect_episode(policy, env):
     """
-    让策略网络在环境中完成一个完整回合，收集轨迹数据
+    Let the policy network run a full episode in the environment and collect
+    the trajectory data
 
-    REINFORCE 是 on-policy 算法，必须用当前策略收集数据，
-    用完即丢弃，下一轮需要重新收集。
+    REINFORCE is an on-policy algorithm, so it must collect data with the
+    current policy; that data is discarded once used, and the next round
+    must collect fresh data.
 
-    参数：
-        policy: 策略网络
-        env: Gymnasium 环境
-    返回：
-        states: 状态列表
-        actions: 动作列表
-        rewards: 奖励列表
-        episode_reward: 回合总奖励
+    Args:
+        policy: policy network
+        env: Gymnasium environment
+    Returns:
+        states: list of states
+        actions: list of actions
+        rewards: list of rewards
+        episode_reward: total reward for the episode
     """
     state, _ = env.reset()
     states, actions, rewards = [], [], []
@@ -127,21 +131,21 @@ def collect_episode(policy, env):
     truncated = False
 
     while not (done or truncated):
-        # 将状态转为张量
-        state_tensor = torch.FloatTensor(state).unsqueeze(0)  # 添加 batch 维度
+        # Convert the state to a tensor
+        state_tensor = torch.FloatTensor(state).unsqueeze(0)  # Add the batch dimension
 
-        # 获取动作概率分布
+        # Get the action probability distribution
         with torch.no_grad():
             probs = policy(state_tensor)
 
-        # 按概率分布采样动作（探索的关键！不是取 argmax）
+        # Sample an action from the probability distribution (key to exploration! not argmax)
         dist = torch.distributions.Categorical(probs)
         action = dist.sample().item()
 
-        # 执行动作，观察结果
+        # Execute the action and observe the result
         next_state, reward, done, truncated, _ = env.step(action)
 
-        # 存储转移数据
+        # Store the transition data
         states.append(state)
         actions.append(action)
         rewards.append(reward)
@@ -153,48 +157,48 @@ def collect_episode(policy, env):
 
 
 # ==========================================
-# 第四部分：训练一个回合（REINFORCE 核心更新）
+# Part 4: Train on one episode (the core REINFORCE update)
 # ==========================================
 def train_one_episode(policy, optimizer, states, actions, returns):
     """
-    REINFORCE 的核心：用策略梯度公式更新网络参数
+    The core of REINFORCE: update the network parameters using the policy gradient formula
 
-    损失函数 = - Σ_t [log π(a_t|s_t) * G_t]
+    Loss function = - sum_t [log pi(a_t|s_t) * G_t]
 
-    这个损失函数的梯度恰好等于策略梯度：
-    ∇loss = - Σ_t [∇log π(a_t|s_t) * G_t] = -∇J(θ)
+    The gradient of this loss function is exactly equal to the policy gradient:
+    grad(loss) = - sum_t [grad log pi(a_t|s_t) * G_t] = -grad J(theta)
 
-    所以 minimize loss = maximize J(θ)（期望回报）
+    So minimizing loss = maximizing J(theta) (the expected return)
 
-    参数：
-        policy: 策略网络
-        optimizer: 优化器
-        states: 状态列表
-        actions: 动作列表
-        returns: 折扣累计回报列表
-    返回：
-        loss_value: 本轮损失值
+    Args:
+        policy: policy network
+        optimizer: optimizer
+        states: list of states
+        actions: list of actions
+        returns: list of discounted cumulative returns
+    Returns:
+        loss_value: this round's loss value
     """
-    # 将数据转为张量
+    # Convert the data to tensors
     states_tensor = torch.FloatTensor(np.array(states))
     actions_tensor = torch.LongTensor(actions)
     returns_tensor = torch.FloatTensor(returns)
 
-    # 前向传播：获取每个状态下的动作概率
+    # Forward pass: get the action probabilities for each state
     probs = policy(states_tensor)
 
-    # 计算所采取动作的对数概率 log π(a_t|s_t)
-    # gather(1, actions) 选取每个状态对应动作的概率
+    # Compute the log probability of the action taken, log pi(a_t|s_t)
+    # gather(1, actions) selects the probability of the corresponding action for each state
     action_probs = probs.gather(1, actions_tensor.unsqueeze(1)).squeeze(1)
-    log_probs = torch.log(action_probs + 1e-8)  # 加小常数防止 log(0)
+    log_probs = torch.log(action_probs + 1e-8)  # Add a small constant to avoid log(0)
 
-    # 策略梯度损失：-log π(a_t|s_t) * G_t
-    # 直觉理解：
-    #   如果 G_t > 0（好结果），-log_prob * G_t < 0，梯度下降会增大 log_prob → 增大概率
-    #   如果 G_t < 0（坏结果），-log_prob * G_t > 0，梯度下降会减小 log_prob → 降低概率
+    # Policy gradient loss: -log pi(a_t|s_t) * G_t
+    # Intuition:
+    #   If G_t > 0 (a good outcome), -log_prob * G_t < 0, so gradient descent increases log_prob -> increases the probability
+    #   If G_t < 0 (a bad outcome), -log_prob * G_t > 0, so gradient descent decreases log_prob -> decreases the probability
     loss = -(log_probs * returns_tensor).mean()
 
-    # 反向传播 + 参数更新
+    # Backward pass + parameter update
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
@@ -203,25 +207,25 @@ def train_one_episode(policy, optimizer, states, actions, returns):
 
 
 # ==========================================
-# 第五部分：主训练循环
+# Part 5: Main training loop
 # ==========================================
 def train():
     """
-    REINFORCE 完整训练流程
+    The full REINFORCE training pipeline
 
-    超参数说明：
-        - num_episodes = 500：训练 500 个回合
-        - gamma = 0.99：折扣因子，重视长期回报
-        - learning_rate = 1e-3：学习率
-        - hidden_dim = 128：隐藏层宽度
+    Hyperparameter notes:
+        - num_episodes = 500: train for 500 episodes
+        - gamma = 0.99: discount factor, favoring long-term reward
+        - learning_rate = 1e-3: learning rate
+        - hidden_dim = 128: hidden layer width
     """
-    # ---------- 超参数 ----------
+    # ---------- Hyperparameters ----------
     num_episodes = 500
     gamma = 0.99
     learning_rate = 1e-3
     hidden_dim = 128
 
-    # ---------- 初始化 ----------
+    # ---------- Initialization ----------
     env = gym.make("CartPole-v1")
     policy = PolicyNetwork(
         state_dim=env.observation_space.shape[0],
@@ -230,75 +234,75 @@ def train():
     )
     optimizer = optim.Adam(policy.parameters(), lr=learning_rate)
 
-    # 记录训练过程
-    episode_rewards = []  # 每个回合的总奖励
-    episode_losses = []   # 每个回合的损失
+    # Record the training process
+    episode_rewards = []  # Total reward for each episode
+    episode_losses = []   # Loss for each episode
 
     print("=" * 60)
-    print("  REINFORCE 策略梯度 —— CartPole-v1 训练")
+    print("  REINFORCE policy gradient -- CartPole-v1 training")
     print("=" * 60)
-    print(f"  超参数:")
-    print(f"    回合数: {num_episodes}")
-    print(f"    折扣因子 γ: {gamma}")
-    print(f"    学习率: {learning_rate}")
-    print(f"    隐藏层维度: {hidden_dim}")
+    print(f"  Hyperparameters:")
+    print(f"    Episodes: {num_episodes}")
+    print(f"    Discount factor gamma: {gamma}")
+    print(f"    Learning rate: {learning_rate}")
+    print(f"    Hidden layer dimension: {hidden_dim}")
     print("=" * 60)
 
-    # ---------- 训练循环 ----------
+    # ---------- Training loop ----------
     for episode in range(num_episodes):
-        # 第一步：用当前策略收集一个完整回合的轨迹
+        # Step 1: collect a full episode trajectory with the current policy
         states, actions, rewards, episode_reward = collect_episode(policy, env)
 
-        # 第二步：计算折扣累计回报
+        # Step 2: compute the discounted cumulative returns
         returns = compute_returns(rewards, gamma=gamma)
 
-        # 第三步：执行策略梯度更新
+        # Step 3: perform the policy gradient update
         loss_value = train_one_episode(policy, optimizer, states, actions, returns)
 
-        # 记录数据
+        # Record the data
         episode_rewards.append(episode_reward)
         episode_losses.append(loss_value)
 
-        # 每 50 个回合打印一次进度
+        # Print progress every 50 episodes
         if (episode + 1) % 50 == 0:
             recent_rewards = episode_rewards[-50:]
             avg_reward = np.mean(recent_rewards)
             print(
-                f"  回合 {episode + 1:4d}/{num_episodes} | "
-                f"本轮奖励: {episode_reward:6.1f} | "
-                f"近 50 回合均值: {avg_reward:6.1f} | "
-                f"损失: {loss_value:.4f}"
+                f"  Episode {episode + 1:4d}/{num_episodes} | "
+                f"Reward: {episode_reward:6.1f} | "
+                f"Last-50 avg: {avg_reward:6.1f} | "
+                f"Loss: {loss_value:.4f}"
             )
 
     env.close()
 
-    # ---------- 训练结果汇总 ----------
+    # ---------- Training results summary ----------
     print("=" * 60)
-    print("  训练完成！")
-    print(f"  最后 50 回合平均奖励: {np.mean(episode_rewards[-50:]):.1f}")
-    print(f"  最佳回合奖励: {np.max(episode_rewards):.1f}")
+    print("  Training complete!")
+    print(f"  Average reward over the last 50 episodes: {np.mean(episode_rewards[-50:]):.1f}")
+    print(f"  Best episode reward: {np.max(episode_rewards):.1f}")
     print("=" * 60)
 
-    # ---------- 绘制训练曲线 ----------
+    # ---------- Plot the training curve ----------
     plot_training_curve(episode_rewards)
 
 
 # ==========================================
-# 第六部分：绘制训练曲线
+# Part 6: Plot the training curve
 # ==========================================
 def plot_training_curve(episode_rewards):
     """
-    绘制奖励曲线和滑动平均线
+    Plot the reward curve and the moving-average line
 
-    滑动平均（window=50）可以更清晰地展示学习趋势，
-    过滤掉单回合的随机波动。
+    The moving average (window=50) shows the learning trend more clearly,
+    filtering out the random fluctuation of individual episodes.
     """
     fig, ax = plt.subplots(figsize=(10, 5))
 
-    # 原始奖励曲线（浅色，展示波动）
-    ax.plot(episode_rewards, alpha=0.3, color='steelblue', label='回合奖励（原始）')
+    # Raw reward curve (light color, shows fluctuation)
+    ax.plot(episode_rewards, alpha=0.3, color='steelblue', label='Episode reward (raw)')
 
-    # 滑动平均曲线（深色，展示趋势）
+    # Moving-average curve (dark color, shows the trend)
     window = 50
     if len(episode_rewards) >= window:
         moving_avg = []
@@ -306,22 +310,22 @@ def plot_training_curve(episode_rewards):
             start = max(0, i - window + 1)
             moving_avg.append(np.mean(episode_rewards[start:i + 1]))
         ax.plot(moving_avg, color='crimson', linewidth=2.0,
-                label=f'滑动平均（窗口={window}）')
+                label=f'Moving average (window={window})')
 
-    ax.set_xlabel('训练回合', fontsize=12)
-    ax.set_ylabel('回合奖励', fontsize=12)
-    ax.set_title('REINFORCE 策略梯度 —— CartPole-v1 训练曲线', fontsize=14)
+    ax.set_xlabel('Training episode', fontsize=12)
+    ax.set_ylabel('Episode reward', fontsize=12)
+    ax.set_title('REINFORCE policy gradient -- CartPole-v1 training curve', fontsize=14)
     ax.legend(fontsize=11)
     ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
     plt.savefig('output/reinforce_cartpole_rewards.png', dpi=150, bbox_inches='tight')
-    print("  训练曲线已保存为 output/reinforce_cartpole_rewards.png")
+    print("  Training curve saved to output/reinforce_cartpole_rewards.png")
     plt.show()
 
 
 # ==========================================
-# 程序入口
+# Program entry point
 # ==========================================
 if __name__ == "__main__":
     train()

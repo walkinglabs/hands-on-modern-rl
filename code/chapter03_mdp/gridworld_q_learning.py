@@ -1,8 +1,9 @@
 """
-第3章：4×4 GridWorld Q-Learning 实验
-在网格世界中学习最优路径，直观理解 Q 值和贝尔曼方程
+Chapter 3: 4x4 GridWorld Q-Learning experiment
+Learn the optimal path in a grid world to build intuition for Q-values and the
+Bellman equation
 
-运行方式：
+How to run:
     python gridworld_q_learning.py
 """
 
@@ -10,31 +11,31 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 创建输出目录
+# Create output directory
 os.makedirs("output", exist_ok=True)
 
 
 # ==========================================
-# 第一部分：GridWorld 环境
+# Part 1: GridWorld environment
 # ==========================================
 class GridWorld:
     """
-    4×4 网格世界环境
+    4x4 grid world environment
 
-    网格布局（4行4列）：
+    Grid layout (4 rows, 4 columns):
         0,0  0,1  0,2  0,3
         1,0  1,1  1,2  1,3
         2,0  2,1  2,2  2,3
         3,0  3,1  3,2  3,3
 
-    - 起点：(0, 0)
-    - 终点：(3, 3)，到达获得 +10 奖励
-    - 障碍物：(1, 1) 和 (2, 2)，撞到获得 -5 惩罚
-    - 每走一步：-1 奖励（鼓励尽快到达终点）
-    - 撞墙：-5 奖励（位置不变）
+    - Start: (0, 0)
+    - Goal: (3, 3), reaching it gives a +10 reward
+    - Obstacles: (1, 1) and (2, 2), hitting one gives a -5 penalty
+    - Each step: -1 reward (encourages reaching the goal quickly)
+    - Hitting a wall: -5 reward (position unchanged)
 
-    动作空间：
-        0 = 上 (↑), 1 = 下 (↓), 2 = 左 (←), 3 = 右 (→)
+    Action space:
+        0 = up (↑), 1 = down (↓), 2 = left (←), 3 = right (→)
     """
 
     def __init__(self):
@@ -43,118 +44,120 @@ class GridWorld:
         self.start = (0, 0)
         self.goal = (3, 3)
         self.obstacles = [(1, 1), (2, 2)]
-        self.n_actions = 4  # 上、下、左、右
-        self.action_names = ['上(↑)', '下(↓)', '左(←)', '右(→)']
+        self.n_actions = 4  # up, down, left, right
+        self.action_names = ['up(↑)', 'down(↓)', 'left(←)', 'right(→)']
         self.reset()
 
     def reset(self):
-        """重置环境到起点，返回初始状态"""
+        """Reset the environment to the start, return the initial state"""
         self.agent_pos = self.start
         return self.agent_pos
 
     def step(self, action):
         """
-        执行动作，返回 (下一状态, 奖励, 是否结束)
+        Execute an action, return (next state, reward, done)
 
-        动作映射：
-            0 = 上 → 行 -1
-            1 = 下 → 行 +1
-            2 = 左 → 列 -1
-            3 = 右 → 列 +1
+        Action mapping:
+            0 = up → row -1
+            1 = down → row +1
+            2 = left → col -1
+            3 = right → col +1
         """
         row, col = self.agent_pos
 
-        # 根据动作计算新位置
-        if action == 0:    # 上
+        # Compute the new position based on the action
+        if action == 0:    # up
             new_pos = (row - 1, col)
-        elif action == 1:  # 下
+        elif action == 1:  # down
             new_pos = (row + 1, col)
-        elif action == 2:  # 左
+        elif action == 2:  # left
             new_pos = (row, col - 1)
-        elif action == 3:  # 右
+        elif action == 3:  # right
             new_pos = (row, col + 1)
         else:
-            raise ValueError(f"无效动作: {action}")
+            raise ValueError(f"Invalid action: {action}")
 
-        # 检查是否撞墙（出界）
+        # Check whether it hits a wall (out of bounds)
         new_row, new_col = new_pos
         if new_row < 0 or new_row >= self.rows or new_col < 0 or new_col >= self.cols:
-            # 撞墙：位置不变，给予惩罚
+            # Hit a wall: position unchanged, apply penalty
             return self.agent_pos, -5, False
 
-        # 检查是否撞到障碍物
+        # Check whether it hits an obstacle
         if new_pos in self.obstacles:
-            # 撞障碍物：位置不变，给予惩罚
+            # Hit an obstacle: position unchanged, apply penalty
             return self.agent_pos, -5, False
 
-        # 合法移动：更新位置
+        # Legal move: update position
         self.agent_pos = new_pos
 
-        # 检查是否到达终点
+        # Check whether the goal has been reached
         if self.agent_pos == self.goal:
-            return self.agent_pos, 10, True  # 到达终点，+10 奖励
+            return self.agent_pos, 10, True  # Reached the goal, +10 reward
 
-        # 普通移动：-1 奖励（鼓励尽快到达）
+        # Normal move: -1 reward (encourages reaching the goal quickly)
         return self.agent_pos, -1, False
 
 
 # ==========================================
-# 第二部分：Q-Learning 算法
+# Part 2: Q-Learning algorithm
 # ==========================================
 def epsilon_greedy(Q, state, epsilon, n_actions):
     """
-    ε-贪心动作选择策略
+    epsilon-greedy action selection policy
 
-    以 ε 的概率随机探索，以 1-ε 的概率选择当前 Q 值最大的动作。
-    这是 Q-Learning 中平衡"探索"与"利用"的标准方法。
+    Explore randomly with probability epsilon, otherwise pick the action with
+    the highest current Q value with probability 1-epsilon.
+    This is the standard way Q-Learning balances "exploration" and "exploitation".
     """
     if np.random.random() < epsilon:
-        return np.random.randint(n_actions)  # 探索：随机选动作
+        return np.random.randint(n_actions)  # Explore: pick a random action
     else:
-        return np.argmax(Q[state])  # 利用：选 Q 值最大的动作
+        return np.argmax(Q[state])  # Exploit: pick the action with the highest Q value
 
 
 def train_q_learning(env, n_episodes=500, alpha=0.1, gamma=0.95,
                      epsilon_start=1.0, epsilon_end=0.01, epsilon_decay=0.995):
     """
-    Q-Learning 训练
+    Q-Learning training
 
-    Q-Learning 的核心更新公式（贝尔曼最优方程的迭代形式）：
+    The core update formula of Q-Learning (the iterative form of the Bellman
+    optimality equation):
         Q(s, a) ← Q(s, a) + α * [r + γ * max_a' Q(s', a') - Q(s, a)]
 
-    其中：
-        - s: 当前状态
-        - a: 当前动作
-        - r: 获得的奖励
-        - s': 下一个状态
-        - α: 学习率（控制更新步长）
-        - γ: 折扣因子（未来奖励的重要程度）
-        - max_a' Q(s', a'): 下一个状态的最大 Q 值
+    Where:
+        - s: current state
+        - a: current action
+        - r: reward received
+        - s': next state
+        - α: learning rate (controls the update step size)
+        - γ: discount factor (how much future rewards matter)
+        - max_a' Q(s', a'): the maximum Q value of the next state
 
-    参数：
-        n_episodes: 训练回合数
-        alpha: 学习率
-        gamma: 折扣因子
-        epsilon_start: 初始探索率
-        epsilon_end: 最低探索率
-        epsilon_decay: 探索率衰减因子
+    Args:
+        n_episodes: number of training episodes
+        alpha: learning rate
+        gamma: discount factor
+        epsilon_start: initial exploration rate
+        epsilon_end: minimum exploration rate
+        epsilon_decay: exploration rate decay factor
     """
-    # 初始化 Q 表：所有 Q 值设为 0
-    # Q[state][action] = 估计的最优动作价值
+    # Initialize the Q table: all Q values set to 0
+    # Q[state][action] = estimated optimal action value
     Q = np.zeros((env.rows, env.cols, env.n_actions))
 
-    # 记录训练过程中的数据
-    episode_rewards = []  # 每回合的累计奖励
-    episode_steps = []    # 每回合的步数
+    # Record data during training
+    episode_rewards = []  # Cumulative reward per episode
+    episode_steps = []    # Number of steps per episode
     epsilon = epsilon_start
 
     print("=" * 60)
-    print("  Q-Learning 训练")
+    print("  Q-Learning training")
     print("=" * 60)
-    print(f"  学习率 α = {alpha}")
-    print(f"  折扣因子 γ = {gamma}")
-    print(f"  初始探索率 ε = {epsilon_start}")
-    print(f"  训练回合数 = {n_episodes}")
+    print(f"  Learning rate α = {alpha}")
+    print(f"  Discount factor γ = {gamma}")
+    print(f"  Initial exploration rate ε = {epsilon_start}")
+    print(f"  Number of training episodes = {n_episodes}")
     print("-" * 60)
 
     for episode in range(n_episodes):
@@ -164,42 +167,42 @@ def train_q_learning(env, n_episodes=500, alpha=0.1, gamma=0.95,
         done = False
 
         while not done:
-            # 1. 用 ε-贪心策略选择动作
+            # 1. Select an action using the epsilon-greedy policy
             action = epsilon_greedy(Q, state, epsilon, env.n_actions)
 
-            # 2. 执行动作，观察奖励和下一状态
+            # 2. Execute the action, observe the reward and next state
             next_state, reward, done = env.step(action)
 
-            # 3. Q-Learning 更新（核心公式）
-            #    注意：这里用的是 max_a' Q(s', a')，不关心实际采取了什么策略
-            #    这就是 Q-Learning "off-policy" 的特点
+            # 3. Q-Learning update (core formula)
+            #    Note: this uses max_a' Q(s', a'), regardless of the policy
+            #    actually followed -- this is the "off-policy" property of Q-Learning
             best_next_q = np.max(Q[next_state])
             td_target = reward + gamma * best_next_q
             td_error = td_target - Q[state][action]
             Q[state][action] += alpha * td_error
 
-            # 4. 转移到下一状态
+            # 4. Transition to the next state
             state = next_state
             total_reward += reward
             steps += 1
 
-            # 安全阀：防止无限循环
+            # Safety valve: prevent an infinite loop
             if steps > 200:
                 break
 
-        # 衰减探索率
+        # Decay the exploration rate
         epsilon = max(epsilon_end, epsilon * epsilon_decay)
 
         episode_rewards.append(total_reward)
         episode_steps.append(steps)
 
-        # 每 100 回合打印一次进度
+        # Print progress every 100 episodes
         if (episode + 1) % 100 == 0:
             avg_reward = np.mean(episode_rewards[-100:])
             avg_steps = np.mean(episode_steps[-100:])
-            print(f"  回合 {episode + 1:4d} | "
-                  f"近100回合平均奖励: {avg_reward:7.2f} | "
-                  f"平均步数: {avg_steps:5.1f} | "
+            print(f"  Episode {episode + 1:4d} | "
+                  f"avg reward (last 100): {avg_reward:7.2f} | "
+                  f"avg steps: {avg_steps:5.1f} | "
                   f"ε: {epsilon:.4f}")
 
     print("-" * 60)
@@ -207,34 +210,35 @@ def train_q_learning(env, n_episodes=500, alpha=0.1, gamma=0.95,
 
 
 # ==========================================
-# 第三部分：结果可视化
+# Part 3: Results visualization
 # ==========================================
 def print_q_table(Q, env):
     """
-    打印格式化的 Q 表
+    Print a formatted Q table
 
-    Q 表展示了每个状态下每个动作的 Q 值（估计的最优动作价值）。
-    Q 值越高，说明在该状态下执行该动作的预期累计奖励越大。
+    The Q table shows the Q value for each action in each state (the estimated
+    optimal action value). A higher Q value means a larger expected cumulative
+    reward for taking that action in that state.
     """
     print("\n" + "=" * 60)
-    print("  最终 Q 表")
+    print("  Final Q table")
     print("=" * 60)
-    print(f"{'状态':<10s}", end="")
+    print(f"{'State':<10s}", end="")
     for name in env.action_names:
         print(f"{name:<12s}", end="")
-    print(f"{'最优动作':<12s}")
+    print(f"{'Best action':<12s}")
     print("-" * 60)
 
     for r in range(env.rows):
         for c in range(env.cols):
             state = (r, c)
             if state in env.obstacles:
-                print(f"({r},{c}) 障碍  ", end="")
-                print("    ---      ---      ---      ---     障碍物")
+                print(f"({r},{c}) obstacle  ", end="")
+                print("    ---      ---      ---      ---     obstacle")
                 continue
             if state == env.goal:
-                print(f"({r},{c}) 终点  ", end="")
-                print("    ---      ---      ---      ---     终点")
+                print(f"({r},{c}) goal  ", end="")
+                print("    ---      ---      ---      ---     goal")
                 continue
 
             print(f"({r},{c})       ", end="")
@@ -248,12 +252,14 @@ def print_q_table(Q, env):
 
 def extract_optimal_path(Q, env):
     """
-    从 Q 表中提取最优路径
+    Extract the optimal path from the Q table
 
-    在每个状态选择 Q 值最大的动作，根据网格规则计算下一状态。
-    不依赖环境的 step() 函数，避免环境状态被意外修改。
+    Select the action with the highest Q value at each state, and compute the
+    next state according to the grid rules.
+    Does not depend on the environment's step() function, avoiding unintended
+    mutation of the environment state.
     """
-    # 动作对应的位移：0=上, 1=下, 2=左, 3=右
+    # Displacement corresponding to each action: 0=up, 1=down, 2=left, 3=right
     deltas = {0: (-1, 0), 1: (1, 0), 2: (0, -1), 3: (0, 1)}
 
     state = env.start
@@ -262,17 +268,18 @@ def extract_optimal_path(Q, env):
 
     while state != env.goal:
         if state in visited:
-            break  # 防止死循环
+            break  # Prevent an infinite loop
         visited.add(state)
         action = np.argmax(Q[state])
         dr, dc = deltas[action]
         new_state = (state[0] + dr, state[1] + dc)
 
-        # 检查新位置是否合法（不越界、不是障碍物）
+        # Check whether the new position is legal (in bounds, not an obstacle)
         if (0 <= new_state[0] < env.rows and 0 <= new_state[1] < env.cols
                 and new_state not in env.obstacles):
             state = new_state
-        # 如果越界或撞障碍物，状态不变（可能导致死循环，由 visited 保护）
+        # If out of bounds or hitting an obstacle, state stays unchanged
+        # (would otherwise risk an infinite loop, guarded by `visited`)
         path.append(state)
         if state == env.goal:
             break
@@ -282,10 +289,10 @@ def extract_optimal_path(Q, env):
 
 def visualize_results(Q, episode_rewards, env):
     """
-    可视化 Q-Learning 的学习结果
-    - 图1：每个动作的 Q 值热力图
-    - 图2：最优路径在网格上的展示
-    - 图3：每回合累计奖励的变化曲线
+    Visualize the Q-Learning results
+    - Figure 1: Q-value heatmap for each action
+    - Figure 2: the optimal path shown on the grid
+    - Figure 3: the cumulative reward curve over episodes
     """
     plt.rcParams['font.sans-serif'] = ['Arial Unicode MS', 'SimHei']
     plt.rcParams['axes.unicode_minus'] = False
@@ -293,16 +300,16 @@ def visualize_results(Q, episode_rewards, env):
     fig = plt.figure(figsize=(16, 12))
 
     # ------------------------------------------
-    # 图1：四个动作的 Q 值热力图
+    # Figure 1: Q-value heatmaps for the four actions
     # ------------------------------------------
-    action_names_short = ['上(↑)', '下(↓)', '左(←)', '右(→)']
+    action_names_short = ['up(↑)', 'down(↓)', 'left(←)', 'right(→)']
 
     for i in range(4):
         ax = fig.add_subplot(2, 3, i + 1)
-        q_values = Q[:, :, i]  # 取出某个动作在所有状态的 Q 值
+        q_values = Q[:, :, i]  # Extract the Q values of one action across all states
 
         im = ax.imshow(q_values, cmap='RdYlGn', aspect='equal')
-        # 在每个格子上标注 Q 值
+        # Annotate the Q value on each cell
         for r in range(env.rows):
             for c in range(env.cols):
                 if (r, c) in env.obstacles:
@@ -322,10 +329,10 @@ def visualize_results(Q, episode_rewards, env):
         plt.colorbar(im, ax=ax, shrink=0.8)
 
     # ------------------------------------------
-    # 图2：最优路径可视化
+    # Figure 2: optimal path visualization
     # ------------------------------------------
     ax_path = fig.add_subplot(2, 3, 5)
-    # 绘制网格底色
+    # Draw the grid background
     grid = np.zeros((env.rows, env.cols))
     for obs in env.obstacles:
         grid[obs] = -1
@@ -333,13 +340,13 @@ def visualize_results(Q, episode_rewards, env):
 
     ax_path.imshow(grid, cmap='Set3', aspect='equal', vmin=-2, vmax=3)
 
-    # 提取并绘制最优路径
+    # Extract and draw the optimal path
     path = extract_optimal_path(Q, env)
     path_rows = [p[0] for p in path]
     path_cols = [p[1] for p in path]
     ax_path.plot(path_cols, path_rows, 'b-o', linewidth=2.5, markersize=10)
 
-    # 标注起点、终点、障碍物
+    # Annotate the start, goal, and obstacles
     ax_path.text(0, 0, 'S', ha='center', va='center', fontsize=16,
                  fontweight='bold', color='green')
     ax_path.text(3, 3, 'G', ha='center', va='center', fontsize=16,
@@ -348,13 +355,13 @@ def visualize_results(Q, episode_rewards, env):
         ax_path.text(obs[1], obs[0], 'X', ha='center', va='center',
                      fontsize=16, fontweight='bold', color='black')
 
-    # 在路径上标注步数
+    # Annotate step numbers along the path
     for idx, (r, c) in enumerate(path):
         ax_path.text(c, r, str(idx), ha='center', va='center',
                      fontsize=8, color='white',
                      bbox=dict(boxstyle='round,pad=0.2', fc='blue', alpha=0.5))
 
-    ax_path.set_title('最优路径', fontsize=12)
+    ax_path.set_title('Optimal path', fontsize=12)
     ax_path.set_xticks(range(env.cols))
     ax_path.set_yticks(range(env.rows))
     ax_path.set_xticklabels(range(env.cols))
@@ -362,65 +369,65 @@ def visualize_results(Q, episode_rewards, env):
     ax_path.grid(True, alpha=0.3)
 
     # ------------------------------------------
-    # 图3：训练奖励曲线
+    # Figure 3: training reward curve
     # ------------------------------------------
     ax_reward = fig.add_subplot(2, 3, 6)
-    ax_reward.plot(episode_rewards, alpha=0.3, color='lightblue', label='单回合奖励')
-    # 计算滑动平均
+    ax_reward.plot(episode_rewards, alpha=0.3, color='lightblue', label='Per-episode reward')
+    # Compute the moving average
     window = 20
     if len(episode_rewards) >= window:
         moving_avg = np.convolve(episode_rewards,
                                  np.ones(window) / window, mode='valid')
         ax_reward.plot(range(window - 1, len(episode_rewards)),
                        moving_avg, color='blue', linewidth=2,
-                       label=f'{window}回合滑动平均')
-    ax_reward.set_xlabel('回合', fontsize=11)
-    ax_reward.set_ylabel('累计奖励', fontsize=11)
-    ax_reward.set_title('训练奖励曲线', fontsize=12)
+                       label=f'{window}-episode moving average')
+    ax_reward.set_xlabel('Episode', fontsize=11)
+    ax_reward.set_ylabel('Cumulative reward', fontsize=11)
+    ax_reward.set_title('Training reward curve', fontsize=12)
     ax_reward.legend(fontsize=9)
     ax_reward.grid(True, alpha=0.3)
 
     plt.tight_layout()
     plt.savefig('output/gridworld_q_learning_results.png', dpi=150, bbox_inches='tight')
-    print("\n图表已保存至 output/gridworld_q_learning_results.png")
+    print("\nFigure saved to output/gridworld_q_learning_results.png")
     plt.show()
 
 
 # ==========================================
-# 第四部分：主程序
+# Part 4: Main program
 # ==========================================
 def main():
-    """主函数：创建环境 → 训练 → 打印 Q 表 → 可视化"""
+    """Main function: create environment → train → print Q table → visualize"""
 
-    # 创建 GridWorld 环境
+    # Create the GridWorld environment
     env = GridWorld()
-    print("GridWorld 环境创建完成")
-    print(f"  起点: {env.start}")
-    print(f"  终点: {env.goal}")
-    print(f"  障碍物: {env.obstacles}")
-    print(f"  动作空间: {env.action_names}")
+    print("GridWorld environment created")
+    print(f"  Start: {env.start}")
+    print(f"  Goal: {env.goal}")
+    print(f"  Obstacles: {env.obstacles}")
+    print(f"  Action space: {env.action_names}")
 
-    # 训练 Q-Learning
+    # Train Q-Learning
     Q, episode_rewards, episode_steps = train_q_learning(env, n_episodes=500)
 
-    # 打印最终 Q 表
+    # Print the final Q table
     print_q_table(Q, env)
 
-    # 提取并打印最优路径
+    # Extract and print the optimal path
     path = extract_optimal_path(Q, env)
-    print(f"\n最优路径: {' → '.join([str(p) for p in path])}")
-    print(f"路径长度: {len(path) - 1} 步")
+    print(f"\nOptimal path: {' → '.join([str(p) for p in path])}")
+    print(f"Path length: {len(path) - 1} steps")
 
-    # 计算最优路径的总奖励
+    # Compute the total reward of the optimal path
     total_r = 0
     for i in range(len(path) - 1):
         if i < len(path) - 2:
-            total_r += -1  # 普通步骤：-1
+            total_r += -1  # Normal step: -1
         else:
-            total_r += 10  # 到达终点的最后一步：+10
-    print(f"最优路径总奖励: {total_r}")
+            total_r += 10  # Final step reaching the goal: +10
+    print(f"Total reward of the optimal path: {total_r}")
 
-    # 可视化结果
+    # Visualize the results
     visualize_results(Q, episode_rewards, env)
 
 
