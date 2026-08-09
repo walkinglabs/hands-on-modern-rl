@@ -32,7 +32,7 @@
   "license": "CC-BY-NC-SA-4.0",
   "repository": {
     "type": "git",
-    "url": "git@github.com:walkinglabs/hands-on-modern-rl.git"
+    "url": "git@github.com:cdiddy77/hands-on-modern-rl.git"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

@@ -3,9 +3,9 @@
   <p><em>现代强化学习实战指南：涵盖经典控制、LLM 后训练、RLVR 与多模态智能体。</em></p>
 
   <p>
-    <a href="https://walkinglabs.github.io/hands-on-modern-rl/"><img src="https://img.shields.io/badge/Course-Online-2563eb?style=flat-square" alt="Online Course" /></a>
-    <a href="https://github.com/walkinglabs/hands-on-modern-rl/releases/latest"><img src="https://img.shields.io/badge/PDF-Download-e11d48?style=flat-square" alt="PDF Download" /></a>
-    <a href="https://github.com/walkinglabs/hands-on-modern-rl/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-111827?style=flat-square" alt="CC BY-NC-SA 4.0 License" /></a>
+    <a href="https://cdiddy77.github.io/hands-on-modern-rl/"><img src="https://img.shields.io/badge/Course-Online-2563eb?style=flat-square" alt="Online Course" /></a>
+    <a href="https://github.com/cdiddy77/hands-on-modern-rl/releases/latest"><img src="https://img.shields.io/badge/PDF-Download-e11d48?style=flat-square" alt="PDF Download" /></a>
+    <a href="https://github.com/cdiddy77/hands-on-modern-rl/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-111827?style=flat-square" alt="CC BY-NC-SA 4.0 License" /></a>
     <img src="https://img.shields.io/badge/Node-%3E%3D18-16a34a?style=flat-square" alt="Node >= 18" />
     <img src="https://img.shields.io/badge/Docs-VitePress-646cff?style=flat-square" alt="VitePress" />
   </p>
@@ -165,7 +165,7 @@
 
 本仓库是一个活跃的课件项目。课程内容正在逐章扩展和完善，重点关注正确性、可运行的示例和稳定的学习路径。
 
-- 课程网站: [walkinglabs.github.io/hands-on-modern-rl](https://walkinglabs.github.io/hands-on-modern-rl/)
+- 课程网站: [cdiddy77.github.io/hands-on-modern-rl](https://cdiddy77.github.io/hands-on-modern-rl/)
 - 源码内容: [`docs/`](docs/)
 - 可运行示例: [`code/`](code/)
 - 本地验证: `npm run verify`
@@ -314,7 +314,7 @@
 发布的课程网站地址：
 
 ```text
-https://walkinglabs.github.io/hands-on-modern-rl/
+https://cdiddy77.github.io/hands-on-modern-rl/
 ```
 
 ### 本地运行文档网站
@@ -325,7 +325,7 @@ https://walkinglabs.github.io/hands-on-modern-rl/
 - npm
 
 ```bash
-git clone https://github.com/walkinglabs/hands-on-modern-rl.git
+git clone https://github.com/cdiddy77/hands-on-modern-rl.git
 cd hands-on-modern-rl
 npm install
 npm run dev

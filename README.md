@@ -3,9 +3,9 @@
   <p><em>A practice-first guide to modern RL, from classic control to LLM post-training, RLVR, and multimodal agents.</em></p>
 
   <p>
-    <a href="https://walkinglabs.github.io/hands-on-modern-rl/"><img src="https://img.shields.io/badge/Course-Online-2563eb?style=flat-square" alt="Online Course" /></a>
-    <a href="https://github.com/walkinglabs/hands-on-modern-rl/releases/latest"><img src="https://img.shields.io/badge/PDF-Download-e11d48?style=flat-square" alt="PDF Download" /></a>
-    <a href="https://github.com/walkinglabs/hands-on-modern-rl/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-111827?style=flat-square" alt="CC BY-NC-SA 4.0 License" /></a>
+    <a href="https://cdiddy77.github.io/hands-on-modern-rl/"><img src="https://img.shields.io/badge/Course-Online-2563eb?style=flat-square" alt="Online Course" /></a>
+    <a href="https://github.com/cdiddy77/hands-on-modern-rl/releases/latest"><img src="https://img.shields.io/badge/PDF-Download-e11d48?style=flat-square" alt="PDF Download" /></a>
+    <a href="https://github.com/cdiddy77/hands-on-modern-rl/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-CC%20BY--NC--SA%204.0-111827?style=flat-square" alt="CC BY-NC-SA 4.0 License" /></a>
     <img src="https://img.shields.io/badge/Node-%3E%3D18-16a34a?style=flat-square" alt="Node >= 18" />
     <img src="https://img.shields.io/badge/Docs-VitePress-646cff?style=flat-square" alt="VitePress" />
   </p>
@@ -165,7 +165,7 @@ After completing the course, learners should be able to:
 
 This repository is an active courseware project. Content is being expanded chapter by chapter, with emphasis on correctness, runnable examples, and a stable learning path.
 
-- Course site: [walkinglabs.github.io/hands-on-modern-rl](https://walkinglabs.github.io/hands-on-modern-rl/)
+- Course site: [cdiddy77.github.io/hands-on-modern-rl](https://cdiddy77.github.io/hands-on-modern-rl/)
 - Source content: [`docs/`](docs/)
 - Runnable examples: [`code/`](code/)
 - Local verification: `npm run verify`
@@ -314,7 +314,7 @@ A practical path through the repository:
 Published course site:
 
 ```text
-https://walkinglabs.github.io/hands-on-modern-rl/
+https://cdiddy77.github.io/hands-on-modern-rl/
 ```
 
 ### Run the Documentation Site Locally
@@ -325,7 +325,7 @@ Requirements:
 - npm
 
 ```bash
-git clone https://github.com/walkinglabs/hands-on-modern-rl.git
+git clone https://github.com/cdiddy77/hands-on-modern-rl.git
 cd hands-on-modern-rl
 npm install
 npm run dev
