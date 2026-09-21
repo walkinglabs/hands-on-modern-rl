@@ -1,0 +1,33 @@
+name: Verify bilingual content
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'scripts/check-bilingual-sync.mjs'
+      - 'scripts/check-english-quality.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/content-quality.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check bilingual page and navigation coverage
+        run: npm run verify:bilingual
+
+      - name: Check English publication quality
+        run: npm run verify:english
