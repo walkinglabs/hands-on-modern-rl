@@ -168,6 +168,10 @@ So, how do we find the optimal policy? There are two fundamentally different rou
 
 $$Q^{\pi}(s, a) = \mathbb{E}_{\pi}\left[G_t \mid s_t = s,\, a_t = a\right]$$
 
+The superscript $\pi$ is not an exponent. It identifies the policy used for the evaluation: the agent first takes action $a$ in state $s$, then follows policy $\pi$ thereafter. The condition $s_t=s, a_t=a$ fixes the current state and action, while $\mathbb{E}_{\pi}$ averages over the different trajectories that may follow. Consequently, the same $(s,a)$ can have different values under different subsequent policies.
+
+The star means “optimal.” $Q^*(s,a)=\max_{\pi}Q^{\pi}(s,a)$ is the optimal action value: take $a$ now, then follow whichever policy gives the highest expected return. Likewise, $\pi^*$ denotes an optimal policy. Once $Q^*$ is known, selecting the action with the largest $Q^*(s,a)$ in each state produces an optimal policy.
+
 You might wonder: **if you haven't reached the end yet, how can you know how many points the future holds? How are these Q-values actually computed?**
 
 This is the most elegant part of RL: **start with random guesses, then correct step by step.** And the theoretical foundation that makes this possible is the **Markov Decision Process (MDP)**.
@@ -178,7 +182,7 @@ The core assumption of MDP is that "the future depends only on the present, not 
 With this equation, the algorithm's operation becomes extremely intuitive:
 Initially, the scores on all signs at every fork are randomly written (random initialization). You take a random step, receive 1 point reward, and see the next fork's sign reads 10 points. You immediately understand: "Oh, the true value of that last step is about 1+10=11 points!" So you take out a pen and update the sign at the previous fork to 11.
 
-Through repeated trial and error in the maze, using "next step's sign" to correct "previous step's sign," all Q-values eventually converge to their true scores (satisfying the **Bellman optimality equation**). At that point, always choosing the highest-scoring action naturally yields the optimal policy: $a^* = \arg\max_a Q^*(s, a)$. The representative algorithms of this route range from the classic Q-Learning to DQN in the deep learning era.
+Through repeated trial and error in the maze, using "next step's sign" to correct "previous step's sign," Q-Learning makes the current estimates approach the optimal action values $Q^*$, which satisfy the **Bellman optimality equation**. At that point, always choosing the highest-scoring action naturally yields the optimal policy: $a^* = \arg\max_a Q^*(s, a)$. The representative algorithms of this route range from the classic Q-Learning to DQN in the deep learning era.
 
 **Route 2: Policy-Based** — Skip the scoring and directly learn "when you see this, do that." Back to the maze example — instead of scoring each path, you repeatedly walk through the maze many times: when you reach the end, you strengthen confidence in every choice made along the way; when you fall into a trap, you weaken those choices. Over many walks, the probability of good actions naturally rises while the probability of bad ones falls. Formally, the policy $\pi_\theta$ is defined by parameters $\theta$, and we optimize it by maximizing expected return:
 
