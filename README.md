@@ -207,7 +207,7 @@ The book contains seven parts and twenty-six chapters. Parts I–III establish t
 
 | Reading                                                                    | Central question                                                                               |
 | :------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------- |
-| [Introduction to Reinforcement Learning](docs/preface/intro.md)            | What does RL study, and how does the book connect classical methods to modern language models? |
+| [Introduction to Reinforcement Learning](docs/en/preface/introduction.md)  | What does RL study, and how does the book connect classical methods to modern language models? |
 | [A History of Reinforcement Learning](docs/preface/brief-history/index.md) | How did control, TD learning, DQN, AlphaGo, RLHF, and reasoning models develop?                |
 | [Environment Setup](docs/preface/env-setup.md)                             | How do you prepare the environments for documentation, control tasks, and LLM experiments?     |
 
