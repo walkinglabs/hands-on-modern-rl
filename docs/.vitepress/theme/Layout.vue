@@ -12,7 +12,9 @@ import {
   ChevronsDown,
   ChevronsUp,
   HandHeart,
+  Maximize,
   MessageCircle,
+  Minimize,
   Moon,
   Settings,
   Sun
@@ -129,6 +131,7 @@ const sidebarWidth = ref(DEFAULT_SIDEBAR_WIDTH)
 const sidebarResizing = ref(false)
 const allSidebarGroupsExpanded = ref(false)
 const routeLoading = ref(false)
+const fullscreenReading = ref(false)
 
 const mermaidViewerOpen = ref(false)
 const mermaidViewerSrc = ref('')
@@ -192,6 +195,15 @@ const supportButtonLabel = computed(() =>
 )
 const settingsButtonLabel = computed(() =>
   isEnglishRoute.value ? 'Reading and appearance settings' : '阅读与外观设置'
+)
+const fullscreenReadingLabel = computed(() =>
+  isEnglishRoute.value
+    ? fullscreenReading.value
+      ? 'Exit fullscreen reading'
+      : 'Enter fullscreen reading'
+    : fullscreenReading.value
+      ? '退出全屏阅读'
+      : '进入全屏阅读'
 )
 const supportNote = computed(() =>
   isEnglishRoute.value
@@ -450,6 +462,22 @@ function closeReadingTools() {
 
 function closeSupportPanel() {
   supportOpen.value = false
+}
+
+function syncFullscreenReading() {
+  fullscreenReading.value = Boolean(document.fullscreenElement)
+}
+
+async function toggleFullscreenReading() {
+  try {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen()
+    } else {
+      await document.documentElement.requestFullscreen()
+    }
+  } catch {
+    // 部分移动浏览器不支持 Fullscreen API，保留当前阅读界面。
+  }
 }
 
 function setAppearance(dark) {
@@ -1158,6 +1186,8 @@ onMounted(() => {
 
   window.addEventListener('resize', handleViewportResize)
   window.addEventListener('keydown', handleWindowKeydown)
+  document.addEventListener('fullscreenchange', syncFullscreenReading)
+  syncFullscreenReading()
   initNavigationSync()
   window.requestAnimationFrame(syncSidebarGroupsExpanded)
   updateSidebarEdgePosition()
@@ -1194,6 +1224,7 @@ onBeforeUnmount(() => {
   router.onAfterRouteChange = undefined
   window.removeEventListener('resize', handleViewportResize)
   window.removeEventListener('keydown', handleWindowKeydown)
+  document.removeEventListener('fullscreenchange', syncFullscreenReading)
 })
 
 watch(fontSize, (next) => {
@@ -1279,6 +1310,27 @@ watch(
               {{ alternateLanguageShort }}
             </span>
           </a>
+
+          <button
+            class="ct-nav-tool-button"
+            type="button"
+            :aria-label="fullscreenReadingLabel"
+            :title="fullscreenReadingLabel"
+            @click="toggleFullscreenReading"
+          >
+            <Minimize
+              v-if="fullscreenReading"
+              :size="18"
+              :stroke-width="2"
+              aria-hidden="true"
+            />
+            <Maximize
+              v-else
+              :size="18"
+              :stroke-width="2"
+              aria-hidden="true"
+            />
+          </button>
 
           <PopoverPortal>
             <Transition name="ct-reading-tools-fade">
