@@ -32,6 +32,7 @@
 
   <p>
     <a href="#learning-paths">Learning Paths</a> ·
+    <a href="#hands-on-examples">Hands-On Examples</a> ·
     <a href="#book-features">Book Features</a> ·
     <a href="#about-this-book">About This Book</a> ·
     <a href="#news">News</a> ·
@@ -45,6 +46,8 @@
 
 ## Learning Paths
 
+**Classical & deep RL (Chapters 1–12).** Start with CartPole: choose an action, observe the next state, and collect a reward. Build MDPs and value functions around that interaction, then implement DQN, policy gradients, Actor-Critic, and PPO in games and control tasks. Offline RL, imitation learning, exploration, and world models extend these foundations.
+
 <!-- README visual: classic-route -->
 <p align="center">
   <picture>
@@ -56,13 +59,15 @@
 </p>
 <!-- /README visual -->
 
+**Modern RL & Agentic AI (Chapters 13–26).** Apply the policy foundations to existing language models through RLHF, DPO, GRPO, and verifiable rewards. Agentic AI extends a model from answering once to calling tools, browsing, writing code, and completing multi-step tasks; the Agentic RL chapters train these decisions using feedback from entire trajectories. The later chapters cover visual and embodied tasks, training systems, and evaluation.
+
 <!-- README visual: modern-route -->
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/modern-route-compact-dark.svg" />
     <source media="(max-width: 640px)" srcset="docs/public/readme/modern-route-compact.svg" />
     <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/modern-route-dark.svg" />
-    <img src="docs/public/readme/modern-route.svg" alt="Modern RL, Chapters 13–26: policy foundations, RLHF and DPO, GRPO and RLVR, reasoning, tool-using agents, and multimodal RL, with training systems, safety, evaluation, and self-play." width="100%" />
+    <img src="docs/public/readme/modern-route.svg" alt="Modern RL, Chapters 13–26: policy foundations, RLHF and DPO, GRPO and RLVR, reasoning, Agentic AI and Agentic RL, and multimodal RL, with training systems, safety, evaluation, and self-play." width="100%" />
   </picture>
 </p>
 <!-- /README visual -->
@@ -79,6 +84,32 @@
 - **[2026-05-15]** 📖 **Full English Translation & PDF Release**: Complete English translation of all chapters is now available. PDF builds for both Chinese and English editions are released automatically via CI.
 - **[2026-05-13]** 🚀 **Major Upgrade: LLM and Traditional RL Hands-on Labs**: Added reproducible training examples for **Agentic RL** (Deep Research / rLLM) and **Traditional RL** (Actor-Critic continuous control). Includes complete code and fine-tuning analysis for building an Agentic training system from scratch, along with new VLM RL (GeoQA geometry reasoning) hands-on experiments!
 - **[2026-05-02]** Initial browsable open-source release for testing and feedback.
+
+## Hands-On Examples
+
+Eight examples from the course: four environment-based experiments, followed by preference tuning, code RL, research agents, and visual reasoning. The links below open the companion code or walkthrough; the full collection is indexed in [`code/README.md`](code/README.md).
+
+<!-- README visual: lab-gallery -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/lab-gallery-compact-dark.svg" />
+    <source media="(max-width: 640px)" srcset="docs/public/readme/lab-gallery-compact.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/lab-gallery-dark.svg" />
+    <img src="docs/public/readme/lab-gallery.svg" alt="Eight hands-on examples: CartPole PPO, Atari Pong DQN, LunarLander DQN, BipedalWalker A2C, DPO preference tuning, code generation with veRL PPO, an offline Deep Research policy, and the GeoQA EasyR1 GRPO training recipe." width="100%" />
+  </picture>
+</p>
+<!-- /README visual -->
+
+| Experiment    | Code or walkthrough                                                                                     |
+| ------------- | ------------------------------------------------------------------------------------------------------- |
+| CartPole      | [PPO training and environment replay](code/chapter01_cartpole/1-ppo_cartpole.py)                        |
+| Atari Pong    | [DQN training from image observations](code/chapter04_dqn/dqn_atari_sb3.py)                             |
+| LunarLander   | [DQN training and landing evaluation](code/chapter04_dqn/dqn_gym_sb3.py)                                |
+| BipedalWalker | [A2C training for continuous control](code/chapter06_actor_critic/actor_critic_bipedalwalker.py)        |
+| DPO           | [Prepare preferences, fine-tune, and test responses](code/chapter17_dpo/)                               |
+| Code RLVR     | [veRL PPO with executable I/O test rewards](code/chapter18_grpo/verl_code_rlvr/)                        |
+| Deep Research | [REINFORCE on a small offline search policy](docs/chapter22_agentic/code/deep_research_rl_benchmark.py) |
+| GeoQA         | [EasyR1 GRPO data, reward, and training walkthrough](docs/chapter26_vlm/easyr1-geoqa.md)                |
 
 ## Online Training Notebooks
 

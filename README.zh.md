@@ -32,6 +32,7 @@
 
   <p>
     <a href="#学习路线">学习路线</a> ·
+    <a href="#动手实验选览">动手实验</a> ·
     <a href="#本书特色">本书特色</a> ·
     <a href="#本书介绍">本书介绍</a> ·
     <a href="#🔥-最新动态-news">最新动态</a> ·
@@ -45,6 +46,8 @@
 
 ## 学习路线
 
+**传统与深度强化学习（第 1–12 章）。** 从 CartPole 开始，观察动作怎样改变环境、奖励怎样影响策略，再学习 MDP 和价值函数。在游戏与连续控制实验中实现 DQN、策略梯度、Actor-Critic 和 PPO，并扩展到离线强化学习、模仿学习、探索与世界模型。
+
 <!-- README visual: classic-route-zh -->
 <p align="center">
   <picture>
@@ -56,13 +59,15 @@
 </p>
 <!-- /README visual -->
 
+**现代强化学习与 Agentic AI（第 13–26 章）。** 把策略优化用于已有语言模型，学习 RLHF、DPO、GRPO 与可验证奖励。Agentic AI 让模型调用工具、检索资料、编写代码并完成多步任务；课程中的 Agentic RL 实验用整段交互轨迹的反馈训练这些决策。后续章节继续介绍视觉与具身任务、训练系统和评测。
+
 <!-- README visual: modern-route-zh -->
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/modern-route-zh-compact-dark.svg" />
     <source media="(max-width: 640px)" srcset="docs/public/readme/modern-route-zh-compact.svg" />
     <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/modern-route-zh-dark.svg" />
-    <img src="docs/public/readme/modern-route-zh.svg" alt="现代强化学习，第 13–26 章：策略基础、大模型对齐、GRPO 与 RLVR、推理训练、工具智能体和多模态强化学习，以及训练系统、安全评测与自博弈。" width="100%" />
+    <img src="docs/public/readme/modern-route-zh.svg" alt="现代强化学习，第 13–26 章：策略基础、大模型对齐、GRPO 与 RLVR、推理训练、Agentic AI 与 Agentic RL、多模态强化学习，以及训练系统、安全评测与自博弈。" width="100%" />
   </picture>
 </p>
 <!-- /README visual -->
@@ -79,6 +84,32 @@
 - **[2026-05-15]** 📖 **全量英文翻译与 PDF 发布**：全部章节英文翻译完成，中英文版 PDF 均通过 CI 自动构建发布。
 - **[2026-05-13]** 🚀 **全面升级大模型与传统强化学习实战**：新增可复现的 **Agentic RL**（Deep Research / rLLM）与 **传统 RL**（Actor-Critic 连续控制）训练实例。包含从零构建 Agentic 训练系统的完整代码与微调过程解析，并同步上线 VLM 强化学习（GeoQA 几何推理）动手实验！
 - **[2026-05-02]** 🎉 教程初期浏览版正式开源发布，开放测试与建议收集。
+
+## 动手实验选览
+
+下面选取了课程中的八个实验：前四个在游戏和控制环境中训练策略，后四个涉及偏好微调、代码强化学习、研究智能体与视觉推理。图下的链接提供配套代码或训练讲义，更多实验见 [`code/README.md`](code/README.md)。
+
+<!-- README visual: lab-gallery-zh -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/lab-gallery-zh-compact-dark.svg" />
+    <source media="(max-width: 640px)" srcset="docs/public/readme/lab-gallery-zh-compact.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/lab-gallery-zh-dark.svg" />
+    <img src="docs/public/readme/lab-gallery-zh.svg" alt="八个动手实验：CartPole PPO、Atari Pong DQN、LunarLander DQN、双足行走 A2C、DPO 偏好微调、veRL PPO 代码生成、小型离线 Deep Research 策略与 GeoQA EasyR1 GRPO 训练配方。" width="100%" />
+  </picture>
+</p>
+<!-- /README visual -->
+
+| 实验          | 代码或讲义                                                                                     |
+| ------------- | ---------------------------------------------------------------------------------------------- |
+| CartPole      | [PPO 训练与环境回放](code/chapter01_cartpole/1-ppo_cartpole.py)                                |
+| Atari Pong    | [基于像素观测训练 DQN](code/chapter04_dqn/dqn_atari_sb3.py)                                    |
+| LunarLander   | [DQN 训练与降落评估](code/chapter04_dqn/dqn_gym_sb3.py)                                        |
+| 双足行走      | [用 A2C 学习连续控制](code/chapter06_actor_critic/actor_critic_bipedalwalker.py)               |
+| DPO           | [构造偏好数据、微调与回答测试](code/chapter17_dpo/)                                            |
+| Code RLVR     | [veRL PPO 与可执行 I/O 测试奖励](code/chapter18_grpo/verl_code_rlvr/)                          |
+| Deep Research | [用 REINFORCE 优化小型离线检索策略](docs/chapter22_agentic/code/deep_research_rl_benchmark.py) |
+| GeoQA         | [EasyR1 GRPO 数据、奖励与训练配方](docs/chapter26_vlm/easyr1-geoqa.md)                         |
 
 ## 在线训练 Notebook
 

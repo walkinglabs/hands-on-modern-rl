@@ -1,0 +1,26 @@
+{
+  "cartpole.png": {
+    "source": "docs/chapter01_cartpole/images/cartpole.gif",
+    "source_sha256": "010d127e69ebb9189d28f8152d24c2b9db7b67e0f28e4e0f73106e03dc27f02c",
+    "frame_sha256": "ae5ac084146afe42277b3253386db28c9dc98a1da01a6b1bf0b8633136978881",
+    "capture": "Browser screenshot of the existing GIF, displayed with object-fit: contain in a 600 × 340 viewport."
+  },
+  "pong.png": {
+    "source": "docs/chapter07_dqn/images/dqn-atari-pong-1m.gif",
+    "source_sha256": "cda4e37fc0065e1c1afac2c63b67faa16a25033b3216185c24eacf93ba9b2c17",
+    "frame_sha256": "3e48543d898ef9d63404e9fd7e956225f1572b99ce6fee3569b6dc240b737d9b",
+    "capture": "Browser screenshot of the existing GIF, displayed with object-fit: contain in a 600 × 340 viewport."
+  },
+  "lander.png": {
+    "source": "docs/chapter07_dqn/images/lunarlander_ep1.gif",
+    "source_sha256": "125b00a956c0a15fd039cf98659835c332bbf16083a4f207db4418f77d2f52ae",
+    "frame_sha256": "691c091926cd5070522ca2ebea3083227749fe28b7d0294a0f9dd4df5533925e",
+    "capture": "Browser screenshot of the existing GIF, displayed with object-fit: contain in a 600 × 340 viewport."
+  },
+  "walker.png": {
+    "source": "docs/chapter09_actor_critic/images/bipedalwalker_a2c_3m.gif",
+    "source_sha256": "a5f4227c2c26e3d9f3df04f67f91cb416b8425ea171654b80f594db778c234df",
+    "frame_sha256": "b56ebcb75847f5d888f18c0d40c623d5093eb753fd115f5efd42c1c0e73c2cce",
+    "capture": "Browser screenshot of the existing GIF, displayed with object-fit: contain in a 600 × 340 viewport."
+  }
+}

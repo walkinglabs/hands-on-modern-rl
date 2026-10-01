@@ -8,6 +8,7 @@ from functools import lru_cache
 from pathlib import Path
 from xml.sax.saxutils import escape
 import argparse
+import base64
 import hashlib
 import io
 import json
@@ -126,23 +127,58 @@ ROUTES = {
     },
     'modern-route': {
         'en': {
-            'title': 'Modern RL',
+            'title': 'Modern RL & Agentic AI',
             'subtitle': 'Chapters 13–26 · LLM post-training, agents & multimodality',
-            'stages': [('Policy core','PPO · KL','policy'),('LLM alignment','RLHF · DPO','language'),('Verifiable RL','GRPO · RLVR','verifier'),('Reasoning','PRM · Search','search'),('Tool-using agents','Code · Browser · GUI','tools'),('Multimodal RL','VLM · Embodied','multimodal')],
+            'stages': [('Policy core','PPO · KL','policy'),('LLM alignment','RLHF · DPO','language'),('Verifiable RL','GRPO · RLVR','verifier'),('Reasoning','PRM · Search','search'),('Agentic AI','Tool use · Multi-turn','tools'),('Multimodal RL','VLM · Embodied','multimodal')],
             'bridge': 'Apply the policy foundations to new environments',
             'practice': 'Sampling · Rewards · Policy updates',
             'topics': 'Systems, evaluation & research',
             'extensions': [('Training systems','Rollouts · Scaling','systems'),('Safety & evaluation','Reward hacking · Tests','check'),('Self-play & research','Self-play · Frontiers','selfplay')],
         },
         'zh': {
-            'title': '现代强化学习',
+            'title': '现代强化学习与 Agentic AI',
             'subtitle': '第 13–26 章 · 大模型后训练、智能体与多模态',
-            'stages': [('策略基础','PPO · KL','policy'),('大模型对齐','RLHF · DPO','language'),('可验证强化学习','GRPO · RLVR','verifier'),('推理训练','过程奖励 · 搜索','search'),('工具智能体','代码 · 浏览器 · GUI','tools'),('多模态强化学习','VLM · 具身智能','multimodal')],
+            'stages': [('策略基础','PPO · KL','policy'),('大模型对齐','RLHF · DPO','language'),('可验证强化学习','GRPO · RLVR','verifier'),('推理训练','过程奖励 · 搜索','search'),('智能体','Agentic RL · 工具调用','tools'),('多模态强化学习','VLM · 具身智能','multimodal')],
             'bridge': '把策略优化用于语言、工具与多模态环境',
             'practice': '采样 · 奖励 · 策略更新',
             'topics': '系统、评测与研究专题',
             'extensions': [('训练系统','轨迹采集 · 规模扩展','systems'),('安全与评测','奖励黑客 · 可靠评测','check'),('自博弈与前沿','自博弈 · 前沿研究','selfplay')],
         },
+    },
+}
+
+LABS = {
+    'en': {
+        'title': 'Eight hands-on examples',
+        'subtitle': 'Classic control · Language models · Agentic AI · Vision',
+        'groups': ['Learn through environments', 'Learn through language, tools & vision'],
+        'items': [
+            ('CartPole', 'PPO · Balance the pole', 'cartpole'),
+            ('Atari Pong', 'DQN · Learn from pixels', 'pong'),
+            ('LunarLander', 'DQN · Control the landing', 'lander'),
+            ('BipedalWalker', 'A2C · Learn to walk', 'walker'),
+            ('Preference tuning', 'DPO · Compare response pairs', 'preference'),
+            ('Code generation', 'veRL PPO · Test-based rewards', 'code'),
+            ('Deep Research', 'REINFORCE · Offline search policy', 'research'),
+            ('GeoQA', 'EasyR1 GRPO · Training recipe', 'geometry'),
+        ],
+        'footer': 'Selected labs · Code and walkthroughs below',
+    },
+    'zh': {
+        'title': '八个动手实验',
+        'subtitle': '经典控制 · 大模型后训练 · Agentic AI · 视觉推理',
+        'groups': ['从环境交互中学习', '从语言、工具与图像中学习'],
+        'items': [
+            ('CartPole', 'PPO · 学会保持平衡', 'cartpole'),
+            ('Atari Pong', 'DQN · 从像素学习打球', 'pong'),
+            ('LunarLander', 'DQN · 控制飞船降落', 'lander'),
+            ('双足行走', 'A2C · 学习连续动作', 'walker'),
+            ('偏好微调', 'DPO · 比较两种回答', 'preference'),
+            ('代码生成', 'veRL PPO · 用测试构造奖励', 'code'),
+            ('Deep Research', 'REINFORCE · 离线检索策略', 'research'),
+            ('GeoQA', 'EasyR1 GRPO · 几何推理配方', 'geometry'),
+        ],
+        'footer': '课程中的部分实验 · 下方提供代码与讲义入口',
     },
 }
 
@@ -231,6 +267,10 @@ class Figure:
     def icon(self, name, x, y, scale=1, color='accent'):
         content=MAP_ICONS[name].replace('@surface',self.c['bg'])
         self.parts.append(f'<g transform="translate({x} {y}) scale({scale})" fill="none" stroke="{self.c[color]}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">{content}</g>')
+
+    def frame(self, name, x, y, w, h):
+        data=base64.b64encode((HERE/'frames'/f'{name}.png').read_bytes()).decode()
+        self.parts.append(f'<image x="{x}" y="{y}" width="{w}" height="{h}" href="data:image/png;base64,{data}" preserveAspectRatio="xMidYMid meet"/>')
 
     def save(self, preview):
         bad=[b for b in self.bounds if b[0]<20 or b[1]<18 or b[2]>self.w-20 or b[3]>self.h-18]
@@ -331,6 +371,74 @@ def modern_route(lang,variant,compact,fonts,preview):
     learning_route('modern-route',lang,variant,compact,fonts,preview)
 
 
+def lab_scene(d,name,x,y):
+    """Task illustrations for the modern labs, without invented training results."""
+    if name=='preference':
+        d.rect(x-144,y-70,288,132,'bg')
+        d.text('问题' if d.lang=='zh' else 'prompt',x,y-40,19,'muted')
+        d.path(f'M{x-128} {y-25}H{x+128}')
+        for a,label in [(x-72,'较优回答' if d.lang=='zh' else 'chosen'),(x+72,'较差回答' if d.lang=='zh' else 'rejected')]:
+            d.rect(a-56,y-9,112,47,'soft','line')
+            d.text(label,a,y+19,18)
+        d.path(f'M{x-85} {y+48}L{x-77} {y+56}L{x-60} {y+39}','accent',3)
+        d.path(f'M{x+64} {y+43}L{x+79} {y+58}M{x+79} {y+43}L{x+64} {y+58}','muted',2.4)
+    elif name=='code':
+        d.rect(x-144,y-73,190,146,'bg')
+        d.path(f'M{x-144} {y-49}H{x+46}')
+        d.text('solve.py',x-129,y-56,17,'muted','start',font='sans')
+        for i,line in enumerate(['def solve():','    read()','    compute()','    print()']):
+            d.text(line,x-129,y-17+i*25,18,'accent' if i==0 else 'ink','start',font='sans')
+        d.path(f'M{x+59} {y}H{x+82}','muted',1.8,True)
+        for i in range(3):
+            a=y-41+i*40
+            d.rect(x+97,a-13,47,27,'bg')
+            d.path(f'M{x+108} {a}L{x+116} {a+7}L{x+133} {a-9}','accent',2.3)
+    elif name=='research':
+        d.rect(x-144,y-73,288,145,'bg')
+        d.path(f'M{x-144} {y-49}H{x+144}')
+        d.rect(x-124,y-36,247,26,'soft','line')
+        d.text('检索' if d.lang=='zh' else 'search',x-105,y-17,17,'muted','start')
+        for i in range(3):
+            a=y+8+i*20
+            d.path(f'M{x-121} {a}H{x+4}','accent' if i==0 else 'muted',2.5)
+        d.icon('book',x+79,y+29,.62)
+        d.path(f'M{x+17} {y+29}H{x+46}','muted',1.8,True)
+    elif name=='geometry':
+        # The same 6 × 4 parallelogram used in the course's GeoQA example.
+        d.parts.append(f'<path d="M{x-90} {y-46}H{x+111}L{x+89} {y+57}H{x-112}Z" fill="{d.c["bg"]}" stroke="{d.c["accent"]}" stroke-width="2.5"/>')
+        d.parts.append(f'<path d="M{x-90} {y-46}H{x+111}L{x} {y+6}Z" fill="{d.c["accent"]}" fill-opacity=".15"/>')
+        d.path(f'M{x-90} {y-46}L{x+89} {y+57}M{x-112} {y+57}L{x+111} {y-46}','muted',1.8)
+        d.text('6 cm',x,y-60,20,'muted',font='sans')
+        d.text('4 cm',x+142,y+11,18,'muted',font='sans')
+        d.parts.append(f'<circle cx="{x}" cy="{y+6}" r="4" fill="{d.c["accent"]}"/>')
+        d.text('O',x+13,y+4,17,'accent',font='sans')
+
+
+def lab_gallery(lang,variant,compact,fonts,preview):
+    t=LABS[lang]
+    d=Figure('lab-gallery',lang,variant,compact,1640 if compact else 940,fonts,t['title'],t['subtitle']+'. '+ '; '.join(title+' · '+sub for title,sub,_ in t['items']))
+    d.text(t['title'],d.w/2,65,42)
+    d.text(t['subtitle'],d.w/2,109,25,'accent',max_width=d.w-80)
+    for row in range(2):
+        top=(158+row*720) if compact else (159+row*352)
+        d.text(t['groups'][row],42 if compact else 60,top,25,'muted','start',max_width=d.w-100)
+        for col in range(4):
+            i=row*4+col; title,sub,scene=t['items'][i]
+            if compact:
+                x=42+(col%2)*370; y=top+27+(col//2)*330; w=346
+            else:
+                x=60+col*378; y=top+27; w=346
+            d.rect(x,y,w,194,'soft','soft')
+            if i<4: d.frame(scene,x+8,y+8,w-16,178)
+            else: lab_scene(d,scene,x+w/2,y+97)
+            d.text(f'{i+1:02}',x,y+236,20,'accent','start',font='sans')
+            d.text(title,x+42,y+238,27,anchor='start',max_width=w-42)
+            d.text(sub,x,y+278,22,'muted','start',max_width=w)
+    d.path(f'M42 {d.h-88}H{d.w-42}')
+    d.text(t['footer'],d.w/2,d.h-40,23,'muted',max_width=d.w-80)
+    d.save(preview)
+
+
 def training_loop(lang,variant,compact,fonts,preview):
     t=COPY[lang]
     d=Figure('training-loop',lang,variant,compact,1330 if compact else 670,fonts,t['loop'],t['repeat']+'. '+'; '.join(' · '.join(s) for s in t['stages']))
@@ -368,12 +476,12 @@ def training_loop(lang,variant,compact,fonts,preview):
 
 if __name__ == '__main__':
     parser=argparse.ArgumentParser(); parser.add_argument('--preview',type=Path)
-    parser.add_argument('--figure',choices=['wordmark','classic-route','modern-route','training-loop'])
+    parser.add_argument('--figure',choices=['wordmark','classic-route','modern-route','lab-gallery','training-loop'])
     args=parser.parse_args()
     fonts={key:Font(name) for key,name in [('serif','InstrumentSerif-Regular.ttf'),('sans','Manrope-500.ttf'),('zh','NotoSansSC-subset.ttf')]}
     for lang in COPY:
         for variant in COLORS:
             for compact in [False,True]:
-                figures={'wordmark':wordmark,'classic-route':classic_route,'modern-route':modern_route,'training-loop':training_loop}
+                figures={'wordmark':wordmark,'classic-route':classic_route,'modern-route':modern_route,'lab-gallery':lab_gallery,'training-loop':training_loop}
                 for name,draw in figures.items():
                     if not args.figure or args.figure==name: draw(lang,variant,compact,fonts,args.preview)
