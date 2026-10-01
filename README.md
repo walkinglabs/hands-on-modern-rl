@@ -1,5 +1,10 @@
 <div align="center">
-  <img src="docs/public/readme/readmelogo.png" alt="Hands-On Modern RL" width="500" />
+  <picture>
+    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/wordmark-compact-dark.svg" />
+    <source media="(max-width: 640px)" srcset="docs/public/readme/wordmark-compact.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/wordmark-dark.svg" />
+    <img src="docs/public/readme/wordmark.svg" alt="Hands-On Modern RL" width="880" />
+  </picture>
   <p><em>From Markov decision processes and policy optimization to reasoning models, agents, and multimodal systems</em></p>
 
   <p>
@@ -203,6 +208,17 @@ The course is under active development. Planned milestones:
 
 The book contains seven parts and twenty-six chapters. Parts I–III establish the common language and algorithmic foundations of reinforcement learning. Part IV brings those tools into LLM post-training. Parts V and VI study what changes when the action space expands to tools and multimodal environments. Part VII asks how to detect failures, build trustworthy evaluations, and move the research frontier forward. The appendices provide implementation, mathematics, and engineering references.
 
+<!-- README visual: course-map -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/course-map-compact-dark.svg" />
+    <source media="(max-width: 640px)" srcset="docs/public/readme/course-map-compact.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/course-map-dark.svg" />
+    <img src="docs/public/readme/course-map.svg" alt="Course map: seven parts and twenty-six chapters" width="880" />
+  </picture>
+</p>
+<!-- /README visual -->
+
 ### Prologue: From Trial and Error to Modern Agents
 
 | Reading                                                                    | Central question                                                                               |
@@ -298,6 +314,17 @@ A rising training reward only shows that the optimizer met its objective. This f
 ## Experiment Code
 
 The [`code/`](code/) directory contains runnable examples aligned with course chapters. Each chapter's code is intentionally compact so it can be inspected, run, and modified independently.
+
+<!-- README visual: training-loop -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/training-loop-compact-dark.svg" />
+    <source media="(max-width: 640px)" srcset="docs/public/readme/training-loop-compact.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/training-loop-dark.svg" />
+    <img src="docs/public/readme/training-loop.svg" alt="PPO training loop: interaction, rollouts, advantages, and policy updates" width="880" />
+  </picture>
+</p>
+<!-- /README visual -->
 
 | Area                   | Code Path                                                                                                          | Representative Experiments                                                                    |
 | :--------------------- | :----------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------- |

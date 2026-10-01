@@ -1,5 +1,10 @@
 <div align="center">
-  <img src="docs/public/readme/readmelogo.png" alt="Hands-On Modern RL" width="500" />
+  <picture>
+    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/wordmark-zh-compact-dark.svg" />
+    <source media="(max-width: 640px)" srcset="docs/public/readme/wordmark-zh-compact.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/wordmark-zh-dark.svg" />
+    <img src="docs/public/readme/wordmark-zh.svg" alt="Hands-On Modern RL" width="880" />
+  </picture>
   <p><em>从马尔可夫决策过程与策略优化，到大模型推理、智能体和多模态系统</em></p>
 
   <p>
@@ -203,6 +208,17 @@ CPU 实验可使用普通 Notebook 运行；实验 03、08、10、11、12 需要
 
 全书共七部分、二十六章。前三部分建立强化学习的统一语言和算法基础；第四部分把这些工具带入大语言模型后训练；第五、六部分研究动作空间扩展到工具和多模态世界后出现的新问题；第七部分讨论如何发现失败、建立可靠评测并继续推进研究。附录提供算法实现、数学基础与工程查阅资料。
 
+<!-- README visual: course-map-zh -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/course-map-zh-compact-dark.svg" />
+    <source media="(max-width: 640px)" srcset="docs/public/readme/course-map-zh-compact.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/course-map-zh-dark.svg" />
+    <img src="docs/public/readme/course-map-zh.svg" alt="课程总览：七部分、二十六章" width="880" />
+  </picture>
+</p>
+<!-- /README visual -->
+
 ### 序章：从试错学习到现代智能体
 
 | 内容                                                  | 要解决的问题                                               |
@@ -298,6 +314,17 @@ CPU 实验可使用普通 Notebook 运行；实验 03、08、10、11、12 需要
 ## 实验代码
 
 [`code/`](code/) 目录包含与各章节对齐的可运行示例。每章的代码都设计得足够精简，以便独立检查、运行和修改。
+
+<!-- README visual: training-loop-zh -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/training-loop-zh-compact-dark.svg" />
+    <source media="(max-width: 640px)" srcset="docs/public/readme/training-loop-zh-compact.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/training-loop-zh-dark.svg" />
+    <img src="docs/public/readme/training-loop-zh.svg" alt="PPO 训练循环：交互、轨迹、优势估计与策略更新" width="880" />
+  </picture>
+</p>
+<!-- /README visual -->
 
 | 领域           | 代码路径                                                                                                           | 代表性实验                                                     |
 | :------------- | :----------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------- |
