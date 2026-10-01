@@ -82,6 +82,36 @@ ICONS = [
     '<path d="M-23-16L0-26L23-16M-23 16L0 26L23 16M-23-16V16M23-16V16M0-26V26M-23-16L23 16M23-16L-23 16"/><circle cx="-23" cy="-16" r="5"/><circle cx="-23" cy="16" r="5"/><circle cx="0" cy="-26" r="5"/><circle cx="0" cy="26" r="5"/><circle cx="23" cy="-16" r="5"/><circle cx="23" cy="16" r="5"/>',
 ]
 
+# Course overview pictograms: concrete environments and model interactions.
+MAP_ICONS = {
+    'cartpole': '<path d="M-48 31H48M-20 1H21V19H-20ZM0 1L21-43"/><circle cx="21" cy="-43" r="4"/><circle cx="-12" cy="24" r="5"/><circle cx="13" cy="24" r="5"/>',
+    'mdp': '<rect x="-39" y="-39" width="78" height="78"/><path d="M-13-39V39M13-39V39M-39-13H39M-39 13H39"/><path d="M-26 26V0H0V-26H26M20-32L26-26L20-20"/><circle cx="-26" cy="26" r="4"/>',
+    'language': '<path d="M-43-36H20V4H-17L-31 17V4H-43ZM-28-23H4M-28-12H9"/><path d="M-9 13V40H22L36 51V40H46V-4H33M4 26L13 35L30 18"/>',
+    'tools': '<rect x="-16" y="-16" width="32" height="32"/><path d="M-7-5L-12 0L-7 5M7-5L12 0L7 5M0-16V-32M-16 0H-32M16 0H35V22"/><rect x="-21" y="-55" width="42" height="23"/><path d="M-21-47H21M-13-51H-11M-5-51H-3"/><rect x="-55" y="-12" width="23" height="25"/><path d="M-49-6L-44-1L-49 4M-42 5H-37M0 16V42H24M24 42L32 34L42 42L34 50ZM29 25L39 35"/>',
+    'multimodal': '<rect x="-45" y="-36" width="61" height="46"/><circle cx="-28" cy="-22" r="5"/><path d="M-42 5L-21-13L-8-2L3-11L13-1M1 19H45V-7H27M45 19L32 31V19M11 37L-5 22L-23 34M-23 34V43M-34 43H-12"/><circle cx="-5" cy="22" r="4"/><circle cx="11" cy="37" r="4"/>',
+    'data': '<ellipse cx="0" cy="-28" rx="29" ry="10"/><path d="M-29-28V24C-29 38 29 38 29 24V-28M-29-9C-29 5 29 5 29-9M-29 9C-29 23 29 23 29 9"/>',
+    'explore': '<circle cx="0" cy="0" r="36"/><path d="M-36 0H-27M27 0H36M0-36V-27M0 27V36M-13 18L-4-4L17-16L7 7Z"/>',
+    'check': '<path d="M0-39L30-25V3C30 21 15 33 0 41C-15 33-30 21-30 3V-25ZM-13 0L-3 10L17-12"/>',
+    'book': '<path d="M-28-23C-18-27-7-23 0-16C7-23 18-27 28-23V23C18 19 7 23 0 30C-7 23-18 19-28 23ZM0-16V30M-18-10L-7-6M-18 1L-7 5M7-6L18-10M7 5L18 1"/>',
+}
+MAP_ICONS['network'] = ''.join(f'<path d="M-38 {a}L0 {b}M0 {a}L38 {b}" stroke-width="1.25"/>' for a in [-32,0,32] for b in [-32,0,32]) + ''.join(f'<circle cx="{x}" cy="{y}" r="5" fill="@surface"/>' for x in [-38,0,38] for y in [-32,0,32])
+MAP_COPY = {
+    'en': {
+        'subtitle': 'From CartPole to modern agents',
+        'stages': [('Environment','CartPole','cartpole'),('MDPs & values','Bellman','mdp'),('Deep RL','DQN · PPO','network'),('LLM post-training','RLHF · GRPO','language'),('Tool-using agents','Code · Browser','tools'),('Multimodal RL','VLM · Embodied','multimodal')],
+        'practice': 'Equations · Code · Experiments',
+        'topics': 'Topics across the course',
+        'extensions': [('Data & experts','Offline RL · Imitation','data'),('Exploration','Multi-agent · Hierarchy','explore'),('Safety & evaluation','Rewards · Self-play','check')],
+    },
+    'zh': {
+        'subtitle': '从 CartPole 到现代智能体',
+        'stages': [('环境交互','CartPole','cartpole'),('MDP 与价值','贝尔曼方程','mdp'),('深度强化学习','DQN · PPO','network'),('大模型后训练','RLHF · GRPO','language'),('工具智能体','代码 · 浏览器','tools'),('多模态强化学习','VLM · 具身智能','multimodal')],
+        'practice': '公式推导 · 代码实现 · 动手实验',
+        'topics': '贯穿课程的专题',
+        'extensions': [('数据与专家','离线强化学习 · 模仿学习','data'),('探索与协作','多智能体 · 分层强化学习','explore'),('安全与评测','奖励设计 · 自博弈','check')],
+    },
+}
+
 
 class Font:
     def __init__(self, name):
@@ -164,8 +194,13 @@ class Figure:
     def rect(self, x, y, w, h, fill='bg', stroke='line'):
         self.parts.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{self.c[fill]}" stroke="{self.c[stroke]}" stroke-width="1.4"/>')
 
+    def icon(self, name, x, y, scale=1, color='accent'):
+        content=MAP_ICONS[name].replace('@surface',self.c['bg'])
+        self.parts.append(f'<g transform="translate({x} {y}) scale({scale})" fill="none" stroke="{self.c[color]}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">{content}</g>')
+
     def save(self, preview):
-        assert all(x>=20 and y>=18 and u<=self.w-20 and v<=self.h-18 for x,y,u,v,_ in self.bounds), self.bounds
+        bad=[b for b in self.bounds if b[0]<20 or b[1]<18 or b[2]>self.w-20 or b[3]>self.h-18]
+        assert not bad,bad
         self.parts.append('<defs>'+''.join(f'<path id="{key}" d="{path}"/>' for path,key in self.outlines.items())+'</defs>')
         source='\n'.join(self.parts+['</svg>'])+'\n'; ET.fromstring(source)
         name = self.name + ('-zh' if self.lang == 'zh' else '') + ('-compact' if self.compact else '') + ('-dark' if self.variant == 'dark' else '')
@@ -195,39 +230,55 @@ def wordmark(lang,variant,compact,fonts,preview):
 
 
 def course_map(lang,variant,compact,fonts,preview):
-    t=COPY[lang]
-    d=Figure('course-map',lang,variant,compact,1920 if compact else 1020,fonts,t['map'],t['total']+'. '+ '; '.join(' · '.join(p) for p in t['parts'])+'; '+' · '.join(t['last']))
-    d.text(t['map'],d.w/2,72,42)
-    d.text(t['total'],d.w/2,117,24,'muted')
+    t=COPY[lang]; visual=MAP_COPY[lang]
+    d=Figure('course-map',lang,variant,compact,1210 if compact else 730,fonts,t['map'],t['total']+'. '+ '; '.join(' · '.join(p) for p in t['parts'])+'; '+' · '.join(t['last']))
+    d.text('Hands-On Modern RL',d.w/2,62,39,font='sans')
+    d.text(visual['subtitle'],d.w/2,106,26,'accent')
     if compact:
-        for i,(meta,title,a,b) in enumerate(t['parts']):
-            y=170+i*250
-            d.rect(42,y,716,224)
-            d.path(f'M42 {y}H116','accent',4)
-            d.text(meta,70,y+44,24,'accent','start',max_width=660)
-            d.lines(title,70,y+96,658,37)
-            d.text(a,70,y+164,27,'muted','start',max_width=658)
-            d.text(b,70,y+202,27,'muted','start',max_width=658)
-        y=1680
-        d.rect(42,y,716,190,'soft')
-        d.text(t['last'][0],70,y+43,24,'accent','start')
-        d.lines(t['last'][1],70,y+97,658,34)
-        d.text(t['last'][2],70,y+157,27,'muted','start',max_width=658)
+        d.rect(42,160,716,728,'bg','accent')
+        for i,(title,sub,icon) in enumerate(visual['stages']):
+            x=224+(i%2)*352; y=252+(i//2)*250
+            d.icon(icon,x,y,1.14)
+            d.text(title,x,y+84,28,max_width=320)
+            d.text(sub,x,y+123,22,'muted',max_width=320)
+            if i%2==0: d.path(f'M{x+76} {y}H{x+276}','muted',1.8,True)
+            elif i<5: d.path(f'M{x} {y+146}V{y+173}H224V{y+186}','muted',1.8,True)
+        d.rect(42,888,716,38,'accent','accent')
+        d.text('Hands-On Modern RL',400,915,24,'bg',font='sans')
+        d.path('M400 928V951','muted',1.6,True)
+        d.icon('book',147 if lang=='en' else 143,979,.42)
+        d.text(visual['practice'],423,986,25,'muted',max_width=556)
+        d.text(visual['topics'],400,1035,21,'muted')
+        d.rect(42,1054,716,132,'soft','soft')
+        for i,(title,sub,icon) in enumerate(visual['extensions']):
+            x=164+i*236
+            d.icon(icon,x,1087,.46)
+            d.text(title,x,1134,22,max_width=230)
+            d.text(sub,x,1168,18,'muted',max_width=230)
     else:
-        d.text(t['foundation'],70,182,25,'muted','start')
-        d.text(t['modern'],70,530,25,'muted','start')
-        for i,(meta,title,a,b) in enumerate(t['parts']):
-            x=70+(i%3)*498; y=214+(i//3)*348
-            d.rect(x,y,464,270)
-            d.path(f'M{x} {y}H{x+74}','accent',4)
-            d.text(meta,x+27,y+45,23,'accent','start',max_width=410)
-            d.lines(title,x+27,y+106,410,34)
-            d.text(a,x+27,y+206,25,'muted','start',max_width=410)
-            d.text(b,x+27,y+241,25,'muted','start',max_width=410)
-        d.rect(70,882,1460,98,'soft')
-        d.text(t['last'][0],96,923,23,'accent','start',max_width=435)
-        d.text(t['last'][1],550,922,32,anchor='start',max_width=930)
-        d.text(t['last'][2],550,958,25,'muted','start',max_width=930)
+        d.rect(220,160,1160,217,'bg','accent')
+        positions=[94,365,655,945,1235,1506]
+        for i,((title,sub,icon),x) in enumerate(zip(visual['stages'],positions)):
+            d.icon(icon,x,252,1.05,'ink' if i in [0,5] else 'accent')
+            d.text(title,x,332,(20 if lang=='zh' else 22) if i in [0,5] else 25,max_width=174 if i in [0,5] else 275)
+            d.text(sub,x,361,18 if i in [0,5] else 20,'muted',max_width=170 if i in [0,5] else 260)
+            if i<5:
+                end=positions[i+1]-72 if i not in [0,4] else (207 if i==0 else 1447)
+                start=x+72 if i not in [0,4] else (152 if i==0 else 1394)
+                d.path(f'M{start} 252H{end}','muted',1.8,True)
+        d.rect(220,377,1160,38,'accent','accent')
+        d.text('Hands-On Modern RL',800,403,24,'bg',font='sans')
+        d.path('M800 417V444','muted',1.6,True)
+        d.icon('book',519 if lang=='en' else 562,481,.42)
+        d.text(visual['practice'],823,489,23,'muted',max_width=645)
+        d.text(visual['topics'],800,542,20,'muted')
+        d.rect(60,562,1480,142,'soft','soft')
+        for i,(title,sub,icon) in enumerate(visual['extensions']):
+            x=307+i*493
+            if i: d.path(f'M{x-246} 581V684')
+            d.icon(icon,x,597,.49)
+            d.text(title,x,646,25,max_width=420)
+            d.text(sub,x,680,20,'muted',max_width=440)
     d.save(preview)
 
 
@@ -268,9 +319,12 @@ def training_loop(lang,variant,compact,fonts,preview):
 
 if __name__ == '__main__':
     parser=argparse.ArgumentParser(); parser.add_argument('--preview',type=Path)
+    parser.add_argument('--figure',choices=['wordmark','course-map','training-loop'])
     args=parser.parse_args()
     fonts={key:Font(name) for key,name in [('serif','InstrumentSerif-Regular.ttf'),('sans','Manrope-500.ttf'),('zh','NotoSansSC-subset.ttf')]}
     for lang in COPY:
         for variant in COLORS:
             for compact in [False,True]:
-                for draw in [wordmark,course_map,training_loop]: draw(lang,variant,compact,fonts,args.preview)
+                figures={'wordmark':wordmark,'course-map':course_map,'training-loop':training_loop}
+                for name,draw in figures.items():
+                    if not args.figure or args.figure==name: draw(lang,variant,compact,fonts,args.preview)
