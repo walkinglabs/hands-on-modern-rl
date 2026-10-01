@@ -31,6 +31,7 @@
   </p>
 
   <p>
+    <a href="#学习路线">学习路线</a> ·
     <a href="#本书特色">本书特色</a> ·
     <a href="#本书介绍">本书介绍</a> ·
     <a href="#🔥-最新动态-news">最新动态</a> ·
@@ -41,6 +42,30 @@
     <a href="#参与贡献">参与贡献</a>
   </p>
 </div>
+
+## 学习路线
+
+<!-- README visual: classic-route-zh -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/classic-route-zh-compact-dark.svg" />
+    <source media="(max-width: 640px)" srcset="docs/public/readme/classic-route-zh-compact.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/classic-route-zh-dark.svg" />
+    <img src="docs/public/readme/classic-route-zh.svg" alt="传统与深度强化学习，第 1–12 章：CartPole、MDP、价值学习、DQN、策略梯度、PPO 与连续控制。策略梯度、优势估计和 PPO 衔接现代强化学习。" width="100%" />
+  </picture>
+</p>
+<!-- /README visual -->
+
+<!-- README visual: modern-route-zh -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/modern-route-zh-compact-dark.svg" />
+    <source media="(max-width: 640px)" srcset="docs/public/readme/modern-route-zh-compact.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/modern-route-zh-dark.svg" />
+    <img src="docs/public/readme/modern-route-zh.svg" alt="现代强化学习，第 13–26 章：策略基础、大模型对齐、GRPO 与 RLVR、推理训练、工具智能体和多模态强化学习，以及训练系统、安全评测与自博弈。" width="100%" />
+  </picture>
+</p>
+<!-- /README visual -->
 
 > **📣 公告**
 >
@@ -207,17 +232,6 @@ CPU 实验可使用普通 Notebook 运行；实验 03、08、10、11、12 需要
 ## 全书结构
 
 全书共七部分、二十六章。前三部分建立强化学习的统一语言和算法基础；第四部分把这些工具带入大语言模型后训练；第五、六部分研究动作空间扩展到工具和多模态世界后出现的新问题；第七部分讨论如何发现失败、建立可靠评测并继续推进研究。附录提供算法实现、数学基础与工程查阅资料。
-
-<!-- README visual: course-map-zh -->
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/course-map-zh-compact-dark.svg" />
-    <source media="(max-width: 640px)" srcset="docs/public/readme/course-map-zh-compact.svg" />
-    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/course-map-zh-dark.svg" />
-    <img src="docs/public/readme/course-map-zh.svg" alt="课程总览：七部分、二十六章" width="880" />
-  </picture>
-</p>
-<!-- /README visual -->
 
 ### 序章：从试错学习到现代智能体
 

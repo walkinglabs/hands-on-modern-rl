@@ -1,0 +1,460 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1230" viewBox="0 0 800 1230" role="img" aria-labelledby="title desc" lang="en">
+<title id="title">Classical &amp; Deep RL</title><desc id="desc">Chapters 1–12 · Values, policies &amp; control. Environment · CartPole; MDPs · States · Actions · Rewards; Value learning · Bellman · DP · MC · TD; Deep Q-learning · DQN · Replay; Policy gradients · Actor-Critic · PPO; Control · TD3 · SAC. Shared foundations for modern RL: Policy gradients · Advantages · PPO. Data &amp; experts · Offline RL · Imitation; Exploration &amp; MARL · Multi-agent · Hierarchy; World models · MuZero · Dreamer</desc>
+<rect width="800" height="1230" fill="#FFFFFF"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#656C78"/></marker></defs>
+<g fill="#171D29" aria-label="Classical &amp; Deep RL">
+<use href="#g0" transform="translate(223.0472 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g1" transform="translate(251.2442 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g2" transform="translate(260.9552 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g3" transform="translate(282.8927 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g3" transform="translate(303.5822 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g4" transform="translate(324.2717 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g5" transform="translate(333.9828 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g2" transform="translate(355.6667 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g1" transform="translate(377.6042 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g6" transform="translate(395.1152 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g7" transform="translate(428.5383 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g8" transform="translate(455.0973 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g8" transform="translate(478.1268 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g9" transform="translate(500.5712 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g10" transform="translate(531.7713 62.0000) scale(0.019500 -0.019500)"/>
+<use href="#g11" transform="translate(556.7507 62.0000) scale(0.019500 -0.019500)"/>
+</g>
+<g fill="#5654D6" aria-label="Chapters 1–12">
+<use href="#g0" transform="translate(325.6065 103.0000) scale(0.011500 -0.011500)"/>
+<use href="#g12" transform="translate(342.2355 103.0000) scale(0.011500 -0.011500)"/>
+<use href="#g2" transform="translate(356.1390 103.0000) scale(0.011500 -0.011500)"/>
+<use href="#g9" transform="translate(369.0765 103.0000) scale(0.011500 -0.011500)"/>
+<use href="#g13" transform="translate(382.8765 103.0000) scale(0.011500 -0.011500)"/>
+<use href="#g8" transform="translate(391.8235 103.0000) scale(0.011500 -0.011500)"/>
+<use href="#g14" transform="translate(405.4050 103.0000) scale(0.011500 -0.011500)"/>
+<use href="#g3" transform="translate(413.5355 103.0000) scale(0.011500 -0.011500)"/>
+<use href="#g15" transform="translate(430.3370 103.0000) scale(0.011500 -0.011500)"/>
+<use href="#g16" transform="translate(439.6750 103.0000) scale(0.011500 -0.011500)"/>
+<use href="#g15" transform="translate(451.7500 103.0000) scale(0.011500 -0.011500)"/>
+<use href="#g17" transform="translate(461.0880 103.0000) scale(0.011500 -0.011500)"/>
+</g>
+<g fill="#656C78" aria-label="Values, policies &amp; control">
+<use href="#g18" transform="translate(266.2205 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g2" transform="translate(279.3535 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g1" transform="translate(292.2910 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g19" transform="translate(298.0180 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g8" transform="translate(311.9215 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g3" transform="translate(325.5030 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g20" transform="translate(337.7045 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g9" transform="translate(348.6985 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g21" transform="translate(362.4985 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g1" transform="translate(376.3100 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g4" transform="translate(382.0370 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g5" transform="translate(387.7640 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g4" transform="translate(400.3220 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g8" transform="translate(406.0490 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g3" transform="translate(419.6305 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g6" transform="translate(436.4320 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g5" transform="translate(456.1430 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g21" transform="translate(468.7010 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g22" transform="translate(482.5125 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g13" transform="translate(496.4160 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g14" transform="translate(505.8805 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g21" transform="translate(514.2410 135.0000) scale(0.011500 -0.011500)"/>
+<use href="#g1" transform="translate(528.0525 135.0000) scale(0.011500 -0.011500)"/>
+</g>
+<rect x="42" y="160" width="716" height="728" fill="#FFFFFF" stroke="#5654D6" stroke-width="1.4"/>
+<g transform="translate(224 252) scale(1.14)" fill="none" stroke="#5654D6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M-48 31H48M-20 1H21V19H-20ZM0 1L21-43"/><circle cx="21" cy="-43" r="4"/><circle cx="-12" cy="24" r="5"/><circle cx="13" cy="24" r="5"/></g>
+<g fill="#171D29" aria-label="Environment">
+<use href="#g23" transform="translate(140.3990 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g22" transform="translate(156.4990 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g24" transform="translate(173.4250 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g4" transform="translate(188.0690 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g14" transform="translate(195.0410 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g21" transform="translate(205.2190 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g22" transform="translate(222.0330 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g25" transform="translate(238.9590 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g8" transform="translate(263.0390 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g22" transform="translate(279.1530 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g13" transform="translate(296.0790 336.0000) scale(0.014000 -0.014000)"/>
+</g>
+<g fill="#656C78" aria-label="CartPole">
+<use href="#g0" transform="translate(178.6690 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g2" transform="translate(194.5750 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g14" transform="translate(206.9500 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g13" transform="translate(215.1670 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g26" transform="translate(224.2200 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g21" transform="translate(237.6510 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g1" transform="translate(250.8620 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g8" transform="translate(256.3400 375.0000) scale(0.011000 -0.011000)"/>
+</g>
+<path d="M300 252H500" fill="none" stroke="#656C78" stroke-width="1.8" marker-end="url(#arrow)"/>
+<g transform="translate(576 252) scale(1.14)" fill="none" stroke="#5654D6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="-31" cy="18" r="12"/><circle cx="30" cy="18" r="12"/><circle cx="0" cy="-31" r="12"/><path d="M-25 4L-10-21M-14-18L-10-21L-9-16M10-21L25 4M20 2L25 4L25-2M18 18H-18M-12 13L-18 18L-12 23"/></g>
+<g fill="#171D29" aria-label="MDPs">
+<use href="#g27" transform="translate(538.5850 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g7" transform="translate(562.2590 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g26" transform="translate(581.3270 336.0000) scale(0.014000 -0.014000)"/>
+<use href="#g3" transform="translate(598.5610 336.0000) scale(0.014000 -0.014000)"/>
+</g>
+<g fill="#656C78" aria-label="States · Actions · Rewards">
+<use href="#g28" transform="translate(443.8460 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g13" transform="translate(457.7060 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g2" transform="translate(466.7590 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g13" transform="translate(479.1340 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g8" transform="translate(487.6920 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g3" transform="translate(500.6830 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g29" transform="translate(516.7540 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g30" transform="translate(526.4340 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g5" transform="translate(540.6460 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g13" transform="translate(552.9880 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g4" transform="translate(562.0410 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g21" transform="translate(567.5190 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g22" transform="translate(580.7300 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g3" transform="translate(594.0290 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g29" transform="translate(610.1000 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g10" transform="translate(619.7800 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g8" transform="translate(633.8710 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g31" transform="translate(646.4220 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g2" transform="translate(662.9000 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g14" transform="translate(675.2750 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g32" transform="translate(683.2720 375.0000) scale(0.011000 -0.011000)"/>
+<use href="#g3" transform="translate(696.4830 375.0000) scale(0.011000 -0.011000)"/>
+</g>
+<path d="M576 398V425H224V438" fill="none" stroke="#656C78" stroke-width="1.8" marker-end="url(#arrow)"/>
+<g transform="translate(224 502) scale(1.14)" fill="none" stroke="#5654D6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="-39" y="-39" width="78" height="78"/><path d="M-13-39V39M13-39V39M-39-13H39M-39 13H39"/><path d="M-26 26V0H0V-26H26M20-32L26-26L20-20"/><circle cx="-26" cy="26" r="4"/></g>
+<g fill="#171D29" aria-label="Value learning">
+<use href="#g18" transform="translate(131.5860 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g2" transform="translate(147.5740 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g1" transform="translate(163.3240 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g19" transform="translate(170.2960 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g8" transform="translate(187.2220 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g1" transform="translate(209.3560 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g8" transform="translate(216.3280 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g2" transform="translate(232.5820 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g14" transform="translate(248.3320 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g22" transform="translate(258.7900 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g4" transform="translate(275.7160 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g22" transform="translate(282.6880 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g33" transform="translate(299.6140 586.0000) scale(0.014000 -0.014000)"/>
+</g>
+<g fill="#656C78" aria-label="Bellman · DP · MC · TD">
+<use href="#g34" transform="translate(116.1395 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g8" transform="translate(129.7575 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g1" transform="translate(142.7485 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g1" transform="translate(148.2265 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g25" transform="translate(153.7045 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g2" transform="translate(172.7345 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g22" transform="translate(185.1095 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g29" transform="translate(202.8085 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g7" transform="translate(212.4885 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g26" transform="translate(227.4705 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g29" transform="translate(245.4115 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g27" transform="translate(255.0915 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g0" transform="translate(273.6925 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g29" transform="translate(293.9985 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g35" transform="translate(303.6785 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g7" transform="translate(316.8785 625.0000) scale(0.011000 -0.011000)"/>
+</g>
+<path d="M300 502H500" fill="none" stroke="#656C78" stroke-width="1.8" marker-end="url(#arrow)"/>
+<g transform="translate(576 502) scale(1.14)" fill="none" stroke="#5654D6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M-38 -32L0 -32M0 -32L38 -32" stroke-width="1.25"/><path d="M-38 -32L0 0M0 -32L38 0" stroke-width="1.25"/><path d="M-38 -32L0 32M0 -32L38 32" stroke-width="1.25"/><path d="M-38 0L0 -32M0 0L38 -32" stroke-width="1.25"/><path d="M-38 0L0 0M0 0L38 0" stroke-width="1.25"/><path d="M-38 0L0 32M0 0L38 32" stroke-width="1.25"/><path d="M-38 32L0 -32M0 32L38 -32" stroke-width="1.25"/><path d="M-38 32L0 0M0 32L38 0" stroke-width="1.25"/><path d="M-38 32L0 32M0 32L38 32" stroke-width="1.25"/><circle cx="-38" cy="-32" r="5" fill="#FFFFFF"/><circle cx="-38" cy="0" r="5" fill="#FFFFFF"/><circle cx="-38" cy="32" r="5" fill="#FFFFFF"/><circle cx="0" cy="-32" r="5" fill="#FFFFFF"/><circle cx="0" cy="0" r="5" fill="#FFFFFF"/><circle cx="0" cy="32" r="5" fill="#FFFFFF"/><circle cx="38" cy="-32" r="5" fill="#FFFFFF"/><circle cx="38" cy="0" r="5" fill="#FFFFFF"/><circle cx="38" cy="32" r="5" fill="#FFFFFF"/></g>
+<g fill="#171D29" aria-label="Deep Q-learning">
+<use href="#g7" transform="translate(469.2850 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g8" transform="translate(488.3530 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g8" transform="translate(504.8870 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g9" transform="translate(521.0010 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g36" transform="translate(543.4010 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g37" transform="translate(563.8970 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g1" transform="translate(575.6570 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g8" transform="translate(582.6290 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g2" transform="translate(598.8830 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g14" transform="translate(614.6330 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g22" transform="translate(625.0910 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g4" transform="translate(642.0170 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g22" transform="translate(648.9890 586.0000) scale(0.014000 -0.014000)"/>
+<use href="#g33" transform="translate(665.9150 586.0000) scale(0.014000 -0.014000)"/>
+</g>
+<g fill="#656C78" aria-label="DQN · Replay">
+<use href="#g7" transform="translate(511.2760 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g36" transform="translate(526.2580 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g38" transform="translate(542.3620 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g29" transform="translate(562.0630 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g10" transform="translate(571.7430 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g8" transform="translate(585.8340 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g9" transform="translate(598.4950 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g1" transform="translate(611.6950 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g2" transform="translate(617.1730 625.0000) scale(0.011000 -0.011000)"/>
+<use href="#g39" transform="translate(628.8880 625.0000) scale(0.011000 -0.011000)"/>
+</g>
+<path d="M576 648V675H224V688" fill="none" stroke="#656C78" stroke-width="1.8" marker-end="url(#arrow)"/>
+<g transform="translate(224 752) scale(1.14)" fill="none" stroke="#5654D6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M-32 24V8H-20V24M-10 24V-12H2V24M12 24V-27H24V24M-40 32H34M-31-16C-27-35-2-48 20-39M15-46L20-39L12-36M41-10C48 10 39 32 23 44M32 44H23V35"/></g>
+<g fill="#171D29" aria-label="Policy gradients">
+<use href="#g26" transform="translate(119.3080 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g21" transform="translate(136.4020 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g1" transform="translate(153.2160 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g4" transform="translate(160.1880 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g5" transform="translate(167.1600 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g39" transform="translate(182.3080 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g33" transform="translate(202.9720 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g14" transform="translate(219.7720 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g2" transform="translate(229.7400 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g32" transform="translate(245.4900 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g4" transform="translate(262.3040 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g8" transform="translate(269.2760 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g22" transform="translate(285.3900 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g13" transform="translate(302.3160 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g3" transform="translate(313.8380 836.0000) scale(0.014000 -0.014000)"/>
+</g>
+<g fill="#656C78" aria-label="Actor-Critic · PPO">
+<use href="#g30" transform="translate(134.2400 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g5" transform="translate(148.4520 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g13" transform="translate(160.7940 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g21" transform="translate(169.3520 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g14" transform="translate(182.5630 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g37" transform="translate(190.7800 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g0" transform="translate(200.0200 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g14" transform="translate(215.9260 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g4" transform="translate(224.1430 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g13" transform="translate(229.6210 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g4" transform="translate(238.6740 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g5" transform="translate(244.1520 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g29" transform="translate(260.8940 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g26" transform="translate(270.5740 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g26" transform="translate(284.1150 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g40" transform="translate(297.6560 875.0000) scale(0.011000 -0.011000)"/>
+</g>
+<path d="M300 752H500" fill="none" stroke="#656C78" stroke-width="1.8" marker-end="url(#arrow)"/>
+<g transform="translate(576 752) scale(1.14)" fill="none" stroke="#5654D6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M-31 40H15M-17 40V27L-9 12L-25-14L1-39L25-21M25-21L35-30M25-21L35-13M35-30L42-25M35-13L42-18"/><circle cx="-9" cy="12" r="7"/><circle cx="-25" cy="-14" r="7"/><circle cx="1" cy="-39" r="7"/></g>
+<g fill="#171D29" aria-label="Control">
+<use href="#g0" transform="translate(526.2650 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g21" transform="translate(546.5090 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g22" transform="translate(563.3230 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g13" transform="translate(580.2490 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g14" transform="translate(591.7710 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g21" transform="translate(601.9490 836.0000) scale(0.014000 -0.014000)"/>
+<use href="#g1" transform="translate(618.7630 836.0000) scale(0.014000 -0.014000)"/>
+</g>
+<g fill="#656C78" aria-label="TD3 · SAC">
+<use href="#g35" transform="translate(526.9125 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g7" transform="translate(540.1125 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g41" transform="translate(555.0945 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g29" transform="translate(571.8695 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g28" transform="translate(581.5495 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g30" transform="translate(595.4095 875.0000) scale(0.011000 -0.011000)"/>
+<use href="#g0" transform="translate(609.1815 875.0000) scale(0.011000 -0.011000)"/>
+</g>
+<rect x="42" y="888" width="716" height="38" fill="#5654D6" stroke="#5654D6" stroke-width="1.4"/>
+<g fill="#FFFFFF" aria-label="Hands-On Modern RL">
+<use href="#g42" transform="translate(280.9600 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g2" transform="translate(297.6880 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g22" transform="translate(311.1880 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g32" transform="translate(325.5760 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g3" transform="translate(339.9880 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g37" transform="translate(352.7200 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g40" transform="translate(362.8000 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g22" transform="translate(380.3680 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g27" transform="translate(399.6760 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g21" transform="translate(419.9680 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g32" transform="translate(434.3800 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g8" transform="translate(448.7920 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g14" transform="translate(462.9640 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g22" transform="translate(471.9280 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g10" transform="translate(491.2360 915.0000) scale(0.012000 -0.012000)"/>
+<use href="#g11" transform="translate(506.6080 915.0000) scale(0.012000 -0.012000)"/>
+</g>
+<path d="M400 928V951" fill="none" stroke="#656C78" stroke-width="1.6" marker-end="url(#arrow)"/>
+<g fill="#5654D6" aria-label="Shared foundations for modern RL">
+<use href="#g28" transform="translate(232.3990 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g12" transform="translate(245.6290 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g2" transform="translate(258.3235 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g14" transform="translate(270.1360 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g8" transform="translate(277.7695 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g32" transform="translate(290.1700 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g43" transform="translate(306.9805 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g21" transform="translate(314.1730 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g19" transform="translate(326.7835 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g22" transform="translate(339.4780 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g32" transform="translate(352.0675 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g2" transform="translate(364.6780 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g13" transform="translate(376.4905 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g4" transform="translate(385.1320 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g21" transform="translate(390.3610 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g22" transform="translate(402.9715 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g3" transform="translate(415.6660 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g43" transform="translate(431.0065 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g21" transform="translate(438.1990 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g14" transform="translate(450.8095 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g25" transform="translate(462.8530 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g21" transform="translate(480.9130 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g32" transform="translate(493.5235 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g8" transform="translate(506.1340 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g14" transform="translate(518.5345 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g22" transform="translate(526.3780 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g10" transform="translate(543.2725 981.0000) scale(0.010500 -0.010500)"/>
+<use href="#g11" transform="translate(556.7230 981.0000) scale(0.010500 -0.010500)"/>
+</g>
+<g fill="#656C78" aria-label="Policy gradients · Advantages · PPO">
+<use href="#g26" transform="translate(195.9687 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g21" transform="translate(211.2312 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g1" transform="translate(226.2437 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g4" transform="translate(232.4687 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g5" transform="translate(238.6937 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g39" transform="translate(252.2187 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g33" transform="translate(270.6687 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g14" transform="translate(285.6687 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g2" transform="translate(294.5687 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g32" transform="translate(308.6312 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g4" transform="translate(323.6437 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g8" transform="translate(329.8687 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g22" transform="translate(344.2562 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g13" transform="translate(359.3687 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g3" transform="translate(369.6562 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g29" transform="translate(387.9187 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g30" transform="translate(398.9187 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g32" transform="translate(415.0687 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g24" transform="translate(430.0812 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g2" transform="translate(442.4062 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g22" transform="translate(456.4688 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g13" transform="translate(471.5812 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g2" transform="translate(481.8687 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g33" transform="translate(495.9312 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g8" transform="translate(510.9312 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g3" transform="translate(525.6938 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g29" transform="translate(543.9562 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g26" transform="translate(554.9562 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g26" transform="translate(570.3438 1018.0000) scale(0.012500 -0.012500)"/>
+<use href="#g40" transform="translate(585.7312 1018.0000) scale(0.012500 -0.012500)"/>
+</g>
+<g fill="#656C78" aria-label="Further topics in Chapters 9–12">
+<use href="#g44" transform="translate(247.3773 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g19" transform="translate(258.0872 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g14" transform="translate(270.7817 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g13" transform="translate(278.6252 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g12" transform="translate(287.2668 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g8" transform="translate(299.9613 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g14" transform="translate(312.3618 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g13" transform="translate(324.4053 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g21" transform="translate(332.5743 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g9" transform="translate(345.1848 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g4" transform="translate(357.7848 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g5" transform="translate(363.0138 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g3" transform="translate(374.7948 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g4" transform="translate(390.1353 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g22" transform="translate(395.3642 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g0" transform="translate(412.2587 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g12" transform="translate(427.4418 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g2" transform="translate(440.1363 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g9" transform="translate(451.9488 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g13" transform="translate(464.5488 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g8" transform="translate(472.7178 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g14" transform="translate(485.1182 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g3" transform="translate(492.5417 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g45" transform="translate(507.8822 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g16" transform="translate(520.9233 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g15" transform="translate(531.9483 1063.0000) scale(0.010500 -0.010500)"/>
+<use href="#g17" transform="translate(540.4742 1063.0000) scale(0.010500 -0.010500)"/>
+</g>
+<rect x="42" y="1081" width="716" height="126" fill="#F5F5FA" stroke="#F5F5FA" stroke-width="1.4"/>
+<g transform="translate(164 1113) scale(0.46)" fill="none" stroke="#5654D6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="0" cy="-28" rx="29" ry="10"/><path d="M-29-28V24C-29 38 29 38 29 24V-28M-29-9C-29 5 29 5 29-9M-29 9C-29 23 29 23 29 9"/></g>
+<g fill="#171D29" aria-label="Data &amp; experts">
+<use href="#g7" transform="translate(88.2430 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g2" transform="translate(103.2250 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g13" transform="translate(115.6000 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g2" transform="translate(124.6530 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g6" transform="translate(141.4280 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g8" transform="translate(160.2820 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g46" transform="translate(172.8330 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g9" transform="translate(184.6250 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g8" transform="translate(197.8250 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g14" transform="translate(210.8160 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g13" transform="translate(219.0330 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g3" transform="translate(228.0860 1158.0000) scale(0.011000 -0.011000)"/>
+</g>
+<g fill="#656C78" aria-label="Offline RL · Imitation">
+<use href="#g40" transform="translate(80.4305 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g47" transform="translate(93.6065 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g4" transform="translate(110.9495 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g22" transform="translate(115.4315 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g8" transform="translate(126.2225 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g10" transform="translate(140.4515 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g11" transform="translate(151.9805 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g29" transform="translate(164.0045 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g48" transform="translate(171.9245 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g25" transform="translate(176.4065 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g4" transform="translate(191.9765 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g13" transform="translate(196.4585 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g2" transform="translate(203.8655 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g13" transform="translate(213.9905 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g4" transform="translate(221.3975 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g21" transform="translate(225.8795 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g22" transform="translate(236.6885 1192.0000) scale(0.009000 -0.009000)"/>
+</g>
+<g transform="translate(400 1113) scale(0.46)" fill="none" stroke="#5654D6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="0" cy="0" r="36"/><path d="M-36 0H-27M27 0H36M0-36V-27M0 27V36M-13 18L-4-4L17-16L7 7Z"/></g>
+<g fill="#171D29" aria-label="Exploration &amp; MARL">
+<use href="#g23" transform="translate(300.4335 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g46" transform="translate(313.0835 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g9" transform="translate(324.8755 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g1" transform="translate(338.0755 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g21" transform="translate(343.5535 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g14" transform="translate(356.7645 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g2" transform="translate(364.5965 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g13" transform="translate(376.9715 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g4" transform="translate(386.0245 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g21" transform="translate(391.5025 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g22" transform="translate(404.7135 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g6" transform="translate(422.4125 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g27" transform="translate(441.2665 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g30" transform="translate(459.8675 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g10" transform="translate(474.0795 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g11" transform="translate(488.1705 1158.0000) scale(0.011000 -0.011000)"/>
+</g>
+<g fill="#656C78" aria-label="Multi-agent · Hierarchy">
+<use href="#g27" transform="translate(303.7405 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g19" transform="translate(318.9595 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g1" transform="translate(329.8405 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g13" transform="translate(334.3225 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g4" transform="translate(341.7295 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g37" transform="translate(346.2115 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g2" transform="translate(353.7715 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g33" transform="translate(363.8965 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g8" transform="translate(374.6965 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g22" transform="translate(385.0555 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g13" transform="translate(395.9365 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g29" transform="translate(406.9435 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g42" transform="translate(414.8635 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g4" transform="translate(427.4095 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g8" transform="translate(431.8915 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g14" transform="translate(442.5205 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g2" transform="translate(448.9285 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g14" transform="translate(459.0535 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g5" transform="translate(465.5965 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g12" transform="translate(475.6945 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g39" transform="translate(486.5755 1192.0000) scale(0.009000 -0.009000)"/>
+</g>
+<g transform="translate(636 1113) scale(0.46)" fill="none" stroke="#5654D6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M-30-20L0-37L30-20V14L0 31L-30 14ZM-30-20L0-3L30-20M0-3V31M-46 10V-29H-36M-42-34L-36-29L-42-24M45-10V33H35M41 28L35 33L41 38"/></g>
+<g fill="#171D29" aria-label="World models">
+<use href="#g49" transform="translate(566.2215 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g21" transform="translate(585.7795 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g14" transform="translate(598.9905 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g1" transform="translate(607.2075 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g32" transform="translate(612.6855 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g25" transform="translate(630.2965 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g21" transform="translate(649.2165 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g32" transform="translate(662.4275 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g8" transform="translate(675.6385 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g1" transform="translate(688.6295 1158.0000) scale(0.011000 -0.011000)"/>
+<use href="#g3" transform="translate(694.1075 1158.0000) scale(0.011000 -0.011000)"/>
+</g>
+<g fill="#656C78" aria-label="MuZero · Dreamer">
+<use href="#g27" transform="translate(561.4215 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g19" transform="translate(576.6405 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g50" transform="translate(587.5215 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g8" transform="translate(598.8705 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g14" transform="translate(609.4995 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g21" transform="translate(616.0425 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g29" transform="translate(630.4515 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g7" transform="translate(638.3715 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g14" transform="translate(650.6295 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g8" transform="translate(657.1725 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g2" transform="translate(667.6215 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g25" transform="translate(677.7465 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g8" transform="translate(693.2265 1192.0000) scale(0.009000 -0.009000)"/>
+<use href="#g14" transform="translate(703.8555 1192.0000) scale(0.009000 -0.009000)"/>
+</g>
+<defs><path id="g0" d="M732 -30Q517 -30 367 65Q217 160 138.5 329Q60 498 60 720Q60 942 138.5 1111Q217 1280 367 1375Q517 1470 732 1470Q982 1470 1143.5 1343Q1305 1216 1366 1001L1185 953Q1141 1114 1028 1207Q915 1300 732 1300Q571 1300 464 1227Q357 1154 303 1023.5Q249 893 248 720Q247 548 301 417.5Q355 287 463 213.5Q571 140 732 140Q915 140 1028 233.5Q1141 327 1185 487L1366 439Q1305 225 1143.5 97.5Q982 -30 732 -30Z"/><path id="g1" d="M160 0V1470H338V0Z"/><path id="g2" d="M447 -30Q326 -30 244.5 14.5Q163 59 121.5 132Q80 205 80 292Q80 377 112.5 439.5Q145 502 204 543.5Q263 585 345 609Q422 630 517.5 645.5Q613 661 711 674Q809 687 894 699L830 662Q833 806 772.5 875Q712 944 564 944Q466 944 392.5 899.5Q319 855 289 755L120 806Q159 948 271 1029Q383 1110 566 1110Q713 1110 818.5 1057.5Q924 1005 970 899Q993 849 999 790.5Q1005 732 1005 668V0H847V259L884 235Q823 104 713.5 37Q604 -30 447 -30ZM474 119Q570 119 640.5 153.5Q711 188 754 244.5Q797 301 810 368Q825 418 826.5 479.5Q828 541 828 574L890 547Q803 535 719 524Q635 513 560 500.5Q485 488 425 471Q381 457 342.5 435Q304 413 280.5 378.5Q257 344 257 293Q257 249 279.5 209Q302 169 349.5 144Q397 119 474 119Z"/><path id="g3" d="M548 -29Q355 -29 231.5 55.5Q108 140 80 292L262 321Q284 233 363 181.5Q442 130 559 130Q670 130 733 176Q796 222 796 301Q796 347 775 375.5Q754 404 688.5 429Q623 454 491 489Q348 527 266 568Q184 609 149 663Q114 717 114 794Q114 889 166 960.5Q218 1032 311.5 1071Q405 1110 529 1110Q652 1110 749 1071Q846 1032 905.5 960.5Q965 889 976 794L794 761Q781 848 710.5 898Q640 948 529 951Q424 955 358.5 914Q293 873 293 803Q293 764 317.5 736Q342 708 408.5 683Q475 658 602 626Q745 590 827.5 547.5Q910 505 945 447.5Q980 390 980 306Q980 150 865 60.5Q750 -29 548 -29Z"/><path id="g4" d="M160 1271V1455H338V1271ZM160 0V1080H338V0Z"/><path id="g5" d="M595 -30Q431 -30 316.5 43.5Q202 117 142 246Q82 375 80 540Q82 709 143.5 837.5Q205 966 320 1038Q435 1110 597 1110Q768 1110 891.5 1026Q1015 942 1057 796L881 743Q847 837 770.5 889Q694 941 595 941Q484 941 412 889.5Q340 838 305 747.5Q270 657 269 540Q271 360 352.5 249.5Q434 139 595 139Q701 139 771 187.5Q841 236 877 328L1057 281Q1001 130 882 50Q763 -30 595 -30Z"/><path id="g6" d="M608 -30Q488 -30 384 5Q280 40 210 115Q156 175 129.5 247.5Q103 320 100 401Q100 480 123 555.5Q146 631 196 690Q222 722 254.5 744.5Q287 767 320 783Q251 857 214.5 922Q178 987 178 1079Q178 1196 238.5 1290.5Q299 1385 404 1429Q455 1451 508.5 1459.5Q562 1468 613 1468Q699 1468 780 1444Q861 1420 918 1366Q956 1334 983 1292.5Q1010 1251 1025 1206L851 1161Q832 1212 788 1247Q753 1277 706.5 1288Q660 1299 613 1299Q535 1299 472 1269Q416 1242 388 1193.5Q360 1145 360 1079Q360 1022 379.5 985.5Q399 949 434 908Q455 886 481.5 861.5Q508 837 536 811L960 417Q963 442 964 468Q965 494 965 518L964 717H1127V483Q1127 412 1122.5 362Q1118 312 1108 279L1291 110L1175 -14L1023 130Q984 86 930 53Q876 20 822 3Q771 -16 717 -23Q663 -30 608 -30ZM612 141Q661 141 701 147Q741 153 777 170Q825 193 851 214Q877 235 894 253L455 655Q419 643 387.5 623Q356 603 333 576Q307 544 294.5 501Q282 458 282 410Q283 359 299 316Q315 273 344 239Q388 188 463 164.5Q538 141 612 141Z"/><path id="g7" d="M140 0V1440H584Q606 1440 661 1439Q716 1438 766 1431Q933 1409 1045.5 1309.5Q1158 1210 1215 1057Q1272 904 1272 720Q1272 536 1215 383Q1158 230 1045.5 130.5Q933 31 766 9Q716 3 660.5 1.5Q605 0 584 0ZM323 170H584Q622 170 669 172.5Q716 175 751 181Q869 203 942 280Q1015 357 1049 472Q1083 587 1083 720Q1083 856 1048.5 971Q1014 1086 941 1162Q868 1238 751 1259Q716 1266 668 1268Q620 1270 584 1270H323Z"/><path id="g8" d="M608 -30Q449 -30 330.5 40.5Q212 111 146 237.5Q80 364 80 533Q80 710 145 839.5Q210 969 326.5 1039.5Q443 1110 600 1110Q763 1110 877.5 1035Q992 960 1049.5 821Q1107 682 1099 490H919V554Q916 753 838 851.5Q760 950 606 950Q441 950 355 844Q269 738 269 540Q269 349 355 244Q441 139 600 139Q707 139 786 188Q865 237 910 329L1081 270Q1018 127 891.5 48.5Q765 -30 608 -30ZM209 490V633H1007V490Z"/><path id="g9" d="M636 -30Q484 -30 380 45.5Q276 121 222.5 250.5Q169 380 169 541Q169 704 222.5 833Q276 962 380.5 1036Q485 1110 637 1110Q787 1110 895.5 1035.5Q1004 961 1062 832Q1120 703 1120 541Q1120 379 1062 250Q1004 121 895.5 45.5Q787 -30 636 -30ZM139 -480V1080H298V285H318V-480ZM614 133Q721 133 791 187Q861 241 896 333.5Q931 426 931 541Q931 655 896.5 747Q862 839 790.5 893Q719 947 609 947Q504 947 435 895.5Q366 844 332 752.5Q298 661 298 541Q298 423 331.5 330.5Q365 238 435 185.5Q505 133 614 133Z"/><path id="g10" d="M140 0V1440H709Q730 1440 759 1438.5Q788 1437 815 1432Q932 1414 1011.5 1352Q1091 1290 1131 1195.5Q1171 1101 1171 986Q1171 819 1084 696.5Q997 574 829 543L761 532H318V0ZM997 0 713 586 889 640 1201 0ZM318 701H703Q722 701 746.5 703Q771 705 793 710Q862 726 905.5 768.5Q949 811 969 868.5Q989 926 989 986Q989 1046 969 1103.5Q949 1161 905.5 1204Q862 1247 793 1262Q771 1268 746.5 1269.5Q722 1271 703 1271H318Z"/><path id="g11" d="M160 0V1440H338V169H1006V0Z"/><path id="g12" d="M909 0V541Q909 618 895.5 689Q882 760 848.5 816.5Q815 873 758.5 906Q702 939 616 939Q549 939 494.5 916.5Q440 894 401 848Q362 802 340.5 732.5Q319 663 319 569L202 605Q202 762 258.5 874.5Q315 987 417.5 1047.5Q520 1108 659 1108Q764 1108 838 1075Q912 1042 961 987.5Q1010 933 1038 865.5Q1066 798 1077.5 728.5Q1089 659 1089 597V0ZM139 0V1440H299V645H319V0Z"/><path id="g13" d="M743 0Q647 -19 553.5 -15.5Q460 -12 387 22.5Q314 57 276 130Q244 194 241.5 259.5Q239 325 239 408V1380H417V416Q417 350 418.5 303Q420 256 439 222Q475 158 553.5 147Q632 136 743 153ZM20 933V1080H743V933Z"/><path id="g14" d="M140 0V1080H299V819L273 853Q292 903 322.5 945Q353 987 391 1014Q433 1048 486 1066Q539 1084 594 1087.5Q649 1091 697 1080V913Q641 928 574 921Q507 914 450 872Q398 835 369.5 782Q341 729 330 667.5Q319 606 319 542V0Z"/><path id="g15" d="M391 0V1243L120 1079V1278L391 1440H572V0Z"/><path id="g16" d="M120 557V704H960V557Z"/><path id="g17" d="M100 1 101 161 740 736Q820 808 847.5 872.5Q875 937 875 1005Q875 1088 837 1155Q799 1222 733.5 1261Q668 1300 585 1300Q499 1300 432 1259.5Q365 1219 326.5 1152Q288 1085 289 1006H107Q107 1142 170 1246.5Q233 1351 341.5 1410.5Q450 1470 588 1470Q722 1470 828 1408.5Q934 1347 995.5 1241.5Q1057 1136 1057 1003Q1057 909 1033.5 840Q1010 771 961 712.5Q912 654 838 588L307 111L284 171H1057V1Z"/><path id="g18" d="M492 0 10 1440H195L614 189L1037 1440H1222L740 0Z"/><path id="g19" d="M550 -28Q446 -28 371.5 5Q297 38 248 93Q199 148 171 215Q143 282 131.5 352Q120 422 120 483V1080H300V539Q300 463 314 392Q328 321 361.5 264Q395 207 451.5 174Q508 141 593 141Q660 141 715 164Q770 187 809 232.5Q848 278 869 348Q890 418 890 511L1007 475Q1007 319 950.5 206Q894 93 791.5 32.5Q689 -28 550 -28ZM910 0V289H890V1080H1069V0Z"/><path id="g20" d="M120 -224 131 -141Q173 -144 194 -125Q215 -106 221 -73Q227 -40 223 0H120V226H316V-30Q316 -135 264.5 -188Q213 -241 120 -224Z"/><path id="g21" d="M600 -30Q439 -30 322.5 43Q206 116 143 245Q80 374 80 541Q80 711 144 839Q208 967 325 1038.5Q442 1110 600 1110Q762 1110 879 1037.5Q996 965 1058.5 836.5Q1121 708 1121 541Q1121 372 1058 243.5Q995 115 878 42.5Q761 -30 600 -30ZM600 139Q768 139 850 251Q932 363 932 541Q932 724 849 832.5Q766 941 600 941Q487 941 414 890Q341 839 305 749Q269 659 269 541Q269 359 353 249Q437 139 600 139Z"/><path id="g22" d="M909 0V541Q909 618 895.5 689Q882 760 848.5 816.5Q815 873 758.5 906Q702 939 616 939Q549 939 494.5 916.5Q440 894 401 848Q362 802 340.5 732.5Q319 663 319 569L202 605Q202 762 258.5 874.5Q315 987 417.5 1047.5Q520 1108 659 1108Q764 1108 838 1075Q912 1042 961 987.5Q1010 933 1038 865.5Q1066 798 1077.5 728.5Q1089 659 1089 597V0ZM139 0V1080H299V791H319V0Z"/><path id="g23" d="M140 0V1440H1050V1271H318V820H930V651H318V169H1050V0Z"/><path id="g24" d="M432 0 40 1080H220L523 227L825 1080H1006L614 0Z"/><path id="g25" d="M1431 0 1432 691Q1432 812 1367.5 880.5Q1303 949 1200 949Q1140 949 1086 921.5Q1032 894 998 835.5Q964 777 964 686L870 724Q868 839 917.5 925.5Q967 1012 1053 1060Q1139 1108 1247 1108Q1416 1108 1513 1005.5Q1610 903 1610 730L1609 0ZM139 0V1080H298V791H318V0ZM786 0 787 684Q787 808 723 878.5Q659 949 553 949Q448 949 383 877Q318 805 318 686L224 742Q224 847 274 930Q324 1013 410 1060.5Q496 1108 605 1108Q714 1108 795 1062Q876 1016 920 930.5Q964 845 964 727L963 0Z"/><path id="g26" d="M140 0V1440H709Q730 1440 759 1438.5Q788 1437 815 1432Q932 1414 1011.5 1352Q1091 1290 1131 1195.5Q1171 1101 1171 986Q1171 872 1130.5 777.5Q1090 683 1010.5 620.5Q931 558 815 540Q788 536 759 534Q730 532 709 532H318V0ZM318 701H703Q722 701 746.5 703Q771 705 793 710Q862 726 905.5 768.5Q949 811 969 868.5Q989 926 989 986Q989 1046 969 1103.5Q949 1161 905.5 1204Q862 1247 793 1262Q771 1268 746.5 1269.5Q722 1271 703 1271H318Z"/><path id="g27" d="M140 0V1440H302L846 293L1387 1440H1551V1H1382V1049L893 0H798L309 1049V0Z"/><path id="g28" d="M651 -30Q498 -30 375.5 22Q253 74 173.5 170.5Q94 267 70 399L254 428Q289 292 399.5 215.5Q510 139 660 139Q757 139 835.5 169.5Q914 200 960 257Q1006 314 1006 392Q1006 440 989.5 474.5Q973 509 944.5 533.5Q916 558 880 575Q844 592 805 603L438 712Q378 730 322 757.5Q266 785 222 826.5Q178 868 152 926.5Q126 985 126 1065Q126 1193 192.5 1283.5Q259 1374 373 1422Q487 1470 630 1469Q775 1468 889.5 1417.5Q1004 1367 1079.5 1273Q1155 1179 1181 1048L992 1015Q977 1103 925.5 1166.5Q874 1230 797 1264.5Q720 1299 628 1300Q540 1301 469 1272Q398 1243 356 1191.5Q314 1140 314 1073Q314 1007 352 966.5Q390 926 445.5 902.5Q501 879 554 864L828 785Q875 772 936.5 749Q998 726 1056 684.5Q1114 643 1152 574.5Q1190 506 1190 402Q1190 298 1148.5 217Q1107 136 1033 81.5Q959 27 861 -1.5Q763 -30 651 -30Z"/><path id="g29" d="M243 510Q192 510 156 544.5Q120 579 120 630Q120 682 156 716Q192 750 243 750Q291 750 325.5 716Q360 682 360 630Q360 579 325.5 544.5Q291 510 243 510Z"/><path id="g30" d="M40 0 522 1440H770L1252 0H1067L616 1336H672L225 0ZM272 337V504H1020V337Z"/><path id="g31" d="M370 0 40 1081 217 1080 458 290 701 1080H858L1100 290L1342 1080H1518L1188 0H1040L779 821L518 0Z"/><path id="g32" d="M564 -30Q413 -30 305 45.5Q197 121 138.5 250Q80 379 80 541Q80 703 138.5 832Q197 961 305 1035.5Q413 1110 563 1110Q716 1110 820 1036Q924 962 977.5 833Q1031 704 1031 541Q1031 380 977.5 250.5Q924 121 820 45.5Q716 -30 564 -30ZM586 133Q695 133 765 185.5Q835 238 868.5 330.5Q902 423 902 541Q902 661 868.5 752.5Q835 844 766 895.5Q697 947 591 947Q481 947 409.5 893Q338 839 303.5 747Q269 655 269 541Q269 426 304 333.5Q339 241 409.5 187Q480 133 586 133ZM902 0V795H882V1440H1061V0Z"/><path id="g33" d="M577 -510Q492 -510 411 -484Q330 -458 262.5 -405.5Q195 -353 150 -273L313 -187Q353 -266 426.5 -302Q500 -338 578 -338Q681 -338 749 -300.5Q817 -263 849.5 -189Q882 -115 881 -5V290H902V1080H1060V-7Q1060 -51 1057.5 -92Q1055 -133 1047 -173Q1026 -288 964 -362.5Q902 -437 804 -473.5Q706 -510 577 -510ZM564 -30Q413 -30 305 45.5Q197 121 138.5 250Q80 379 80 541Q80 703 138.5 832Q197 961 305 1035.5Q413 1110 563 1110Q716 1110 820 1036Q924 962 977.5 833Q1031 704 1031 541Q1031 380 977.5 250.5Q924 121 820 45.5Q716 -30 564 -30ZM586 133Q695 133 765 185.5Q835 238 868.5 330.5Q902 423 902 541Q902 661 868.5 752.5Q835 844 766 895.5Q697 947 591 947Q481 947 409.5 893Q338 839 303.5 747Q269 655 269 541Q269 426 304 333.5Q339 241 409.5 187Q480 133 586 133Z"/><path id="g34" d="M140 0V1440H701Q830 1440 921.5 1387Q1013 1334 1061.5 1247.5Q1110 1161 1110 1061Q1110 944 1050 856Q990 768 888 735L886 784Q1025 747 1102 648Q1179 549 1179 412Q1179 286 1127.5 194Q1076 102 979.5 51Q883 0 751 0ZM320 170H717Q797 170 860 199.5Q923 229 959.5 283Q996 337 996 413Q996 486 963.5 544Q931 602 872.5 636.5Q814 671 737 671H320ZM320 839H699Q763 839 814.5 866.5Q866 894 896.5 944Q927 994 927 1061Q927 1154 864 1213Q801 1272 699 1272H320Z"/><path id="g35" d="M511 0V1271H20V1440H1180V1271H689V0Z"/><path id="g36" d="M1270 -29 877 362 994 479 1385 88ZM732 -30Q517 -30 367 65Q217 160 138.5 329Q60 498 60 720Q60 942 138.5 1111Q217 1280 367 1375Q517 1470 732 1470Q948 1470 1098 1375Q1248 1280 1326 1111Q1404 942 1404 720Q1404 498 1326 329Q1248 160 1098 65Q948 -30 732 -30ZM732 140Q893 139 1000.5 212.5Q1108 286 1161.5 417Q1215 548 1215 720Q1215 893 1161.5 1023Q1108 1153 1000.5 1226Q893 1299 732 1300Q571 1301 464.5 1228Q358 1155 304 1024Q250 893 249 720Q248 548 302 418Q356 288 463.5 214.5Q571 141 732 140Z"/><path id="g37" d="M120 557V704H720V557Z"/><path id="g38" d="M140 0V1440H320L1071 315V1440H1251V0H1071L320 1126V0Z"/><path id="g39" d="M290 -480 499 88 502 -80 30 1080H217L587 147H523L870 1080H1051L463 -480Z"/><path id="g40" d="M732 -30Q517 -30 367 65Q217 160 138.5 329Q60 498 60 720Q60 942 138.5 1111Q217 1280 367 1375Q517 1470 732 1470Q948 1470 1098 1375Q1248 1280 1326 1111Q1404 942 1404 720Q1404 498 1326 329Q1248 160 1098 65Q948 -30 732 -30ZM732 140Q893 139 1000.5 212.5Q1108 286 1161.5 417Q1215 548 1215 720Q1215 893 1161.5 1023Q1108 1153 1000.5 1226Q893 1299 732 1300Q571 1301 464.5 1228Q358 1155 304 1024Q250 893 249 720Q248 548 302 418Q356 288 463.5 214.5Q571 141 732 140Z"/><path id="g41" d="M535 -28Q428 -28 336 11.5Q244 51 177.5 123.5Q111 196 80 296L251 345Q284 245 361 193Q438 141 534 142Q622 144 686.5 182.5Q751 221 786.5 288Q822 355 822 443Q822 577 742 660.5Q662 744 532 744Q496 744 456.5 734Q417 724 383 706L297 847L831 1330L854 1270H137V1440H986V1269L531 833L529 896Q672 906 779 849Q886 792 945.5 686Q1005 580 1005 443Q1005 305 943 199Q881 93 775 32.5Q669 -28 535 -28Z"/><path id="g42" d="M140 0V1440H318V805H1076V1440H1254V0H1076V636H318V0Z"/><path id="g43" d="M243 0V1139Q243 1181 247 1224.5Q251 1268 265 1309.5Q279 1351 311 1386Q348 1427 392 1444.5Q436 1462 481.5 1466Q527 1470 568 1470H705V1322H578Q499 1322 460 1283.5Q421 1245 421 1167V0ZM60 933V1080H705V933Z"/><path id="g44" d="M140 0V1440H980V1262H318V809H860V631H318V0Z"/><path id="g45" d="M611 1469Q749 1469 860 1403Q971 1337 1036.5 1223Q1102 1109 1102 964V485Q1102 334 1037 218Q972 102 857.5 36Q743 -30 595 -30Q477 -30 374.5 19Q272 68 201 158L334 276Q378 214 447 176.5Q516 139 595 139Q691 139 764.5 185Q838 231 879.5 305Q921 379 921 465V754L960 710Q898 620 801 566Q704 512 590 512Q456 512 350 575Q244 638 182 745.5Q120 853 120 987Q120 1121 187 1230.5Q254 1340 365.5 1404.5Q477 1469 611 1469ZM611 1297Q525 1297 454.5 1255.5Q384 1214 342 1143.5Q300 1073 300 987Q300 901 341.5 830.5Q383 760 453.5 718Q524 676 610 676Q696 676 767 718Q838 760 879.5 830.5Q921 901 921 987Q921 1072 879.5 1142.5Q838 1213 767.5 1255Q697 1297 611 1297Z"/><path id="g46" d="M20 0 433 546 29 1080H241L537 684L830 1080H1042L638 546L1052 0H839L537 408L233 0Z"/><path id="g47" d="M1314 933V1080H1604V933ZM878 0V1139Q878 1181 882 1224.5Q886 1268 900 1309.5Q914 1351 946 1386Q983 1427 1027 1444.5Q1071 1462 1116.5 1466Q1162 1470 1203 1470H1340V1322H1213Q1134 1322 1095 1283.5Q1056 1245 1056 1167V0ZM695 933V1080H1340V933ZM1589 0V1470H1767V0ZM243 0V1139Q243 1181 247 1224.5Q251 1268 265 1309.5Q279 1351 311 1386Q348 1427 392 1444.5Q436 1462 481.5 1466Q527 1470 568 1470H705V1322H578Q499 1322 460 1283.5Q421 1245 421 1167V0ZM60 933V1080H705V933Z"/><path id="g48" d="M160 0V1440H338V0Z"/><path id="g49" d="M447 0 30 1440H216L536 301L855 1439L1042 1440L1362 301L1681 1440H1868L1451 0H1273L949 1129L625 0Z"/><path id="g50" d="M100 0V32L861 1271H130V1440H1161V1406L404 169H1151V0Z"/></defs>
+</svg>

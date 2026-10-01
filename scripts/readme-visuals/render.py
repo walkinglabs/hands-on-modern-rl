@@ -82,7 +82,7 @@ ICONS = [
     '<path d="M-23-16L0-26L23-16M-23 16L0 26L23 16M-23-16V16M23-16V16M0-26V26M-23-16L23 16M23-16L-23 16"/><circle cx="-23" cy="-16" r="5"/><circle cx="-23" cy="16" r="5"/><circle cx="0" cy="-26" r="5"/><circle cx="0" cy="26" r="5"/><circle cx="23" cy="-16" r="5"/><circle cx="23" cy="16" r="5"/>',
 ]
 
-# Course overview pictograms: concrete environments and model interactions.
+# Learning-route pictograms: environments, learning methods, and model interactions.
 MAP_ICONS = {
     'cartpole': '<path d="M-48 31H48M-20 1H21V19H-20ZM0 1L21-43"/><circle cx="21" cy="-43" r="4"/><circle cx="-12" cy="24" r="5"/><circle cx="13" cy="24" r="5"/>',
     'mdp': '<rect x="-39" y="-39" width="78" height="78"/><path d="M-13-39V39M13-39V39M-39-13H39M-39 13H39"/><path d="M-26 26V0H0V-26H26M20-32L26-26L20-20"/><circle cx="-26" cy="26" r="4"/>',
@@ -93,22 +93,56 @@ MAP_ICONS = {
     'explore': '<circle cx="0" cy="0" r="36"/><path d="M-36 0H-27M27 0H36M0-36V-27M0 27V36M-13 18L-4-4L17-16L7 7Z"/>',
     'check': '<path d="M0-39L30-25V3C30 21 15 33 0 41C-15 33-30 21-30 3V-25ZM-13 0L-3 10L17-12"/>',
     'book': '<path d="M-28-23C-18-27-7-23 0-16C7-23 18-27 28-23V23C18 19 7 23 0 30C-7 23-18 19-28 23ZM0-16V30M-18-10L-7-6M-18 1L-7 5M7-6L18-10M7 5L18 1"/>',
+    'states': '<circle cx="-31" cy="18" r="12"/><circle cx="30" cy="18" r="12"/><circle cx="0" cy="-31" r="12"/><path d="M-25 4L-10-21M-14-18L-10-21L-9-16M10-21L25 4M20 2L25 4L25-2M18 18H-18M-12 13L-18 18L-12 23"/>',
+    'policy': '<path d="M-32 24V8H-20V24M-10 24V-12H2V24M12 24V-27H24V24M-40 32H34M-31-16C-27-35-2-48 20-39M15-46L20-39L12-36M41-10C48 10 39 32 23 44M32 44H23V35"/>',
+    'control': '<path d="M-31 40H15M-17 40V27L-9 12L-25-14L1-39L25-21M25-21L35-30M25-21L35-13M35-30L42-25M35-13L42-18"/><circle cx="-9" cy="12" r="7"/><circle cx="-25" cy="-14" r="7"/><circle cx="1" cy="-39" r="7"/>',
+    'world': '<path d="M-30-20L0-37L30-20V14L0 31L-30 14ZM-30-20L0-3L30-20M0-3V31M-46 10V-29H-36M-42-34L-36-29L-42-24M45-10V33H35M41 28L35 33L41 38"/>',
+    'verifier': '<path d="M-43-31H12V19H-43ZM-32-16L-24-8L-32 0M-17 1H-6M21-6L43 4V22C43 36 31 44 21 49C11 44-1 36-1 22V4ZM10 20L18 28L33 11"/>',
+    'search': '<circle cx="0" cy="-37" r="7"/><circle cx="-29" cy="0" r="7"/><circle cx="29" cy="0" r="7"/><circle cx="-43" cy="35" r="6"/><circle cx="-13" cy="35" r="6"/><circle cx="29" cy="35" r="6"/><path d="M-5-31L-24-6M5-31L24-6M-33 6L-41 29M-26 6L-16 29M29 7V29M37 38L43 44L55 27"/>',
+    'systems': '<rect x="-34" y="-36" width="68" height="20"/><rect x="-34" y="-9" width="68" height="20"/><rect x="-34" y="18" width="68" height="20"/><path d="M-25-26H-23M-25 1H-23M-25 28H-23M-12-26H22M-12 1H22M-12 28H22"/>',
+    'selfplay': '<circle cx="-28" cy="-7" r="10"/><circle cx="28" cy="7" r="10"/><path d="M-44 26V18C-44 2-12 2-12 18V26ZM12 40V32C12 16 44 16 44 32V40ZM-22-32C-7-44 21-40 34-24M34-34V-24H24M22 48C7 60-21 56-34 40M-34 50V40H-24"/>',
 }
 MAP_ICONS['network'] = ''.join(f'<path d="M-38 {a}L0 {b}M0 {a}L38 {b}" stroke-width="1.25"/>' for a in [-32,0,32] for b in [-32,0,32]) + ''.join(f'<circle cx="{x}" cy="{y}" r="5" fill="@surface"/>' for x in [-38,0,38] for y in [-32,0,32])
-MAP_COPY = {
-    'en': {
-        'subtitle': 'From CartPole to modern agents',
-        'stages': [('Environment','CartPole','cartpole'),('MDPs & values','Bellman','mdp'),('Deep RL','DQN · PPO','network'),('LLM post-training','RLHF · GRPO','language'),('Tool-using agents','Code · Browser','tools'),('Multimodal RL','VLM · Embodied','multimodal')],
-        'practice': 'Equations · Code · Experiments',
-        'topics': 'Topics across the course',
-        'extensions': [('Data & experts','Offline RL · Imitation','data'),('Exploration','Multi-agent · Hierarchy','explore'),('Safety & evaluation','Rewards · Self-play','check')],
+ROUTES = {
+    'classic-route': {
+        'en': {
+            'title': 'Classical & Deep RL',
+            'subtitle': 'Chapters 1–12 · Values, policies & control',
+            'stages': [('Environment','CartPole','cartpole'),('MDPs','States · Actions · Rewards','states'),('Value learning','Bellman · DP · MC · TD','mdp'),('Deep Q-learning','DQN · Replay','network'),('Policy gradients','Actor-Critic · PPO','policy'),('Control','TD3 · SAC','control')],
+            'bridge': 'Shared foundations for modern RL',
+            'practice': 'Policy gradients · Advantages · PPO',
+            'topics': 'Further topics in Chapters 9–12',
+            'extensions': [('Data & experts','Offline RL · Imitation','data'),('Exploration & MARL','Multi-agent · Hierarchy','explore'),('World models','MuZero · Dreamer','world')],
+        },
+        'zh': {
+            'title': '传统与深度强化学习',
+            'subtitle': '第 1–12 章 · 价值学习、策略优化与控制',
+            'stages': [('环境交互','CartPole','cartpole'),('MDP','状态 · 动作 · 奖励','states'),('价值学习','贝尔曼 · DP · MC · TD','mdp'),('深度价值学习','DQN · 经验回放','network'),('策略梯度','Actor-Critic · PPO','policy'),('连续控制','TD3 · SAC','control')],
+            'bridge': '通向现代强化学习的共同基础',
+            'practice': '策略梯度 · 优势估计 · PPO',
+            'topics': '第 9–12 章的扩展专题',
+            'extensions': [('数据与专家','离线强化学习 · 模仿学习','data'),('探索与协作','多智能体 · 分层强化学习','explore'),('世界模型','MuZero · Dreamer','world')],
+        },
     },
-    'zh': {
-        'subtitle': '从 CartPole 到现代智能体',
-        'stages': [('环境交互','CartPole','cartpole'),('MDP 与价值','贝尔曼方程','mdp'),('深度强化学习','DQN · PPO','network'),('大模型后训练','RLHF · GRPO','language'),('工具智能体','代码 · 浏览器','tools'),('多模态强化学习','VLM · 具身智能','multimodal')],
-        'practice': '公式推导 · 代码实现 · 动手实验',
-        'topics': '贯穿课程的专题',
-        'extensions': [('数据与专家','离线强化学习 · 模仿学习','data'),('探索与协作','多智能体 · 分层强化学习','explore'),('安全与评测','奖励设计 · 自博弈','check')],
+    'modern-route': {
+        'en': {
+            'title': 'Modern RL',
+            'subtitle': 'Chapters 13–26 · LLM post-training, agents & multimodality',
+            'stages': [('Policy core','PPO · KL','policy'),('LLM alignment','RLHF · DPO','language'),('Verifiable RL','GRPO · RLVR','verifier'),('Reasoning','PRM · Search','search'),('Tool-using agents','Code · Browser · GUI','tools'),('Multimodal RL','VLM · Embodied','multimodal')],
+            'bridge': 'Apply the policy foundations to new environments',
+            'practice': 'Sampling · Rewards · Policy updates',
+            'topics': 'Systems, evaluation & research',
+            'extensions': [('Training systems','Rollouts · Scaling','systems'),('Safety & evaluation','Reward hacking · Tests','check'),('Self-play & research','Self-play · Frontiers','selfplay')],
+        },
+        'zh': {
+            'title': '现代强化学习',
+            'subtitle': '第 13–26 章 · 大模型后训练、智能体与多模态',
+            'stages': [('策略基础','PPO · KL','policy'),('大模型对齐','RLHF · DPO','language'),('可验证强化学习','GRPO · RLVR','verifier'),('推理训练','过程奖励 · 搜索','search'),('工具智能体','代码 · 浏览器 · GUI','tools'),('多模态强化学习','VLM · 具身智能','multimodal')],
+            'bridge': '把策略优化用于语言、工具与多模态环境',
+            'practice': '采样 · 奖励 · 策略更新',
+            'topics': '系统、评测与研究专题',
+            'extensions': [('训练系统','轨迹采集 · 规模扩展','systems'),('安全与评测','奖励黑客 · 可靠评测','check'),('自博弈与前沿','自博弈 · 前沿研究','selfplay')],
+        },
     },
 }
 
@@ -229,11 +263,18 @@ def wordmark(lang,variant,compact,fonts,preview):
     d.save(preview)
 
 
-def course_map(lang,variant,compact,fonts,preview):
-    t=COPY[lang]; visual=MAP_COPY[lang]
-    d=Figure('course-map',lang,variant,compact,1210 if compact else 730,fonts,t['map'],t['total']+'. '+ '; '.join(' · '.join(p) for p in t['parts'])+'; '+' · '.join(t['last']))
-    d.text('Hands-On Modern RL',d.w/2,62,39,font='sans')
-    d.text(visual['subtitle'],d.w/2,106,26,'accent')
+def learning_route(name,lang,variant,compact,fonts,preview):
+    visual=ROUTES[name][lang]
+    description=visual['subtitle']+'. '+ '; '.join(title+' · '+sub for title,sub,_ in visual['stages'])+'. '+visual['bridge']+': '+visual['practice']+'. '+ '; '.join(title+' · '+sub for title,sub,_ in visual['extensions'])
+    d=Figure(name,lang,variant,compact,1230 if compact else 750,fonts,visual['title'],description)
+    d.text(visual['title'],d.w/2,62,39)
+    if compact:
+        # Split only the overview line; every stage label stays beside its icon.
+        chapters,summary=visual['subtitle'].split(' · ',1)
+        d.text(chapters,d.w/2,103,23,'accent')
+        d.text(summary,d.w/2,135,23,'muted',max_width=716)
+    else:
+        d.text(visual['subtitle'],d.w/2,106,26,'accent',max_width=1500)
     if compact:
         d.rect(42,160,716,728,'bg','accent')
         for i,(title,sub,icon) in enumerate(visual['stages']):
@@ -246,15 +287,15 @@ def course_map(lang,variant,compact,fonts,preview):
         d.rect(42,888,716,38,'accent','accent')
         d.text('Hands-On Modern RL',400,915,24,'bg',font='sans')
         d.path('M400 928V951','muted',1.6,True)
-        d.icon('book',147 if lang=='en' else 143,979,.42)
-        d.text(visual['practice'],423,986,25,'muted',max_width=556)
-        d.text(visual['topics'],400,1035,21,'muted')
-        d.rect(42,1054,716,132,'soft','soft')
+        d.text(visual['bridge'],400,981,21,'accent',max_width=716)
+        d.text(visual['practice'],400,1018,25,'muted',max_width=716)
+        d.text(visual['topics'],400,1063,21,'muted')
+        d.rect(42,1081,716,126,'soft','soft')
         for i,(title,sub,icon) in enumerate(visual['extensions']):
             x=164+i*236
-            d.icon(icon,x,1087,.46)
-            d.text(title,x,1134,22,max_width=230)
-            d.text(sub,x,1168,18,'muted',max_width=230)
+            d.icon(icon,x,1113,.46)
+            d.text(title,x,1158,22,max_width=230)
+            d.text(sub,x,1192,18,'muted',max_width=230)
     else:
         d.rect(220,160,1160,217,'bg','accent')
         positions=[94,365,655,945,1235,1506]
@@ -269,17 +310,25 @@ def course_map(lang,variant,compact,fonts,preview):
         d.rect(220,377,1160,38,'accent','accent')
         d.text('Hands-On Modern RL',800,403,24,'bg',font='sans')
         d.path('M800 417V444','muted',1.6,True)
-        d.icon('book',519 if lang=='en' else 562,481,.42)
-        d.text(visual['practice'],823,489,23,'muted',max_width=645)
-        d.text(visual['topics'],800,542,20,'muted')
-        d.rect(60,562,1480,142,'soft','soft')
+        d.text(visual['bridge'],800,478,21,'accent',max_width=1100)
+        d.text(visual['practice'],800,516,25,'muted',max_width=1100)
+        d.text(visual['topics'],800,566,20,'muted')
+        d.rect(60,585,1480,142,'soft','soft')
         for i,(title,sub,icon) in enumerate(visual['extensions']):
             x=307+i*493
-            if i: d.path(f'M{x-246} 581V684')
-            d.icon(icon,x,597,.49)
-            d.text(title,x,646,25,max_width=420)
-            d.text(sub,x,680,20,'muted',max_width=440)
+            if i: d.path(f'M{x-246} 604V707')
+            d.icon(icon,x,620,.49)
+            d.text(title,x,669,25,max_width=420)
+            d.text(sub,x,703,20,'muted',max_width=440)
     d.save(preview)
+
+
+def classic_route(lang,variant,compact,fonts,preview):
+    learning_route('classic-route',lang,variant,compact,fonts,preview)
+
+
+def modern_route(lang,variant,compact,fonts,preview):
+    learning_route('modern-route',lang,variant,compact,fonts,preview)
 
 
 def training_loop(lang,variant,compact,fonts,preview):
@@ -319,12 +368,12 @@ def training_loop(lang,variant,compact,fonts,preview):
 
 if __name__ == '__main__':
     parser=argparse.ArgumentParser(); parser.add_argument('--preview',type=Path)
-    parser.add_argument('--figure',choices=['wordmark','course-map','training-loop'])
+    parser.add_argument('--figure',choices=['wordmark','classic-route','modern-route','training-loop'])
     args=parser.parse_args()
     fonts={key:Font(name) for key,name in [('serif','InstrumentSerif-Regular.ttf'),('sans','Manrope-500.ttf'),('zh','NotoSansSC-subset.ttf')]}
     for lang in COPY:
         for variant in COLORS:
             for compact in [False,True]:
-                figures={'wordmark':wordmark,'course-map':course_map,'training-loop':training_loop}
+                figures={'wordmark':wordmark,'classic-route':classic_route,'modern-route':modern_route,'training-loop':training_loop}
                 for name,draw in figures.items():
                     if not args.figure or args.figure==name: draw(lang,variant,compact,fonts,args.preview)

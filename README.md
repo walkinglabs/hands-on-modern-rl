@@ -31,6 +31,7 @@
   </p>
 
   <p>
+    <a href="#learning-paths">Learning Paths</a> ·
     <a href="#book-features">Book Features</a> ·
     <a href="#about-this-book">About This Book</a> ·
     <a href="#news">News</a> ·
@@ -41,6 +42,30 @@
     <a href="#contributing">Contributing</a>
   </p>
 </div>
+
+## Learning Paths
+
+<!-- README visual: classic-route -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/classic-route-compact-dark.svg" />
+    <source media="(max-width: 640px)" srcset="docs/public/readme/classic-route-compact.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/classic-route-dark.svg" />
+    <img src="docs/public/readme/classic-route.svg" alt="Classical and deep RL, Chapters 1–12: CartPole, MDPs, value learning, DQN, policy gradients, PPO, and continuous control. Policy gradients, advantages, and PPO provide the foundations for modern RL." width="100%" />
+  </picture>
+</p>
+<!-- /README visual -->
+
+<!-- README visual: modern-route -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/modern-route-compact-dark.svg" />
+    <source media="(max-width: 640px)" srcset="docs/public/readme/modern-route-compact.svg" />
+    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/modern-route-dark.svg" />
+    <img src="docs/public/readme/modern-route.svg" alt="Modern RL, Chapters 13–26: policy foundations, RLHF and DPO, GRPO and RLVR, reasoning, tool-using agents, and multimodal RL, with training systems, safety, evaluation, and self-play." width="100%" />
+  </picture>
+</p>
+<!-- /README visual -->
 
 > **📣 Announcement**
 >
@@ -207,17 +232,6 @@ The course is under active development. Planned milestones:
 ## Structure of the Book
 
 The book contains seven parts and twenty-six chapters. Parts I–III establish the common language and algorithmic foundations of reinforcement learning. Part IV brings those tools into LLM post-training. Parts V and VI study what changes when the action space expands to tools and multimodal environments. Part VII asks how to detect failures, build trustworthy evaluations, and move the research frontier forward. The appendices provide implementation, mathematics, and engineering references.
-
-<!-- README visual: course-map -->
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark) and (max-width: 640px)" srcset="docs/public/readme/course-map-compact-dark.svg" />
-    <source media="(max-width: 640px)" srcset="docs/public/readme/course-map-compact.svg" />
-    <source media="(prefers-color-scheme: dark)" srcset="docs/public/readme/course-map-dark.svg" />
-    <img src="docs/public/readme/course-map.svg" alt="Course map: seven parts and twenty-six chapters" width="880" />
-  </picture>
-</p>
-<!-- /README visual -->
 
 ### Prologue: From Trial and Error to Modern Agents
 
