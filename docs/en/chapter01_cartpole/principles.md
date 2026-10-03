@@ -134,7 +134,8 @@ After logging in, you can view the same curves in your project/experiment pages.
 If you want to understand what each curve means, continue to the next section: [Training Metrics](./metrics).
 
 ```python
-# SB3 version shown below; the pure PyTorch version logs the same metrics but expands the PPO loop in full.
+# SB3 version shown below. The pure PyTorch script expands the PPO loop in full and logs
+# rollout/ep_rew_mean over a rolling 100-episode window (SB3's default), with step=total_timesteps.
 import gymnasium as gym
 from stable_baselines3 import PPO
 from swanlab.integration.sb3 import SwanLabCallback

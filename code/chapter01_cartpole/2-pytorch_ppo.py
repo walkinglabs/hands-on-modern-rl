@@ -24,6 +24,7 @@ import csv
 import os
 import random
 import sys
+from collections import deque
 from pathlib import Path
 
 _CODE_ROOT = Path(__file__).resolve().parents[1]
@@ -377,6 +378,9 @@ def train():
     metric_rows = []
     ongoing_episode_reward = 0.0
     ongoing_episode_length = 0
+    # Match SB3's stats_window_size=100: rolling across rollouts, not reset each iteration.
+    ep_rew_buffer = deque(maxlen=100)
+    ep_len_buffer = deque(maxlen=100)
 
     for iteration in range(total_iterations):
         # Collect data
@@ -423,13 +427,20 @@ def train():
         else:
             explained_variance = 1 - np.var(return_values - rollout_values) / var_returns
 
-        mean_reward = np.mean(ep_rewards) if ep_rewards else 0
-        mean_ep_len = np.mean(ep_lengths) if ep_lengths else 0
+        mean_reward_rollout = float(np.mean(ep_rewards)) if ep_rewards else 0.0
+        mean_ep_len_rollout = float(np.mean(ep_lengths)) if ep_lengths else 0.0
+        ep_rew_buffer.extend(ep_rewards)
+        ep_len_buffer.extend(ep_lengths)
+        mean_reward = float(np.mean(ep_rew_buffer)) if ep_rew_buffer else 0.0
+        mean_ep_len = float(np.mean(ep_len_buffer)) if ep_len_buffer else 0.0
 
-        # Log to SwanLab (aligned with SB3's metrics)
+        # Log to SwanLab. ep_rew_mean / ep_len_mean use a rolling 100-episode window
+        # (SB3's default); *_rollout keep the per-rollout means for teaching.
         swanlab.log({
             "rollout/ep_rew_mean": mean_reward,
             "rollout/ep_len_mean": mean_ep_len,
+            "rollout/ep_rew_mean_rollout": mean_reward_rollout,
+            "rollout/ep_len_mean_rollout": mean_ep_len_rollout,
             "train/policy_gradient_loss": metrics["policy_loss"],
             "train/value_loss": metrics["value_loss"],
             "train/entropy_loss": -metrics["entropy"],
@@ -441,7 +452,7 @@ def train():
             "train/n_updates": (iteration + 1) * 10 * (steps_per_rollout // 64),
             "time/total_timesteps": total_timesteps,
             "time/iterations": iteration + 1,
-        }, step=iteration)
+        }, step=total_timesteps)
 
         metric_rows.append({
             "seed": args.seed,
@@ -450,6 +461,8 @@ def train():
             "completed_episodes": len(ep_rewards),
             "mean_episode_reward": mean_reward,
             "mean_episode_length": mean_ep_len,
+            "mean_episode_reward_rollout": mean_reward_rollout,
+            "mean_episode_length_rollout": mean_ep_len_rollout,
             "policy_loss": metrics["policy_loss"],
             "value_loss": metrics["value_loss"],
             "entropy": metrics["entropy"],

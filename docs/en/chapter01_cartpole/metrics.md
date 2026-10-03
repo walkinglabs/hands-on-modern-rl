@@ -386,7 +386,7 @@ These three steps form the main data flow behind `model.learn(total_timesteps=80
 
 Our [2-pytorch_ppo.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter01_cartpole/2-pytorch_ppo.py) implements this data flow in pure PyTorch: separate Actor-Critic networks, orthogonal initialization, value bootstrapping at truncation, GAE resets at episode boundaries, PPO clipping, and SwanLab metric logging. Scores depend on the random seed and runtime environment, so use the evaluation printed by the current run.
 
-> **Hands-on experiment**: You can run both scripts and inspect each curve in SwanLab. To compare algorithms, keep seeds, budgets, and evaluation protocols identical and run multiple seeds; do not draw a conclusion from two unrelated single runs.
+> **Hands-on experiment**: You can run both scripts and inspect each curve in SwanLab. Both log `rollout/ep_rew_mean` as a rolling mean over the last 100 completed episodes, against `total_timesteps` on the x-axis. To compare algorithms, keep seeds, budgets, and evaluation protocols identical and run multiple seeds; do not draw a conclusion from two unrelated single runs.
 >
 > ```bash
 > python 1-ppo_cartpole.py      # SB3 version
@@ -444,12 +444,12 @@ Iteration 40/40 | episodes:  4 | mean reward: 500.0 | KL: 0.0004 | clip:  0.0%
 
 CartPole gives `+1` for every step survived. An episode starts at `reset` and ends when the cart leaves the allowed region, the pole angle crosses its threshold, or the 500-step time limit is reached. Episode return and episode length are therefore numerically equal in this environment.
 
-The script collects 2,048 steps per training iteration, then averages the **complete episodes** that ended in that segment. An episode that crosses a rollout boundary must continue accumulating until it actually ends. Resetting its counter at every rollout boundary would make the logged return too small.
+The script collects 2,048 steps per training iteration. SwanLab's `rollout/ep_rew_mean` (and the CSV's `mean_episode_reward`) averages a rolling window of the last 100 completed episodes across rollouts, matching SB3. The per-rollout mean of episodes that finished in the current segment is still logged as `rollout/ep_rew_mean_rollout` / `mean_episode_reward_rollout`. An episode that crosses a rollout boundary must continue accumulating until it actually ends. Resetting its counter at every rollout boundary would make the logged return too small.
 
 ![Measured reward curve for seed 42](../../chapter01_cartpole/images/cartpole_reward_seed42.png)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>Figure 1-2: raw measured data for seed 42. Each point is the mean of complete episodes ending within that 2,048-step rollout. No smoothing or manual adjustment is applied. The dashed line marks the 500-step episode limit.</em>
+  <em>Figure 1-2: raw measured data for seed 42 from the published CSV. Each point is the per-rollout mean of complete episodes ending within that 2,048-step segment (the older column layout). No smoothing or manual adjustment is applied. The dashed line marks the 500-step episode limit.</em>
 </div>
 
 This curve supports three specific observations:
@@ -462,7 +462,7 @@ This remains a single-seed result. It shows that this implementation solved the 
 
 ## Training return versus independent evaluation
 
-Training uses stochastic action sampling to preserve exploration. Each plotted point also averages a different number of completed episodes: dozens early in training and usually four near the 500-step limit.
+Training uses stochastic action sampling to preserve exploration. The per-rollout mean (`ep_rew_mean_rollout`) averages a changing number of completed episodes: dozens early in training and usually four near the 500-step limit. The primary `ep_rew_mean` curve instead uses a fixed 100-episode rolling window.
 
 Independent evaluation selects the highest-probability action at every step. After training, the saved policy was evaluated for 20 episodes:
 
