@@ -7,11 +7,11 @@ outline:
 
 > **Section goal**: Train DQN directly from Pong frames, then use evaluation curves and checkpoint replays to determine whether the policy learned to return the ball and score.
 
-> **Learning path**: [5.1 From Q-Learning to DQN](./from-q-to-dqn) → [5.4 LunarLander Experiment](./lunar-lander) → **5.5 Visual Game Projects**
+> **Learning path**: [5.1 From Q-Learning to DQN](./from-q-to-dqn) → [5.3 LunarLander Experiment](./lunar-lander) → **5.5 Visual Game Projects**
 
 > **Code and resources**: [training script](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/dqn_atari_sb3.py) · [curve export](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/export_dqn_curves.py) · [replay rendering](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/render_atari.py) · [dependencies](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/requirements.txt)
 
-The previous sections have discussed DQN's three core components separately: the Q-network estimates action values, experience replay breaks sample correlation, and the target network stabilizes TD targets. Section 5.4 placed these components into a LunarLander experiment: observing real training, evaluation returns, replay animations, training curves, Q-values, and ablation studies. By this point, low-dimensional state tasks have served their pedagogical purpose: they let us see clearly how DQN learns action values between 8 numbers and 4 discrete actions.
+The previous sections have discussed DQN's three core components separately: the Q-network estimates action values, experience replay breaks sample correlation, and the target network stabilizes TD targets. Section 5.3 placed these components into a LunarLander experiment: observing real training, evaluation returns, replay animations, training curves, Q-values, and ablation studies. By this point, low-dimensional state tasks have served their pedagogical purpose: they let us see clearly how DQN learns action values between 8 numbers and 4 discrete actions.
 
 This section addresses the next question: when the state is no longer a clean set of numbers but raw game frames, what else does DQN need to change?
 
@@ -46,7 +46,7 @@ The first line constructs the target value: one transition provides a learning t
 
 ## 5.5.1 From Low-Dimensional States to Screen Pixels
 
-In LunarLander, the environment already provides a structured state: `x`, `y`, velocities, angle, angular velocity, and whether each leg contacts the ground. The Q-network takes 8 numbers and outputs 4 action values. Section 5.4 used this task to examine training curves, evaluation returns, and replay animations; the question there was whether DQN could stably learn action preferences in a low-dimensional control task.
+In LunarLander, the environment already provides a structured state: `x`, `y`, velocities, angle, angular velocity, and whether each leg contacts the ground. The Q-network takes 8 numbers and outputs 4 action values. Section 5.3 used this task to examine training curves, evaluation returns, and replay animations; the question there was whether DQN could stably learn action preferences in a low-dimensional control task.
 
 Visual games push the problem forward. In Pong, the agent initially does not know where the ball is, which direction it is moving, or how far the paddle is from the ball. It only sees screen pixels. This means the network must do two things simultaneously: learn a state representation from images, and learn an action-value function from that representation.
 

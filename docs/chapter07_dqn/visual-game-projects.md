@@ -7,7 +7,7 @@ outline:
 
 > **本节目标**：训练 DQN 直接读取 Pong 游戏画面，并用评估曲线与多个 checkpoint 回放判断策略是否真正学会接球和得分。
 
-> **学习路径**：[5.1 从 Q-Learning 到 DQN](./from-q-to-dqn) → [5.4 LunarLander 实验](./lunar-lander) → **5.5 视觉游戏项目**
+> **学习路径**：[5.1 从 Q-Learning 到 DQN](./from-q-to-dqn) → [5.3 LunarLander 实验](./lunar-lander) → **5.5 视觉游戏项目**
 
 > **本节代码与资源**：[训练脚本](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/dqn_atari_sb3.py) · [曲线导出](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/export_dqn_curves.py) · [回放渲染](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/render_atari.py) · [依赖](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/requirements.txt)
 
@@ -17,7 +17,7 @@ DQN 的更新规则没有改变。输入端需要增加图像预处理、帧堆�
 
 ## 5.5.1 从低维状态到屏幕像素
 
-在 LunarLander 中，环境已经替我们整理好了状态：`x`、`y`、速度、角度、角速度和两条支架是否接触地面。Q 网络接收 8 个数字，输出 4 个动作价值。前面的 4.3 已经用这个任务看过训练曲线、评估回报和回放动画；那里关心的是 DQN 能不能在低维控制任务中稳定学到动作偏好。
+在 LunarLander 中，环境已经替我们整理好了状态：`x`、`y`、速度、角度、角速度和两条支架是否接触地面。Q 网络接收 8 个数字，输出 4 个动作价值。前面的 5.3 已经用这个任务看过训练曲线、评估回报和回放动画；那里关心的是 DQN 能不能在低维控制任务中稳定学到动作偏好。
 
 视觉游戏把问题往前推了一步。Pong 中，智能体一开始并不知道“球在哪里”“球往哪里飞”“球拍离球有多远”。它看到的是屏幕像素。也就是说，网络不仅要估计动作价值，还要先从图像中抽取可用于决策的状态表示。
 

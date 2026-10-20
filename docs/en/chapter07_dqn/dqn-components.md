@@ -1,8 +1,8 @@
 ---
-title: 5.3 DQN Architecture
+title: 5.2 DQN Architecture and Implementation
 ---
 
-# 5.3 Distributional RL
+# 5.2 DQN Architecture and Implementation
 ## Section Guide
 
 **Core ideas**
@@ -569,7 +569,7 @@ Compared to the tabular Q-Learning method from Chapter 3, DQN makes only three c
 <details>
 <summary>Exercise: When the replay buffer is full, old experiences get evicted. What if a "critical experience" (like the first time reaching the goal) gets evicted?</summary>
 
-In standard experience replay, old experiences are evicted on a first-in-first-out (FIFO) basis. It is indeed possible for a critical experience to be evicted. However, since the replay buffer is not yet full early in training, critical experiences usually get sampled many times. Additionally, a DQN improvement -- Prioritized Experience Replay (PER) -- gives higher sampling probability to experiences with larger TD errors, so "surprising" experiences are less likely to be ignored. We will discuss this improvement in the final section of this chapter.
+In standard experience replay, old experiences are evicted on a first-in-first-out (FIFO) basis. It is indeed possible for a critical experience to be evicted. However, since the replay buffer is not yet full early in training, critical experiences usually get sampled many times. Additionally, a DQN improvement -- Prioritized Experience Replay (PER) -- gives higher sampling probability to experiences with larger TD errors, so "surprising" experiences are less likely to be ignored. We will discuss this improvement in [5.4 DQN Improvements](./dqn-family).
 
 </details>
 

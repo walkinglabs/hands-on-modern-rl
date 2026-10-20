@@ -784,16 +784,16 @@ const zhSidebar = {
               link: '/chapter07_dqn/from-q-to-dqn'
             },
             {
-              text: '5.2 DQN 改进方法',
-              link: '/chapter07_dqn/dqn-family'
-            },
-            {
-              text: '5.3 Distributional RL',
+              text: '5.2 DQN 的结构与实现',
               link: '/chapter07_dqn/dqn-components'
             },
             {
-              text: '5.4 动手：LunarLander 与 Atari',
+              text: '5.3 动手：LunarLander 实战',
               link: '/chapter07_dqn/lunar-lander'
+            },
+            {
+              text: '5.4 DQN 改进方法',
+              link: '/chapter07_dqn/dqn-family'
             },
             {
               text: '5.5 动手：视觉游戏项目',
@@ -1702,16 +1702,16 @@ const enSidebar = {
               link: '/en/chapter07_dqn/from-q-to-dqn'
             },
             {
-              text: '5.2 DQN Improvements',
-              link: '/en/chapter07_dqn/dqn-family'
-            },
-            {
-              text: '5.3 Distributional RL',
+              text: '5.2 DQN Architecture and Implementation',
               link: '/en/chapter07_dqn/dqn-components'
             },
             {
-              text: '5.4 Hands-on: LunarLander and Atari',
+              text: '5.3 Hands-on: LunarLander',
               link: '/en/chapter07_dqn/lunar-lander'
+            },
+            {
+              text: '5.4 DQN Improvements',
+              link: '/en/chapter07_dqn/dqn-family'
             },
             {
               text: '5.5 Hands-on: Visual Game Projects',

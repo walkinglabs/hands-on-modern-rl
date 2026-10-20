@@ -1,16 +1,16 @@
 ---
-title: '5.4 Hands-On: LunarLander'
+title: '5.3 Hands-on: LunarLander'
 ---
 
-# 5.4 Hands-on: LunarLander and Atari
+# 5.3 Hands-on: LunarLander
 
 > **Section goal**: Train DQN on `LunarLander-v3`, then use evaluation curves, replay GIFs, and failure analysis to determine what the policy learned.
 
-> **Learning path**: [5.1 From Q-Learning to DQN](./from-q-to-dqn) → [5.2 Improvements to DQN](./dqn-family) → **5.4 LunarLander and Atari**
+> **Learning path**: [5.1 From Q-Learning to DQN](./from-q-to-dqn) → [5.2 DQN Architecture and Implementation](./dqn-components) → **5.3 LunarLander**
 
 > **Code and resources**: [dqn_gym_sb3.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/dqn_gym_sb3.py) · [export_dqn_curves.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/export_dqn_curves.py) · [render_lunarlander_split.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/render_lunarlander_split.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/requirements.txt)
 
-## 5.4.1 Run the LunarLander Training
+## 5.3.1 Run the LunarLander Training
 
 The previous sections explained the three key components that make DQN work: represent $Q$ with a network, break sample correlation with replay, and stabilize bootstrapped targets with a target network.
 
@@ -21,7 +21,7 @@ LunarLander is intuitive: a lander falls from the sky, and the agent must use th
 ![LunarLander: land smoothly between the two flags](../../chapter07_dqn/images/lunarlander.gif)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>Figure 4.3-1: The goal in LunarLander is not to have the lander just touch the ground, but to control it to make smooth contact within the landing zone.</em>
+  <em>Figure 5.3-1: The goal in LunarLander is not to have the lander just touch the ground, but to control it to make smooth contact within the landing zone.</em>
 </div>
 
 This experiment can run on CPU. It is slower than CartPole because Box2D physics and replay-buffer updates add overhead, but 100k environment steps is still a reasonable classroom scale.
@@ -81,7 +81,7 @@ To export the local evaluation CSV into images used in the notes:
 python code/chapter04_dqn/export_dqn_curves.py --run lunarlander
 ```
 
-## 5.4.2 Read Curves First, Then Watch Replays
+## 5.3.2 Read Curves First, Then Watch Replays
 
 After training, **look at the curve first, then watch the replays**.
 
@@ -111,7 +111,7 @@ timesteps  mean_reward  std_reward
 ![DQN LunarLander evaluation curve (100k steps)](../../chapter07_dqn/images/dqn-lunarlander-tikz.svg)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>Figure 4.3-2: DQN evaluation curve for LunarLander-v3. The curve is not monotonic, but has clearly departed from the random-policy level.</em>
+  <em>Figure 5.3-2: DQN evaluation curve for LunarLander-v3. The curve is not monotonic, but has clearly departed from the random-policy level.</em>
 </div>
 
 The final evaluation reached `253.12`, showing that this training run learned an effective control policy. An independent post-training evaluation scored `175.30 +/- 64.79`, indicating the policy has not yet reached "consistently high scores every episode." When reading such curves, you should not only look at the last point, but also consider the mean, variance, and replays together.
@@ -131,7 +131,7 @@ python code/chapter04_dqn/render_lunarlander_split.py \
 
 This script loads the trained `final_model.zip`, runs the environment with the deterministic policy under the specified seeds, and saves each episode as an independent GIF. `--max-steps 1000` limits the environment to at most 1000 steps; `--max-frames 150` limits only the number of frames saved to the GIF. That is, the animation will be compressed to under 150 frames, but the step count in parentheses still records the actual environment steps of the original episode.
 
-## 5.4.3 Criteria for a Successful Landing
+## 5.3.3 Criteria for a Successful Landing
 
 Before interpreting replays, we must clarify what counts as success. LunarLander's goal is not simply "the lander eventually touches the ground," but landing smoothly between two flags. A high-quality landing typically satisfies several conditions simultaneously:
 
@@ -181,7 +181,7 @@ Worst episode: -460.8
 
 This baseline tells us: if DQN's evaluation return stays around `-200` for a long time, we cannot say it has learned to land. Only when the evaluation mean stably leaves the random level and the replays show behavior like decelerating, correcting attitude, and approaching the landing zone can we conclude the policy is forming.
 
-## 5.4.4 Typical Replays: High Score, Medium, and Failure
+## 5.3.4 Typical Replays: High Score, Medium, and Failure
 
 Now let us look at three replay segments. During testing, exploration should be disabled; the agent should act purely according to the highest Q-value action. Otherwise, the evaluation results are contaminated with random actions, making it impossible to judge how well the network itself has learned. The three GIFs below come from the same post-training model but use different reset seeds, showing the same policy's performance under different initial perturbations.
 
@@ -199,7 +199,7 @@ Now let us look at three replay segments. During testing, exploration should be 
 
 These three replays illustrate exactly why you cannot judge from a single episode. Episode 1 proves the policy can complete a high-quality landing; Episode 2 shows the same policy may still use a longer path and more corrections for a medium-quality landing; Episode 3 reminds us that training to 100k steps does not mean the policy is stable for all initial states. Reading curves and replays together, the conclusion should be: this DQN has clearly learned LunarLander's control patterns, but it is not yet a fully robust landing controller.
 
-## 5.4.5 States, Actions, and Training Fluctuations
+## 5.3.5 States, Actions, and Training Fluctuations
 
 LunarLander's state is an 8-dimensional continuous vector; actions are 4 discrete choices. The 8 state components can be understood as:
 
@@ -220,7 +220,7 @@ The curve is not monotonic for this reason. DQN's Q-value estimates affect actio
 
 This is exactly where experience replay and the target network truly matter. Experience replay ensures each update draws from different phases of descent and landing; the target network keeps next-state value estimates stable long enough that the Q-network can actually move toward them. Without these two mechanisms, a task like LunarLander with physical continuity can easily be pulled along by the most recent string of failure trajectories.
 
-## 5.4.6 Common Failures and a Debugging Order
+## 5.3.6 Common Failures and a Debugging Order
 
 If your run performs poorly, do not start by concluding "DQN cannot solve LunarLander". DQN is a reasonable baseline for this task, but it is sensitive to experiment setup. Diagnose in order.
 
@@ -243,7 +243,7 @@ Fourth, then tune hyperparameters. Common starting points:
 
 Also note the maximum step limit. Gymnasium's LunarLander episodes can be truncated at `1000` steps; if the lander never terminates normally, it is truncated. A timeout is not a success; it merely means the policy failed to complete the task decisively. The failure example in this section is not a timeout case: Episode 3 ends at 104 steps, and the problem is crashing or hard landing after deviating from the stable descent path, not hovering to the maximum duration.
 
-## 5.4.7 Why LunarLander Is the First Full DQN Lab
+## 5.3.7 Why LunarLander Is the First Full DQN Lab
 
 We can now explain why this chapter uses LunarLander as the first end-to-end DQN lab: CartPole saturates too easily, making DQN look easier than it is; MountainCar has sparse rewards and a minimal DQN baseline can get stuck in the failure zone for a long time; LunarLander sits in the middle: still low-dimensional vectors and discrete actions, but a richer reward structure and more realistic control dynamics.
 

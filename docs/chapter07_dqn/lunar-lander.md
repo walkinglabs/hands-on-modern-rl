@@ -1,12 +1,12 @@
-# 5.4 动手：LunarLander 与 Atari
+# 5.3 动手：LunarLander 实战
 
 > **本节目标**：从一个可复现实验开始，训练 DQN 控制 `LunarLander-v3`，并用评估曲线、回放 GIF 和失败诊断判断策略到底学到了什么。
 
-> **学习路径**：[5.1 从 Q-Learning 到 DQN](./from-q-to-dqn) → [5.2 DQN 改进方法](./dqn-family) → **5.4 LunarLander 与 Atari**
+> **学习路径**：[5.1 从 Q-Learning 到 DQN](./from-q-to-dqn) → [5.2 DQN 的结构与实现](./dqn-components) → **5.3 LunarLander 实战**
 
 > **本节代码与资源**：[dqn_gym_sb3.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/dqn_gym_sb3.py) · [export_dqn_curves.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/export_dqn_curves.py) · [render_lunarlander_split.py](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/render_lunarlander_split.py) · [requirements.txt](https://github.com/walkinglabs/hands-on-modern-rl/blob/main/code/chapter04_dqn/requirements.txt)
 
-## 5.4.1 运行 LunarLander 训练
+## 5.3.1 运行 LunarLander 训练
 
 前面几节已经解释了 DQN 的三个关键部件：用神经网络表示 Q 函数，用经验回放打散样本相关性，用目标网络稳定更新目标。现在先不继续增加概念，而是把这些部件放进一个完整任务里跑一遍。
 
@@ -15,7 +15,7 @@ LunarLander 的任务很直观：飞船从空中下降，智能体要通过主�
 ![LunarLander 中的登月舱需要在两个旗帜之间平稳着陆](./images/lunarlander.gif)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>图 4.3-1：LunarLander 的目标不是让飞船随便落到地面，而是控制它在落地区域内平稳接触地面。</em>
+  <em>图 5.3-1：LunarLander 的目标不是让飞船随便落到地面，而是控制它在落地区域内平稳接触地面。</em>
 </div>
 
 这个实验在普通 CPU 上即可运行。它比 CartPole 慢一些，因为 Box2D 物理环境和 DQN 回放池都会带来额外开销；但 100k 环境步通常仍然属于课堂练习可以接受的规模。若只是检查脚本是否能跑通，可以把 `--total-timesteps` 临时改小；若要观察较稳定的学习趋势，应以 100k 甚至更长训练为准。
@@ -71,7 +71,7 @@ python code/chapter04_dqn/export_dqn_curves.py --run lunarlander
 
 这一步对应的是“看训练结果”的代码；后面渲染 GIF 用的是另一个脚本。
 
-## 5.4.2 查看评估曲线与回放
+## 5.3.2 查看评估曲线与回放
 
 训练完成后，先看曲线，再看回放。这个顺序很重要：曲线回答“平均上有没有变好”，回放回答“策略具体做了什么”。如果只看单个 GIF，很容易把某一局偶然成功或偶然失败误读成算法整体能力。
 
@@ -94,7 +94,7 @@ timesteps  mean_reward  std_reward
 ![LunarLander-v3 DQN 真实训练曲线：100k 环境步内，评估均值从负回报逐步上升，并在最后一次评估达到 253.12](./images/dqn-lunarlander-tikz.svg)
 
 <div style="text-align: center; font-size: 0.9em; color: var(--vp-c-text-2); margin-top: -10px; margin-bottom: 20px;">
-  <em>图 4.3-2：LunarLander-v3 DQN 评估曲线。曲线不单调，但整体已经明显脱离随机策略水平。</em>
+  <em>图 5.3-2：LunarLander-v3 DQN 评估曲线。曲线不单调，但整体已经明显脱离随机策略水平。</em>
 </div>
 
 曲线中的最后一次评估达到 `253.12`，说明这次训练确实学到了有效控制策略。训练结束后的独立评估为 `175.30 ± 64.79`，也说明策略还没有达到“每局都稳定高分”的程度。读这类曲线时，不应只看最后一点，而要同时看均值、波动和回放。
@@ -114,7 +114,7 @@ python code/chapter04_dqn/render_lunarlander_split.py \
 
 这个脚本会加载训练好的 `final_model.zip`，在指定 seed 下用确定性策略运行环境，并把每局保存成独立 GIF。`--max-steps 1000` 限制环境最多运行 1000 步，`--max-frames 150` 只限制保存到 GIF 的帧数。也就是说，讲义中的动图会被压到 150 帧以内，但括号中的步数仍然记录原始 episode 的真实环境步数。
 
-## 5.4.3 成功降落的判定标准
+## 5.3.3 成功降落的判定标准
 
 在解释回放之前，必须先说清楚成功标准。LunarLander 的目标不是“飞船最后碰到地面”这么简单，而是在两个旗帜之间平稳着陆。一个高质量降落通常同时满足几件事：
 
@@ -164,7 +164,7 @@ print(f"最差一轮: {np.min(returns):.1f}")
 
 这个基线告诉我们：如果 DQN 的评估回报仍然长期停在 `-200` 附近，就不能说它学会了降落。只有当评估均值稳定离开随机水平，并在回放中表现出减速、修正姿态和接近落地区域的行为时，才说明策略正在形成。
 
-## 5.4.4 典型回放：高分、中等与失败
+## 5.3.4 典型回放：高分、中等与失败
 
 现在回到三段回放。测试时应关闭探索，只按 Q 值最大的动作行动；否则评估结果会混入随机动作，无法判断网络本身学得如何。下面三段 GIF 来自同一个训练后的模型，但使用了不同的 reset seed，因此展示的是同一策略在不同初始扰动下的表现。
 
@@ -182,7 +182,7 @@ print(f"最差一轮: {np.min(returns):.1f}")
 
 这三段回放正好说明为什么不能只看一局。Episode 1 证明策略已经能完成高质量降落；Episode 2 说明同一策略仍可能用较长路径和较多修正完成中等质量降落；Episode 3 则提醒我们，训练到 100k 步并不代表策略对所有初始状态都稳定。把曲线和回放放在一起读，结论应当是：这次 DQN 已经明显学到 LunarLander 的控制规律，但还不是一个完全稳健的降落控制器。
 
-## 5.4.5 状态、动作与训练波动
+## 5.3.5 状态、动作与训练波动
 
 LunarLander 的状态是 8 维连续向量，动作是 4 个离散选择。8 个状态分量可以理解为：
 
@@ -203,7 +203,7 @@ LunarLander 的状态是 8 维连续向量，动作是 4 个离散选择。8 个
 
 这也是经验回放和目标网络真正发挥作用的地方。经验回放让一次更新不只依赖最近几步轨迹，而是从不同降落阶段采样；目标网络让下一状态价值在一段时间内保持相对稳定，避免网络一边改预测、一边又用刚改过的自己制造目标。没有这两个机制，LunarLander 这种带有物理连续性的任务很容易被最近一段失败轨迹牵着走。
 
-## 5.4.6 常见失败与调参顺序
+## 5.3.6 常见失败与调参顺序
 
 如果训练结果不好，不要先怀疑 DQN “不能解决 LunarLander”。DQN 可以作为这个离散动作任务的有效基线，但它对实验设置很敏感。诊断时应按顺序检查。
 
@@ -226,7 +226,7 @@ LunarLander 的状态是 8 维连续向量，动作是 4 个离散选择。8 个
 
 还要注意最大步数。Gymnasium 的 LunarLander 一局通常最多运行到 `1000` 步；如果飞船一直没有正常终止，就会被截断。超时不是成功，最多只能说明策略没有及时完成任务。本节的失败样例不是这种情况：Episode 3 在 104 步结束，问题是偏离稳定下降路径后坠毁或硬着陆，而不是悬停到最大时长。
 
-## 5.4.7 为什么选择 LunarLander
+## 5.3.7 为什么选择 LunarLander
 
 现在可以解释为什么本章把 LunarLander 放在 DQN 的第一个完整实战里。CartPole 太快满分，容易让人误以为 DQN 只要套上神经网络就稳定；MountainCar 奖励过于稀疏，最小 DQN 又容易长时间卡在失败区间；LunarLander 正好处在中间：状态仍然是低维向量，动作仍然离散，但奖励已经包含位置、速度、姿态、接触和终止方式等多种信号。
 
