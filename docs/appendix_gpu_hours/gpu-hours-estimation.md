@@ -2,9 +2,9 @@
 
 > 工程实践中最常被问的问题是："训这个模型大概要多少 GPU 小时、烧多少钱？"——这不是算力公司销售的问题，而是研究方案可行性的核心约束。本附录把公开 tech report（DeepSeek、Qwen、Kimi、Llama、Claude）的预训练与后训练成本整理成可查表，再给出三档自训预算规划。
 >
-> 阅读建议：直接跳到所需小节查表。若需做预算规划，从 [G.4](#_g-4-自训模型预算规划) 起读。所有数字均来自公开 tech report 或基于 scaling law 的估算，**不包含未公开的内部数据**。
+> 阅读建议：直接跳到所需小节查表。若需做预算规划，从 [C.2.4](#budget-planning) 起读。所有数字均来自公开 tech report 或基于 scaling law 的估算，**不包含未公开的内部数据**。
 
-## G.1 不同模型规模的预训练成本
+## C.2.1 不同模型规模的预训练成本
 
 预训练成本由三个量决定：
 
@@ -47,7 +47,7 @@ $$\text{GPU 小时} \approx \frac{6 \cdot N \cdot D}{\text{硬件算力利用率
 上表只算**裸 GPU 租金**。真实训练还需叠加：(1) 存储/网络/电力约 +30%，(2) 多次失败实验与超参搜索约 ×3–5，(3) 数据采集与标注约 10%–20%。一个公开报告 "$15M" 的模型，公司实际投入往往在 $50M–$100M 量级。
 :::
 
-## G.2 SFT / RLHF / RLVR 各阶段成本
+## C.2.2 SFT / RLHF / RLVR 各阶段成本
 
 预训练只是成本的一部分。**后训练**（SFT、RLHF、RLVR）的 GPU 小时占比已从 2022 年的 5% 上升到 2026 年的 30% 以上——这是因为 RLHF/RLVR 的 rollout 远比一次 forward 慢。
 
@@ -100,7 +100,7 @@ DeepSeek-R1 报告其 RL 阶段（R1-Zero + R1）总开销约 128K H800 GPU 小�
 R1 的工程价值在于证明：**在已有强基础模型上，纯 RL（无 SFT warmup）即可触发长 CoT 推理**。这意味着只要有一个 V3 级 base model，几十 K GPU 小时即可得到一个 R1 级推理模型。这是开源社区在 2025 年涌现大量 R1 复现的根本原因。
 :::
 
-## G.3 公开训练数据参考
+## C.2.3 公开训练数据参考
 
 下面表格汇总截至 2026 年的**公开 tech report 训练数据**，作为预算规划的锚点。所有数字均来自厂商公开报告或其引用的 scaling law 估算。
 
@@ -166,7 +166,7 @@ Qwen3 tech report 描述了复杂的 4 阶段后训练（含冷启动、RL、合
 | Step-2       | 1T 参数 / 未公开 token 数          | StepFun                |
 | GLM-4.6      | 未公开训练细节                     | 智谱 2025              |
 
-## G.4 自训模型预算规划
+## C.2.4 自训模型预算规划 {#budget-planning}
 
 把上述公开数字换算成**自训模型的三档预算**。本节假设读者是研究者或小团队，目标是**复现并改进某个开源 baseline**，而非从零训练万亿参数模型。
 
@@ -252,7 +252,7 @@ Qwen3 tech report 描述了复杂的 4 阶段后训练（含冷启动、RL、合
 | 适合任务    | 学习、复现小实验 | 论文 baseline 复现 | 工业级训练         |
 | 风险等级    | 低（失败成本低） | 中（需多次迭代）   | 高（每次实验烧钱） |
 
-## G.5 成本优化清单
+## C.2.5 成本优化清单
 
 无论哪一档，以下技巧可显著降低成本：
 
@@ -292,6 +292,6 @@ Qwen3 tech report 描述了复杂的 4 阶段后训练（含冷启动、RL、合
 
 下一步建议：
 
-- **做入门实验**：参考 [附录 D 代码速查](../appendix_code_cheatsheet/sft-kl) 中的 GRPO/DPO 代码，在单卡上跑一遍。
+- **做入门实验**：参考 [附录 B 代码速查](../appendix_code_cheatsheet/sft-kl) 中的 GRPO/DPO 代码，在单卡上跑一遍。
 - **规划中型实验**：参考 [附录 A.1 训练跑偏](../appendix_industrial_training/training-debugging) 中的诊断顺序与排查清单。
-- **阅读前沿论文的成本披露**：在 [附录 F](../appendix_paper_reading/learning-resources) 的 tech report 中寻找训练细节。
+- **阅读前沿论文的成本披露**：在 [附录 C](../appendix_paper_reading/learning-resources) 的 tech report 中寻找训练细节。

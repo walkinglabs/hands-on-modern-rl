@@ -2,9 +2,9 @@
 
 > In engineering practice, the most frequently asked question is: "How many GPU hours and how much money will it cost to train this model?" — This is not a question from a compute company's sales team, but rather a core constraint in assessing the feasibility of a research plan. This appendix compiles the pre-training and fine-tuning costs from publicly available tech reports (DeepSeek, Qwen, Kimi, Llama, Claude) into a searchable table, and provides three tiers of self-training budget planning.
 
-> **Reading recommendation:** Jump directly to the table you need. For budget planning, start with [G.4](#g4-budget-planning-for-self-trained-models). All numbers come from public technical reports or scaling-law estimates and **do not include unpublished internal data**.
+> **Reading recommendation:** Jump directly to the table you need. For budget planning, start with [C.2.4](#budget-planning). All numbers come from public technical reports or scaling-law estimates and **do not include unpublished internal data**.
 
-## G.1 Pre-training Costs for Different Model Sizes
+## C.2.1 Pre-training Costs for Different Model Sizes
 
 Pre-training costs are determined by three factors:
 
@@ -47,7 +47,7 @@ Where $N$ is the number of model parameters, $D$ is the number of training token
 The table only accounts for the **bare GPU rental cost**. Real training also includes: (1) Storage/network/power costs, approximately +30%, (2) Multiple failed experiments and hyperparameter search, approximately ×3–5, (3) Data collection and annotation, approximately 10%–20%. A publicly reported "$15M" model, for example, often costs a company $50M–$100M in reality.
 :::
 
-## G.2 Cost of Each Stage: SFT / RLHF / RLVR
+## C.2.2 Cost of Each Stage: SFT / RLHF / RLVR
 
 Pretraining accounts for only part of the cost. The **post-training** (SFT, RLHF, RLVR) GPU hours have increased from 5% in 2022 to over 30% in 2026 — this is because the rollout in RLHF/RLVR is significantly slower than a single forward pass.
 
@@ -99,7 +99,7 @@ DeepSeek-R1 reports that its RL phase (R1-Zero + R1) has a total cost of approxi
 ::: tip Why is the R1 approach cost-effective?
 The engineering value of R1 lies in demonstrating: **Long CoT reasoning can be triggered purely through RL (without SFT warmup) on an already strong base model.** This means that with just a V3-level base model, a few tens of thousands of GPU hours are sufficient to obtain an R1-level reasoning model. This is the fundamental reason why the open-source community has seen a surge of R1 reproductions by 2025.
 
-## G.3 Reference of Public Training Data
+## C.2.3 Reference of Public Training Data
 
 The following table summarizes the **public tech report training data** up to 2026, serving as a reference point for budget planning. All figures are derived from the manufacturers' public reports or their referenced scaling law estimates.
 
@@ -165,7 +165,7 @@ The Qwen3 tech report describes a complex 4-stage post-training process (includi
 | Step-2       | 1T parameters / Not disclosed token count | StepFun                |
 | GLM-4.6      | Not disclosed training details            | Zhipu 2025             |
 
-## G.4 Budget Planning for Self-Trained Models
+## C.2.4 Budget Planning for Self-Trained Models {#budget-planning}
 
 Convert the above public figures into **three tiers of budgets for self-trained models**. This section assumes the reader is a researcher or a small team aiming to **reproduce and improve an open-source baseline**, rather than training a model with trillions of parameters from scratch.
 
@@ -184,7 +184,7 @@ Suitable for learning the full process of RLHF/RLVR/DPO, and can complete a full
 
 ::: tip Recommended Tasks for Beginners
 
-- Reproduce the training curves of R1-Zero on GSM8K using GRPO ([Chapter 18](../chapter18_grpo/grpo-practice-and-mechanism))
+- Reproduce the training curves of R1-Zero on GSM8K using GRPO ([Chapter 15](../chapter18_grpo/grpo-practice-and-mechanism))
 - Fine-tune on Anthropic HH-RLHF data using DPO ([Chapter 14](../chapter17_dpo/dpo-objective-derivation))
 - Run SAC/TD3 on CartPole / MuJoCo ([Chapter 9](../chapter11_continuous_control/ddpg))
   :::
@@ -259,7 +259,7 @@ This means that if your rollout engine is not optimized (e.g., not using vLLM/SG
 | Suitable Tasks  | Learning, small experiments | Paper baseline reproduction           | Industrial-scale training        |
 | Risk Level      | Low (low cost of failure)   | Medium (requires multiple iterations) | High (each experiment is costly) |
 
-## G.5 Cost Optimization Checklist
+## C.2.5 Cost Optimization Checklist
 
 Regardless of the scale, the following techniques can significantly reduce costs:
 
@@ -299,6 +299,6 @@ This appendix provides cost estimates to serve a core judgment: **whether your e
 
 Next Steps Recommendation:
 
-- **Do a Baseline Experiment**: Refer to the GRPO/DPO code in [Appendix D Code Quick Reference](../appendix_code_cheatsheet/sft-kl) and run it on a single GPU.
-- **Plan a Mid-Scale Experiment**: Refer to the distributed training and monitoring sections in [Appendix B Engineering Practices](../appendix_industrial_training/training-debugging).
+- **Do a Baseline Experiment**: Refer to the GRPO/DPO code in [Appendix B Code Quick Reference](../appendix_code_cheatsheet/sft-kl) and run it on a single GPU.
+- **Plan a Mid-Scale Experiment**: Refer to the diagnostic sequence and troubleshooting checklist in [Appendix A.1 Training Debugging Guide](../appendix_industrial_training/training-debugging).
 - **Read the Cost Disclosure in Frontier Papers**: Look for training details in the tech reports in [Appendix C](../appendix_paper_reading/learning-resources).

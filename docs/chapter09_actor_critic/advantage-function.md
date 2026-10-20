@@ -243,4 +243,4 @@ Actor（策略网络）           Critic（价值网络）
 
 Actor 和 Critic 共享输入（状态 $s$），但输出不同：Actor 输出动作概率分布，Critic 输出价值标量。它们通过优势函数 $A \approx \delta$ 协作：Critic 给出评估，Actor 根据评估调整行为。
 
-但 Critic 怎么训练？它怎么学会准确估计 $V(s)$？下一节将展开第 4 章速览过的 [DP、MC、TD](../chapter03_mdp/dp-mc-td) 三种方法在 Critic 训练中的具体应用。[Critic 训练方法](./critic-training)
+但 Critic 怎么训练？它怎么学会准确估计 $V(s)$？7.3 节将展开第 4 章速览过的 [DP、MC、TD](../chapter03_mdp/dp-mc-td) 三种方法在 Critic 训练中的具体应用。[Critic 训练方法](./critic-training)

@@ -174,7 +174,7 @@ HIRO 最关键的技术创新就是**目标转移**（goal transition）来解�
 
 ### 3.1 从 Dreamer 到 Genie
 
-我们在 [第 9 章 Dreamer V3](../chapter11_continuous_control/ddpg#_12-7-dreamer-v3-世界模型的新世代) 已经见过世界模型的一个成功代表：Dreamer 系列先用真实交互数据训一个 RSSM（Recurrent State Space Model）世界模型，然后在模型生成的"想象"轨迹里训练 actor-critic。Dreamer 证明了"在世界模型里训策略"是可行的，甚至在很多任务上比 model-free 方法样本效率更高。
+我们在 [第 9 章 Dreamer V3](../chapter11_continuous_control/search-world-models#dreamer-v3-与-世界模型的新世代) 已经见过世界模型的一个成功代表：Dreamer 系列先用真实交互数据训一个 RSSM（Recurrent State Space Model）世界模型，然后在模型生成的"想象"轨迹里训练 actor-critic。Dreamer 证明了"在世界模型里训策略"是可行的，甚至在很多任务上比 model-free 方法样本效率更高。
 
 但是 Dreamer 的世界模型还是**任务相关**的——你在哪个 Atari 游戏上训，它就只能学那个游戏的环境；换一个游戏就得重新训一个世界模型。
 

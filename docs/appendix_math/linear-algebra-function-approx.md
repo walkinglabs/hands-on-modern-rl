@@ -1,6 +1,6 @@
 # D.1.3 点积、范数与函数近似
 
-> **前置知识**：[E.1.1 向量与矩阵](./linear-algebra-basics)——需掌握向量和向量运算。[E.1.2 贝尔曼矩阵形式](./linear-algebra-bellman)——需掌握贝尔曼方程的矩阵形式 $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$。
+> **前置知识**：[D.1.1 向量与矩阵](./linear-algebra-basics)——需掌握向量和向量运算。[D.1.2 贝尔曼矩阵形式](./linear-algebra-bellman)——需掌握贝尔曼方程的矩阵形式 $\boldsymbol{v} = \boldsymbol{r} + \gamma P\boldsymbol{v}$。
 
 ---
 
@@ -299,4 +299,4 @@ RL 的梯度来自策略梯度和时序差分估计，其噪声水平天然高�
 
 这两个问题的共同本质是：需要分析"变化量"在不同方向上的行为差异。这便引出了特征值、谱半径和加权范数——下一篇的主题。
 
-> **下一篇**：[E.1.4 收敛性、特征值与信任域](./linear-algebra-advanced) —— 值迭代为何会稳定？参数更新如何考虑方向敏感度？
+> **下一篇**：[D.1.4 收敛性、特征值与信任域](./linear-algebra-advanced) —— 值迭代为何会稳定？参数更新如何考虑方向敏感度？

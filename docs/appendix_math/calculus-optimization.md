@@ -10,9 +10,9 @@
 
 | 文章                                                          | 数学节奏                              | 强化学习中的作用               |
 | ------------------------------------------------------------- | ------------------------------------- | ------------------------------ |
-| [E.3.1 导数、梯度与链式法则](./calculus-basics)               | 函数 → 导数 → 梯度 → 链式法则         | 理解参数如何影响目标函数       |
-| [E.3.2 从梯度到策略梯度](./calculus-policy-gradient)          | log 概率梯度 → 回报加权 → 优势函数    | 推导“好动作概率上升”的更新方向 |
-| [E.3.3 优化稳定性：PPO 与 Adam](./calculus-ppo)               | 概率比 → 裁剪 → 自适应步长            | 控制策略更新幅度和梯度噪声     |
-| [E.3.4 推导工具：log trick 与 Taylor](./calculus-derivations) | 对数导数技巧 → Taylor 展开 → 二阶直觉 | 看懂策略梯度和 PPO 的推导骨架  |
-| [E.3.5 完整优化公式](./calculus-advanced-formulas)            | PG、DQN、GAE、PPO、GRPO 完整表达      | 连接现代 RL 训练目标           |
-| [E.3.6 小结、公式与练习](./calculus-formulas-exercises)       | 公式汇总 → 误区 → 练习                | 回顾并检查理解                 |
+| [D.3.1 导数、梯度与链式法则](./calculus-basics)               | 函数 → 导数 → 梯度 → 链式法则         | 理解参数如何影响目标函数       |
+| [D.3.2 从梯度到策略梯度](./calculus-policy-gradient)          | log 概率梯度 → 回报加权 → 优势函数    | 推导“好动作概率上升”的更新方向 |
+| [D.3.3 优化稳定性：PPO 与 Adam](./calculus-ppo)               | 概率比 → 裁剪 → 自适应步长            | 控制策略更新幅度和梯度噪声     |
+| [D.3.4 推导工具：log trick 与 Taylor](./calculus-derivations) | 对数导数技巧 → Taylor 展开 → 二阶直觉 | 看懂策略梯度和 PPO 的推导骨架  |
+| [D.3.5 完整优化公式](./calculus-advanced-formulas)            | PG、DQN、GAE、PPO、GRPO 完整表达      | 连接现代 RL 训练目标           |
+| [D.3.6 小结、公式与练习](./calculus-formulas-exercises)       | 公式汇总 → 误区 → 练习                | 回顾并检查理解                 |

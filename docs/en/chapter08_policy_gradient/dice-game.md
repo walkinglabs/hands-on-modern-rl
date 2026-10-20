@@ -182,7 +182,7 @@ Yes, but it learns more slowly and oscillates more. The gap between A and B is s
 
 </details>
 
-This experiment shows that policy gradients can increase the probability of the better action. The next section, [the REINFORCE algorithm](./reinforce), explains why the update `-log_prob * reward` has this effect.
+This experiment shows that policy gradients can increase the probability of the better action. Section 6.1, [the REINFORCE algorithm](./reinforce), explains why the update `-log_prob * reward` has this effect.
 
 ## Section Summary
 

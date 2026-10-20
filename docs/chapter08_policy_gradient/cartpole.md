@@ -113,4 +113,4 @@ CartPole 实验说明 REINFORCE 能学，但学得不够稳。根源在于 $G_t$
 - CartPole 的奖励曲线能够上升，但不同随机种子之间仍会有明显波动。
 - 高方差来自用整段后续回报评价单个动作，下一节将用状态基线降低这种噪声。
 
-下一节解释这个基线背后的数学原理：[策略梯度的改进](./pg-improvements)。
+这个基线背后的数学原理见 [6.2 策略梯度改进方法](./pg-improvements)；下一节进入[价值基线控制 CartPole](./baseline-experiment)实验。

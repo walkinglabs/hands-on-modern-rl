@@ -599,7 +599,7 @@ experiments/rlhf-smollm/
 2. Reward Model 把偏好数据变成可优化的奖励。
 3. PPO 在 KL 约束下提高高奖励回答的概率。
 
-但真正可靠的 RLHF 不只是这三步训练，还包括 artifact 管理、数据质量闸门和评估闭环。下一节进入第一阶段：SFT 数据和偏好数据到底怎么构造，为什么它和模仿学习、逆强化学习有天然关系——[SFT：教模型按指令回答](./imitation-learning-pipeline)。
+但真正可靠的 RLHF 不只是这三步训练，还包括 artifact 管理、数据质量闸门和评估闭环。第一阶段的数据构造见 13.2 节：SFT 数据和偏好数据到底怎么构造，为什么它和模仿学习、逆强化学习有天然关系——[SFT：教模型按指令回答](./imitation-learning-pipeline)。
 
 ## 练习
 

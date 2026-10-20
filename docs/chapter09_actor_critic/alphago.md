@@ -2,7 +2,7 @@
 
 > **本节目标**：在 6×6 棋盘上实现策略网络、价值网络和蒙特卡洛树搜索，复现 AlphaGo 的核心决策流程。
 
-> **学习路径**：[6.2 REINFORCE 与价值基线](../chapter08_policy_gradient/reinforce) → [7.2 Actor-Critic](./actor-critic) → **7.5 AlphaGo 复现**
+> **学习路径**：[6.1 策略梯度与 REINFORCE](../chapter08_policy_gradient/reinforce) → [7.2 Actor-Critic](./actor-critic) → **7.5 AlphaGo 复现**
 
 > **本节代码与资源**：本页按棋盘环境、策略网络、价值网络、MCTS 和自我对弈的顺序给出完整代码。
 

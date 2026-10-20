@@ -1,6 +1,6 @@
 # D.4.3 PPO、RLHF 与 DPO 中的信息论
 
-> **前置知识**：[E.4.1 熵](./information-basics)和[E.4.2 交叉熵与 KL](./information-cross-entropy-kl)——你需要知道熵、交叉熵和 KL 散度的定义。
+> **前置知识**：[D.4.1 熵](./information-basics)和[D.4.2 交叉熵与 KL](./information-cross-entropy-kl)——你需要知道熵、交叉熵和 KL 散度的定义。
 
 ---
 
@@ -137,4 +137,4 @@ $$
 
 三个概念构成一条叙事线：KL 散度限制策略漂移 -> 交叉熵和 KL 的等式关系让训练损失有理论支撑 -> DPO 用对数概率比隐式实现 KL 正则，跳过了奖励模型。
 
-> **下一篇**：[E.4.4 互信息与表征学习](./information-mutual-info) —— 用信息论衡量表征质量。
+> **下一篇**：[D.4.4 互信息与表征学习](./information-mutual-info) —— 用信息论衡量表征质量。

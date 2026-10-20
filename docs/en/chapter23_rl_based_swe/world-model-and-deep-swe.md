@@ -248,7 +248,7 @@ def deep_swe_beam_search(issue, model, value_model, K=4):
     return beams[0]["state"]
 ```
 
-Beam Search allows DeepSWE to trade computational resources for higher accuracy during inference — consistent with [Chapter 19 on Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling).
+Beam Search allows DeepSWE to trade computational resources for higher accuracy during inference — consistent with [Chapter 16 on Test-time Compute Scaling](../chapter19_reasoning/test-time-scaling).
 
 ## 20.2.4 Comparison with Industrial Practices
 

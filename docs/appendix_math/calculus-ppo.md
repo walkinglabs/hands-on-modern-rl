@@ -1,6 +1,6 @@
 # D.3.3 PPO 裁剪、Adam 与更新稳定性
 
-> **前置知识**：[E.3.2 策略梯度与优势函数](./calculus-policy-gradient)——你需要知道策略梯度和优势函数。
+> **前置知识**：[D.3.2 策略梯度与优势函数](./calculus-policy-gradient)——你需要知道策略梯度和优势函数。
 
 ---
 
@@ -60,4 +60,4 @@ PPO 裁剪控制的是策略更新幅度，而 Adam 优化器控制的是梯度�
 
 两者配合使用：PPO 从宏观上限制策略不偏离太远，Adam 从微观上平滑梯度噪声。下一篇我们来看策略梯度和 PPO 背后的推导骨架。
 
-> **下一篇**：[E.3.4 推导工具：log trick 与 Taylor](./calculus-derivations) —— 看懂策略梯度和 PPO 的推导骨架。
+> **下一篇**：[D.3.4 推导工具：log trick 与 Taylor](./calculus-derivations) —— 看懂策略梯度和 PPO 的推导骨架。

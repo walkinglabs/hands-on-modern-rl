@@ -583,7 +583,7 @@ OpenRLHF 这类框架把几个系统问题打包解决：
 
 小参数实验用 TRL 跑通，大参数训练用 OpenRLHF 或 NeMo RL 扩展——算法结构不变，系统工程变重。
 
-PPO-RLHF 训练循环搭好之后，不能只看 reward 是否上涨。下一节我们会用 benchmark、偏好评估和人工抽检确认模型真的变好，也会专门检查 reward hacking 和能力回退——[评估与奖励黑客](./evaluation)。
+PPO-RLHF 训练循环搭好之后，不能只看 reward 是否上涨。13.6 节会用 benchmark、偏好评估和人工抽检确认模型真的变好，也会专门检查 reward hacking 和能力回退——[评估与奖励黑客](./evaluation)。
 
 ## 练习
 

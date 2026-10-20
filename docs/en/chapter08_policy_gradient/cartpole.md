@@ -115,7 +115,7 @@ The CartPole experiment shows that REINFORCE can learn, but it often learns unst
 
 The policy gradient theorem has a useful property: you can subtract a baseline $b(s_t)$ that does not depend on the action from the gradient estimator, changing the update signal from $G_t$ to $G_t - b(s_t)$. This does not change the expected direction of the gradient, but it can drastically reduce variance.
 
-The next section explains the math behind this baseline: [Improvements to Policy Gradients](./pg-improvements).
+The math behind this baseline is explained in [6.2 Policy Gradient Improvements](./pg-improvements); the next section runs the [value-baseline CartPole experiment](./baseline-experiment).
 
 ## Section Summary
 

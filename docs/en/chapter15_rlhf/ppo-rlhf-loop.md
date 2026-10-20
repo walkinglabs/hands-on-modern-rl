@@ -587,7 +587,7 @@ The PPO stage of classic RLHF can be compressed into one sentence: **let the Act
 
 Small-scale experiments run with TRL; large-scale training scales with OpenRLHF or NeMo RL -- the algorithmic structure does not change, but systems engineering gets heavier.
 
-Once the PPO-RLHF training loop is built, you cannot just check whether reward is rising. The next section uses benchmarks, preference evaluation, and manual review to confirm the model truly improved, and specifically checks for reward hacking and capability regression -- [Evaluation](./evaluation).
+Once the PPO-RLHF training loop is built, you cannot just check whether reward is rising. Section 13.6 uses benchmarks, preference evaluation, and manual review to confirm the model truly improved, and specifically checks for reward hacking and capability regression -- [Evaluation](./evaluation).
 
 ## Exercises
 

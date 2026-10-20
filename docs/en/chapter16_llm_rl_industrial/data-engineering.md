@@ -178,7 +178,7 @@ The scale of industrial RL is therefore measured by more than its GPU count. Dat
 - RL data returns to SFT, reward-model training, the task pool, and safety evaluation, forming a continuous iteration loop.
 - Large-scale RL data engineering aims to keep data executable, verifiable, traceable, and reusable across training rounds rather than simply storing more of it.
 
-This completes the path from single-machine algorithms through preference optimization, industrial feedback loops, stability, distributed training, and data engineering. The next chapter turns to a more specific direction with major recent impact. [Chapter 19, The Emergence of Reasoning and o1-Style Training](../chapter19_reasoning/emergence-and-o1), begins with capability emergence, pure-RL reasoning training, test-time scaling, and hybrid thinking.
+This completes the path from single-machine algorithms through preference optimization, industrial feedback loops, stability, distributed training, and data engineering. For capability emergence, pure-RL reasoning training, test-time scaling, and hybrid thinking, revisit [Chapter 16](../chapter19_reasoning/emergence-and-o1). The next chapter, [Chapter 19: Agentic RL](../chapter22_agentic/overview), studies training with tool calls and environment interaction.
 
 ## Further Reading
 

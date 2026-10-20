@@ -1,8 +1,8 @@
 ---
-title: '24.4 Model-Based RL'
+title: 'Supplementary Reading: Model-Based RL'
 ---
 
-# 24.4 Model-Based RL
+# Supplementary Reading: Model-Based RL
 
 <a id="article-start"></a>
 

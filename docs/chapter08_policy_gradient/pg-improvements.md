@@ -1,6 +1,6 @@
 # 6.2 策略梯度改进方法
 
-上一节在 CartPole 上跑了一遍 REINFORCE，看到了高方差的直接后果：训练曲线抖动剧烈，策略被运气牵着走。本节回答一个关键问题：**能不能在不改变梯度方向的前提下，降低 $G_t$ 的方差？**
+6.4 节的 CartPole 实验会展示 REINFORCE 高方差的直接后果：训练曲线抖动剧烈，策略被运气牵着走。本节回答一个关键问题：**能不能在不改变梯度方向的前提下，降低 $G_t$ 的方差？**
 
 答案是肯定的。策略梯度定理有一个重要性质：梯度估计中可以减去一个不依赖于动作的基线。
 
@@ -100,7 +100,7 @@ policy_loss = -(log_probs * advantages).mean()
 
 这就是 **REINFORCE with Value Baseline**。它仍然是 REINFORCE（必须等 episode 结束，用蒙特卡洛回报更新），但更新信号从 $G_t$ 变成了 $\hat{A}_t$。
 
-下一节在 CartPole 上对比 vanilla REINFORCE 和 REINFORCE + Value Baseline：[动手：CartPole 对比实验](./cartpole-baseline)。
+6.6 节在 CartPole 上对比 vanilla REINFORCE 和 REINFORCE + Value Baseline：[动手：CartPole 对比实验](./cartpole-baseline)。
 
 ---
 

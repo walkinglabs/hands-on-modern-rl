@@ -2527,6 +2527,13 @@ function collectEnglishRoutes(directory, relativeDirectory = '') {
 }
 
 const englishRoutes = collectEnglishRoutes(path.join(docsRoot, 'en'))
+const chineseRoutes = englishRoutes
+  .map((route) => route.replace(/^\/en(?=\/|$)/, '') || '/')
+  .filter(
+    (route) =>
+      fs.existsSync(path.join(docsRoot, `${route}.md`)) ||
+      fs.existsSync(path.join(docsRoot, route, 'index.md'))
+  )
 
 const logger = createLogger()
 const originalWarn = logger.warn
@@ -2629,6 +2636,7 @@ export default defineConfig({
       description: '现代强化学习实战——从代码到原理',
       themeConfig: {
         englishRoutes,
+        chineseRoutes,
         nav: zhNav,
         sidebar: zhSidebar,
         editLink: {
@@ -2675,6 +2683,7 @@ export default defineConfig({
         'Modern Reinforcement Learning in Practice — From Code to Theory',
       themeConfig: {
         englishRoutes,
+        chineseRoutes,
         nav: enNav,
         sidebar: enSidebar,
         editLink: {
@@ -2715,6 +2724,8 @@ export default defineConfig({
     }
   },
   themeConfig: {
+    // The custom language toggle resolves matching pages; stock menus use home.
+    i18nRouting: false,
     logo: '/readme/logo-symbol.svg',
     siteTitle: 'Hands on Modern RL',
     nav: zhNav,

@@ -3,7 +3,7 @@ title: 6.2 Variance Reduction and Baselines
 ---
 
 # 6.2 Policy Gradient Improvements
-In the previous section, we ran REINFORCE on CartPole and saw the most direct symptom of high variance: the learning curve shakes violently, and the policy gets dragged around by luck. This section answers a key question:
+The CartPole experiment in Section 6.4 will show the most direct symptom of high variance in REINFORCE: the learning curve shakes violently, and the policy gets dragged around by luck. This section answers a key question:
 
 **Can we reduce the variance of $G_t$ without changing the direction of the gradient in expectation?**
 
@@ -105,7 +105,7 @@ The value network is trained so that $V(s_t)$ is as close to $G_t$ as possible. 
 
 This is **REINFORCE with a Value Baseline**. It is still REINFORCE (you still have to wait until the episode ends and use Monte Carlo returns), but the update signal changes from $G_t$ to $\hat{A}_t$.
 
-In the next section, we will compare vanilla REINFORCE and REINFORCE + Value Baseline on CartPole: [Hands-on: CartPole Comparison Experiment](./cartpole-baseline).
+In Section 6.6, we will compare vanilla REINFORCE and REINFORCE + Value Baseline on CartPole: [Hands-on: CartPole Comparison Experiment](./cartpole-baseline).
 
 ---
 

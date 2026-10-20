@@ -321,9 +321,9 @@ From a teaching perspective, BipedalWalker has several important advantages:
 - **A richer state space**. The 24-dimensional state includes 10 lidar distance readings, a simplified analogue of real robot sensors (lidar, tactile sensors). The agent must infer terrain changes from sensor signals rather than reading a direct "position" coordinate.
 - **More complex learning dynamics**. The task requires discovering a full gait cycle involving multi-joint coordination, center-of-mass transfer, and terrain adaptation. The policy is not simply switching among a few actions; it is shaping stable motion patterns in a continuous space.
 
-From CartPole (Chapter 5) to BipedalWalker, the experimental difficulty and realism increase substantially. But PPO's core mechanism does not change: clipping constrains update size, multiple epochs reuse the same rollout data, and Actor-Critic jointly optimizes policy and value. The increase in complexity comes from the environment and task, not from the algorithm itself.
+From CartPole (Chapter 1) to BipedalWalker, the experimental difficulty and realism increase substantially. But PPO's core mechanism does not change: clipping constrains update size, multiple epochs reuse the same rollout data, and Actor-Critic jointly optimizes policy and value. The increase in complexity comes from the environment and task, not from the algorithm itself.
 
-In the next section, we will unpack the mathematical derivation behind PPO: [PPO Math Derivation](./ppo-math).
+In the next section, we will unpack the mechanisms behind PPO: [8.2 Trust Regions and PPO-Clip](./trust-region-clipping).
 
 ## Section Summary
 

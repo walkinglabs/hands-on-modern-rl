@@ -15,7 +15,7 @@ outline: [2, 3]
 - **Q-Learning**: take one step, compute a TD target, update one entry.
 - **Off-policy and exploration**: allow yourself to explore randomly while learning, in your head, the most rational way to act.
 
-In the previous section, we introduced three value-estimation methods: DP, MC, and TD. Their shared goal is to estimate a **state-value table** $V(s)$: one number per state, representing how much return we can expect, on average, if we continue from here.
+In the previous section, we introduced state values and the Bellman expectation equation, using a **state-value table** $V(s)$: one number per state, representing how much return we can expect, on average, if we continue from here.
 
 This table is already a big step beyond staring at immediate rewards. It no longer asks “how many points do I get this step?”, but “starting from this situation, how many points is it worth in the long run?”. However, for **control**, we are still missing the last step: an agent must ultimately choose actions. Knowing only how valuable a state is overall does not necessarily tell us whether, in that state, we should go left, go right, jump, or stop.
 
@@ -397,7 +397,7 @@ In 4×4 GridWorld, we have only 16 states × 4 actions = 64 $Q$ values. But in r
 
 So the core idea of Q-Learning has not become obsolete: iteratively approximate the solution to the Bellman optimality equation using TD targets. What becomes infeasible is “store a separate row for every state-action pair”. Chapter 4 will tackle this exact issue: if a table cannot fit, can we use a neural network to **approximate** the entire $Q$ function? The answer is Deep Q-Networks (DQN).
 
-Previous section: [DP, MC, and TD](./dp-mc-td) | Next section: [Policy, Value, and Return](./policy-value)
+Previous section: [3.1 State Values and Bellman Expectation](./value-bellman) | Next section: [3.3 Hands-on: Value Function Experiments](./value-experiment)
 
 **Summary**
 

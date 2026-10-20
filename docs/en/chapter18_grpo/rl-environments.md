@@ -492,7 +492,7 @@ Asynchronous training introduces **off-policy bias**. If the staleness $N$ is to
 - For extremely long tasks (> 1 hour): Asynchronous is the only feasible option.
   :::
 
-More detailed engineering details are provided in [Appendix B.1: RL Training System](../appendix_industrial_training/rl-infrastructure).
+More detailed engineering details are provided in [Appendix A.2: RL Training System](../appendix_industrial_training/rl-infrastructure).
 
 ## Evaluation Benchmarks
 

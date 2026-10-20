@@ -600,7 +600,7 @@ The standard RLHF pipeline can be compressed into three sentences:
 2. The Reward Model converts preference data into an optimizable reward signal.
 3. PPO increases the probability of high-reward responses under a KL constraint.
 
-But reliable RLHF is not just these three training steps. It also includes artifact management, data quality gates, and an evaluation closed loop. The next section enters the first stage: how SFT data and preference data are constructed and why they have a natural relationship to imitation learning and inverse reinforcement learning -- [SFT: Teaching the Model to Answer Instructions](./imitation-learning-pipeline).
+But reliable RLHF is not just these three training steps. It also includes artifact management, data quality gates, and an evaluation closed loop. Data construction for the first stage is covered in Section 13.2: how SFT data and preference data are constructed and why they have a natural relationship to imitation learning and inverse reinforcement learning -- [SFT: Teaching the Model to Answer Instructions](./imitation-learning-pipeline).
 
 ## Exercises
 

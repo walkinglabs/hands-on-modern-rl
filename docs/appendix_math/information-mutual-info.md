@@ -1,6 +1,6 @@
 # D.4.4 互信息与表征学习
 
-> **前置知识**：[E.4.1 熵](./information-basics)和[E.4.2 KL 散度](./information-cross-entropy-kl)——你需要知道熵和 KL 散度的定义。
+> **前置知识**：[D.4.1 熵](./information-basics)和[D.4.2 KL 散度](./information-cross-entropy-kl)——你需要知道熵和 KL 散度的定义。
 
 ---
 
@@ -63,6 +63,6 @@ $$
 | 互信息           | 知道一个变量后另一个的不确定性减少多少 | $I(X;Y)=H(X)-H(X\mid Y)$        | 评估表征是否保留任务相关信息 |
 | 互信息的 KL 定义 | 用 KL 散度表达互信息                   | $I(X;Y)=D_{KL}(P_{XY}\|P_XP_Y)$ | 独立时互信息为 0             |
 
-互信息把前面几篇的熵和 KL 散度串联起来：用 KL 衡量联合分布与独立假设的差异，用熵的减少量衡量信息的增益。下一篇汇总 E.4 模块的所有完整公式。
+互信息把前面几篇的熵和 KL 散度串联起来：用 KL 衡量联合分布与独立假设的差异，用熵的减少量衡量信息的增益。下一篇汇总 D.4 模块的所有完整公式。
 
-> **下一篇**：[E.4.5 完整信息论公式](./information-advanced-formulas) —— 汇总 KL、RLHF、DPO、互信息完整表达。
+> **下一篇**：[D.4.5 完整信息论公式](./information-advanced-formulas) —— 汇总 KL、RLHF、DPO、互信息完整表达。

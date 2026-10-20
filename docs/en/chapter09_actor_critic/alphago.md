@@ -6,7 +6,7 @@ title: '7.5 Hands-On: Reproducing AlphaGo'
 
 > **Section goal**: Implement a policy network, value network, and Monte Carlo tree search on a 6×6 board to reproduce the central decision flow of AlphaGo.
 
-> **Learning path**: [6.2 REINFORCE and Value Baselines](../chapter08_policy_gradient/reinforce) → [7.2 Actor-Critic](./actor-critic) → **7.5 Reproducing AlphaGo**
+> **Learning path**: [6.1 Policy Gradient and REINFORCE](../chapter08_policy_gradient/reinforce) → [7.2 Actor-Critic](./actor-critic) → **7.5 Reproducing AlphaGo**
 
 > **Code and resources**: This page presents the board environment, policy network, value network, MCTS, and self-play code in execution order.
 

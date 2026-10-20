@@ -801,7 +801,7 @@ This section discussed three methods of value estimation.
 
 In the next section we move from state value $V(s)$ to action value $Q(s,a)$. $V(s)$ only tells you how good a state is overall, whereas $Q(s,a)$ directly compares "how good it is to take action $a$ first in state $s$", enabling the agent to make action choices.
 
-Next section: [Action-Value Function](./value-q)
+Next section: [4.2 Policy Sampling and Data Sources](./algorithm-taxonomy)
 
 ## References
 

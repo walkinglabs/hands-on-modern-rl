@@ -1,6 +1,6 @@
 # D.4.2 交叉熵与 KL 散度
 
-> **前置知识**：[E.4.1 自信息、熵与探索](./information-basics)——你需要知道熵的定义。
+> **前置知识**：[D.4.1 自信息、熵与探索](./information-basics)——你需要知道熵的定义。
 
 ---
 
@@ -116,4 +116,4 @@ $$
 
 交叉熵和 KL 散度的关系——$D_{KL}(P\|Q)=H(P,Q)-H(P)$——是下一篇理解 PPO、RLHF 和 DPO 的关键桥梁。
 
-> **下一篇**：[E.4.3 PPO、RLHF 与 DPO 中的信息论](./information-rlhf-dpo) —— 把交叉熵和 KL 用到对齐训练中。
+> **下一篇**：[D.4.3 PPO、RLHF 与 DPO 中的信息论](./information-rlhf-dpo) —— 把交叉熵和 KL 用到对齐训练中。

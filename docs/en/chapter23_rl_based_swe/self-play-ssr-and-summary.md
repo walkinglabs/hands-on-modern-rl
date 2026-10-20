@@ -316,5 +316,5 @@ In this chapter, we have reviewed the full picture of RL-based Software Engineer
 **Next Chapters**:
 
 - [Chapter 17: PRM and Search](../chapter20_prm_search/outcome-vs-process) — Step-level reward in SWE-RL
-- [Chapter 30: Reward Hacking](../chapter30_alignment_failures/classical-failures) — Reward hacking in SWE tasks (e.g., "delete tests to increase reward")
+- [Chapter 25: Reward Hacking](../chapter30_alignment_failures/classical-failures) — Reward hacking in SWE tasks (e.g., "delete tests to increase reward")
 - [Section 19.10: Agentic RL Training Systems](../chapter22_agentic/build-agentic-training-system) — Engineering implementation of SWE-RL

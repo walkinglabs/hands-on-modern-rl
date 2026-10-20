@@ -172,14 +172,14 @@ Since $\pi_{\text{ref}}$ is fixed, changes in this term come entirely from $\ln 
 
 ## Chapter Summary
 
-In Chapter 2, we accomplished:
+In Chapter 14, we accomplished:
 
 1. **Ran modern preference tuning**: applied DPO to a 0.5B instruct model and reduced sycophancy within minutes of training.
 2. **Placed DPO inside the post-training pipeline**: clarified the sequence Pre-training → SFT → Alignment, and where DPO fits.
 3. **Derived the DPO loss**: saw how preference optimization can be expressed as a direct, sigmoid-based contrastive loss with a reference model.
 4. **Learned how to read metrics**: understood Training Loss, Reward Margin, Reward Accuracy, and Chosen/Rejected rewards.
 
-Whether it is CartPole in Chapter 1 or language alignment in this chapter, the central theme is the same: learn to make better decisions. Next, we move into the theory part and systematically build the mathematical foundations of reinforcement learning.
+Whether it is CartPole in Chapter 1 or language alignment in this chapter, the central theme is the same: learn to make better decisions. The next section, [14.3 DPO Improvements](./dpo-theory-and-family), continues with the theory and variants of preference optimization.
 
 ## References
 

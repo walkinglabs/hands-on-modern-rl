@@ -179,7 +179,7 @@ class MADDPG:
 MADDPG 是一个里程碑式的工作，但它也有明显的弱点：
 
 1. **维度灾难**：集中式 Critic 的输入维度是 $n \times (\text{obs\_dim} + \text{action\_dim})$，随智能体数量线性增长——如果有几十个智能体，Critic 输入会非常大，很难训
-2. **继承了 DDPG 的稳定性问题**：回忆 [第 9 章](../chapter11_continuous_control/ddpg#_12-3-td3-ddpg-的稳定性补丁) 讲过的 DDPG 的问题——过估计、超参数敏感、训练容易崩溃——这些问题在多智能体设定下会被进一步放大
+2. **继承了 DDPG 的稳定性问题**：回忆 [第 9 章](../chapter11_continuous_control/td3-sac#td3-给-ddpg-打三个稳定性补丁) 讲过的 DDPG 的问题——过估计、超参数敏感、训练容易崩溃——这些问题在多智能体设定下会被进一步放大
 
 那有没有办法用更稳定的 on-policy 算法（比如 PPO）来做 CTDE？这就是 MAPPO 要解决的问题。
 

@@ -283,4 +283,4 @@ The Critic provides a baseline in this process. It estimates the value of the cu
 
 At the same time, this experiment exposes the limitations of vanilla Actor-Critic: it explains the basic mechanics of continuous control, but its sample efficiency and stability are not ideal. The next chapter's PPO adds a mechanism — capping how much the policy can change per update — on top of the same Actor-Critic framework. That mechanism is exactly what makes complex continuous-control tasks reliably trainable.
 
-In the next section, we take the same ideas to a more complex robot task: [Hands-on: BipedalWalker Locomotion](./bipedalwalker).
+In Section 7.6, we take the same ideas to a more complex robot task: [Hands-on: BipedalWalker Locomotion](./bipedalwalker).

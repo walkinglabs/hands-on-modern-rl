@@ -166,7 +166,8 @@ const alternateLanguage = computed(() =>
 const alternateLanguageLink = computed(() => {
   if (isEnglishRoute.value) {
     const zhPath = mobileRoutePath.value.replace(/^\/en(?=\/|$)/, '') || '/'
-    return withBase(zhPath)
+    const chineseRoutes = theme.value.chineseRoutes || []
+    return withBase(chineseRoutes.includes(zhPath) ? zhPath : '/')
   }
 
   const enPath =

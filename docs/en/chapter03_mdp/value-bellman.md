@@ -1149,7 +1149,7 @@ $$
 
 True remaining discomfort was never required. Step 1 used $V(\text{Bus stop})=0$ because that was the table entry. Step 3 used $V(\text{Bus stop})=-2$ because the table had been written once. Each $\delta$ is the gap between the old guess for the current place and “this step’s reward plus the current guess for the next place.”
 
-DP, MC, and TD handle different environment conditions and information assumptions. The next section, [Classic Methods at a Glance: DP, MC, and TD](./dp-mc-td), compares them specifically.
+DP, MC, and TD handle different environment conditions and information assumptions. Section 4.1, [Classic Methods at a Glance: DP, MC, and TD](./dp-mc-td), compares them specifically.
 
 ## Section Summary
 

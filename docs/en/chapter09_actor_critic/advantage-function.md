@@ -249,4 +249,4 @@ Actor (policy network)             Critic (value network)
 
 The Actor and the Critic share the same input (the state $s$) but produce different outputs: the Actor outputs a probability distribution over actions, while the Critic outputs a scalar value estimate. They cooperate through the advantage estimate $A \approx \delta$: the Critic provides an evaluation signal, and the Actor adjusts its behavior based on that evaluation.
 
-But how is the Critic trained? How does it learn to estimate $V(s)$ accurately? The next section expands on the three methods -- [DP, MC, and TD](../chapter03_mdp/dp-mc-td) -- briefly surveyed in Chapter 4, showing how they are applied concretely in Critic training. See: [Critic training methods](./critic-training)
+But how is the Critic trained? How does it learn to estimate $V(s)$ accurately? Section 7.3 expands on the three methods -- [DP, MC, and TD](../chapter03_mdp/dp-mc-td) -- briefly surveyed in Chapter 4, showing how they are applied concretely in Critic training. See: [Critic training methods](./critic-training)
