@@ -1,5 +1,7 @@
 # 19.10 动手：从零实现 Agentic RL 训练系统
 
+<ChapterNotebookLink chapter="agentic" />
+
 > **本节目标**：用不超过 500 行的代码实现一个 Agentic RL 训练系统，让语言模型能够编写代码、执行、读取错误并继续修改。
 
 > **学习路径**：[19.1 Agentic RL 基础](./overview) → [19.8 DeepCoder Agent](./rllm-deepcoder-lab) → [19.9 金融分析 Agent](./rllm-finqa-lab) → **19.10 从零实现训练系统**

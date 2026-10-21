@@ -35,8 +35,8 @@ def main():
                 record = evidence["notebooks"][lab["id"]]
                 assert record["status"] == "passed"
                 assert record["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
-    assert len(paths) == 44
-    print("Verified 22 Chinese and 22 English Notebooks, language coverage and 10 English CPU runs")
+    assert len(paths) == 2 * len(catalog["labs"])
+    print(f"Verified {len(paths)} language files and {len(LABS)} English CPU runs")
 
 
 if __name__ == "__main__":

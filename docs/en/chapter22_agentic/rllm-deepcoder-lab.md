@@ -4,6 +4,8 @@ title: '19.8 Hands-On: rLLM DeepCoder'
 
 # 19.8 Hands-on: Training a DeepCoder Agent with rLLM
 
+<ChapterNotebookLink chapter="agentic" locale="en" />
+
 > **Section goal**: Use rLLM to run data preparation, sandbox verification, GRPO training, and LiveCodeBench evaluation for a coding agent, then compare Pass@1 before and after training.
 
 > **Learning path**: [19.1 Agentic RL Foundations](./overview) → [19.3 Credit Assignment](./credit-assignment) → [19.6 Code Interpreter RL](./industrial-practice) → **19.8 DeepCoder Agent**

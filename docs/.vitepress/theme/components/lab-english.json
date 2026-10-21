@@ -130,5 +130,29 @@
     "desc": "Train only on fixed data and compare naive Q maximization, conservative penalties and behavior constraints.",
     "result": "Coverage plots, out-of-distribution Q estimates and three-seed policy-return comparisons.",
     "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. The linked Notebook includes English explanations, exercises and references. Colab and ModelScope execution has not been verified."
+  },
+  "agentic-tools": {
+    "name": "Multi-turn tools and credit assignment",
+    "desc": "Continue decisions after tool responses and inspect credit from terminal rewards.",
+    "result": "Actual lookup/calculation, action-loss masking, two-seed evaluation and complete traces.",
+    "next": "Executed locally in a fresh CPU kernel. This finite-action teaching policy uses supplied interface constraints; pretrained language-model training is a separate recipe. Colab and ModelScope hosted execution still need separate verification."
+  },
+  "agentic-code": {
+    "name": "Repair code and verify it with tests",
+    "desc": "Select a trusted patch, execute Python tests and check separate test inputs.",
+    "result": "Public/private tests, patch traces, actual subprocess invocation counts and policy parameters.",
+    "next": "Executed locally in a fresh CPU kernel. This finite-action teaching policy uses supplied interface constraints; pretrained language-model training is a separate recipe. Colab and ModelScope hosted execution still need separate verification."
+  },
+  "agentic-finqa": {
+    "name": "Query, calculate and answer with tools",
+    "desc": "Use SQL and a calculator over synthetic company data in a multi-turn workflow.",
+    "result": "Actual SQLite queries, calculator traces, held-out companies and tool-call costs.",
+    "next": "Executed locally in a fresh CPU kernel. This finite-action teaching policy uses supplied interface constraints; pretrained language-model training is a separate recipe. Colab and ModelScope hosted execution still need separate verification."
+  },
+  "agentic-research": {
+    "name": "Retrieve evidence and verify citations",
+    "desc": "Learn candidate query/evidence selection over a fixed teaching corpus; score answers and citations separately.",
+    "result": "Three-seed training, matched evaluation and evidence traces. Greedy baseline is already perfect; sampled results improve.",
+    "next": "Executed locally in a fresh CPU kernel. This finite-action teaching policy uses supplied interface constraints; pretrained language-model training is a separate recipe. Colab and ModelScope hosted execution still need separate verification."
   }
 }

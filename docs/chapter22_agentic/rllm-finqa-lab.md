@@ -1,5 +1,7 @@
 # 19.9 动手：使用 rLLM 训练金融分析 Agent
 
+<ChapterNotebookLink chapter="agentic" />
+
 > **本节目标**：用 rLLM 训练一个能够查财报表格、写 SQL、调用计算器并回答问题的金融分析 Agent，按工具轨迹和最终答案评估训练效果。
 
 > **学习路径**：[19.8 DeepCoder Agent](./rllm-deepcoder-lab) → **19.9 金融分析 Agent** → [19.10 从零实现训练系统](./build-agentic-training-system)

@@ -63,6 +63,8 @@ const copy = english
       runtime: 'Running and reproducing the experiment',
       runtimeDesc:
         'A Notebook file is available. ModelScope and Colab environments need separate verification. Preview images are existing assets, not results from a new training run.',
+      runtimeExecutedDesc:
+        'The preview comes from an actual local run of the default CPU recipe. File hashes and measurements are in the execution record below. ModelScope and Colab hosted execution need separate verification.',
       review: 'View',
       cpu: 'CPU'
     }
@@ -108,6 +110,8 @@ const copy = english
       runtime: '运行与复现说明',
       runtimeDesc:
         '当前已有 Notebook 文件，ModelScope 与 Colab 的环境适配需分别实测。此页面展示环境素材，不代表本次运行的训练结果。',
+      runtimeExecutedDesc:
+        '预览图来自默认 CPU 配方的本地实际运行，文件哈希与测量结果见下方运行记录。ModelScope 与 Colab 的托管运行仍需分别实测。',
       review: '查看',
       cpu: 'CPU'
     }
@@ -131,6 +135,16 @@ const chapters = [
   { id: 'dpo', name: '第 14 章 · DPO', ids: ['dpo'] },
   { id: 'grpo', name: '第 15 章 · GRPO', ids: ['grpo', 'financial'] },
   {
+    id: 'agentic',
+    name: '第 19 章 · Agentic RL',
+    ids: ['agentic-tools', 'agentic-code', 'agentic-finqa']
+  },
+  {
+    id: 'research',
+    name: '第 21 章 · DeepResearch',
+    ids: ['agentic-research']
+  },
+  {
     id: 'embodied',
     name: '专题 · 世界模型与具身',
     ids: ['worldmodel', 'maniskill', 'ai2thor']
@@ -151,6 +165,8 @@ const englishChapters = {
   explore: 'Chapter 12 · Exploration and MARL',
   dpo: 'Chapter 14 · DPO',
   grpo: 'Chapter 15 · GRPO',
+  agentic: 'Chapter 19 · Agentic RL',
+  research: 'Chapter 21 · DeepResearch',
   embodied: 'Topic · World models and embodiment',
   selfplay: 'Topic · Self-play and offline RL'
 }
@@ -180,6 +196,30 @@ const methodNames = {
   '自博弈 · CFR+': 'Self-play · CFR+'
 }
 const info = {
+  'agentic-tools': [
+    'Multi-Turn',
+    '多轮工具与信用分配',
+    'REINFORCE',
+    'agentic-tools-result.png'
+  ],
+  'agentic-code': [
+    'Code Agent',
+    '让代码 Agent 修复并通过测试',
+    'REINFORCE',
+    'agentic-code-result.png'
+  ],
+  'agentic-finqa': [
+    'FinQA Agent',
+    '让 Agent 查表、计算并作答',
+    'REINFORCE',
+    'agentic-finqa-result.png'
+  ],
+  'agentic-research': [
+    'Research',
+    '让研究 Agent 检索并给出证据',
+    'Feature policy',
+    'agentic-research-result.png'
+  ],
   bandit: [
     'Bandit',
     '在尝试中找到更好的动作',
@@ -274,6 +314,8 @@ const availableChapters = chapters.filter((ch) =>
 const selectedChapter = ref('all')
 const view = ref('cards')
 const chapterMenu = ref(null)
+const menuAbove = ref(false)
+const menuHeight = ref(420)
 const viewport = ref(null)
 const modal = ref(null)
 const active = ref(null)
@@ -377,6 +419,23 @@ function setChapter(id) {
   )
   window.dispatchEvent(new Event('lab:context-change'))
 }
+async function fitChapterMenu() {
+  if (!chapterMenu.value?.open) return
+  const summary = chapterMenu.value
+    .querySelector('summary')
+    .getBoundingClientRect()
+  const below = window.innerHeight - summary.bottom - 24
+  const above = summary.top - 24
+  menuAbove.value = below < 200 && above > below
+  menuHeight.value = Math.max(
+    80,
+    Math.min(420, menuAbove.value ? above : below)
+  )
+  await nextTick()
+  chapterMenu.value
+    ?.querySelector('[aria-pressed="true"]')
+    ?.scrollIntoView({ block: 'nearest' })
+}
 function clickAway(event) {
   if (chapterMenu.value && !chapterMenu.value.contains(event.target))
     chapterMenu.value.open = false
@@ -416,10 +475,12 @@ onMounted(() => {
     view.value = 'list'
   syncViewport()
   window.addEventListener('click', clickAway)
+  window.addEventListener('resize', fitChapterMenu)
 })
 onBeforeUnmount(() => {
   observer?.disconnect()
   window.removeEventListener('click', clickAway)
+  window.removeEventListener('resize', fitChapterMenu)
 })
 </script>
 
@@ -446,6 +507,7 @@ onBeforeUnmount(() => {
           <details
             ref="chapterMenu"
             class="nl-chapter-menu"
+            @toggle="fitChapterMenu"
             @keydown.esc="chapterMenu.open = false"
           >
             <summary>
@@ -453,7 +515,12 @@ onBeforeUnmount(() => {
               <span>{{ chapterLabel }}</span>
               <ChevronDown :size="14" />
             </summary>
-            <div class="nl-menu-options" :aria-label="copy.chapterFilter">
+            <div
+              class="nl-menu-options"
+              :class="{ 'nl-menu-above': menuAbove }"
+              :style="{ maxHeight: menuHeight + 'px' }"
+              :aria-label="copy.chapterFilter"
+            >
               <button
                 type="button"
                 :aria-pressed="selectedChapter === 'all'"
@@ -877,7 +944,11 @@ onBeforeUnmount(() => {
               <ChevronDown :size="13" />
             </summary>
             <p>
-              {{ copy.runtimeDesc }}
+              {{
+                active.previewKind === 'result'
+                  ? copy.runtimeExecutedDesc
+                  : copy.runtimeDesc
+              }}
             </p>
             <p>{{ active.next }}</p>
             <a
@@ -1007,6 +1078,12 @@ onBeforeUnmount(() => {
   border-radius: 12px;
   background: var(--nl-bg);
   box-shadow: 0 12px 40px rgb(0 0 0 / 0.1);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.nl-menu-options.nl-menu-above {
+  top: auto;
+  bottom: calc(100% + 8px);
 }
 .nl-menu-options button {
   width: 100%;

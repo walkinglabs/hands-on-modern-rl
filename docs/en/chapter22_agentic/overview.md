@@ -1,5 +1,7 @@
 # 19.1 Foundations of Agentic RL
 
+<ChapterNotebookLink chapter="agentic" locale="en" />
+
 When models are connected to search, code execution, and external tools, a single decision can alter subsequent observations, thereby expanding the training objective to full trajectories. Part V begins with the fundamentals of Agentic RL, sequentially addressing multi-turn reinforcement learning, credit assignment, tool invocation, code and browser agents, and multi-agent collaboration.
 
 **Core Content**

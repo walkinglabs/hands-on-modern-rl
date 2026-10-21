@@ -1,5 +1,7 @@
 # 19.8 动手：使用 rLLM 训练 DeepCoder Agent
 
+<ChapterNotebookLink chapter="agentic" />
+
 > **本节目标**：用 rLLM 跑通代码 Agent 的数据准备、沙箱验证、GRPO 训练和 LiveCodeBench 评测，并比较训练前后的 Pass@1。
 
 > **学习路径**：[19.1 Agentic RL 基础](./overview) → [19.3 轨迹信用分配](./credit-assignment) → [19.6 Code Interpreter RL](./industrial-practice) → **19.8 DeepCoder Agent**

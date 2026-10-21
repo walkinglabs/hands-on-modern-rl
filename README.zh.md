@@ -44,7 +44,7 @@
   </p>
 </div>
 
-实验室已补齐 10 本可独立运行的章节 Notebook，与 12 本 Studio 实验合计 22 项。查看[实验室](https://walkinglabs.github.io/hands-on-modern-rl/labs/)或[本地验收记录](code/chapter-notebooks/README.md)。
+实验室已补齐 14 本可独立运行的章节 Notebook，与 12 本 Studio 实验合计 26 项。查看[实验室](https://walkinglabs.github.io/hands-on-modern-rl/labs/)或[本地验收记录](code/chapter-notebooks/README.md)。
 
 ## 学习路线
 

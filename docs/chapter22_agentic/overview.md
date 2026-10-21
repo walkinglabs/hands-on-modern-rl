@@ -1,5 +1,7 @@
 # 19.1 Agentic RL 基础
 
+<ChapterNotebookLink chapter="agentic" />
+
 Part IV 训练模型生成更符合偏好的单段回答。模型接入搜索、代码执行和外部工具后，一次决策会改变后续观测，训练对象随之扩展为完整轨迹。Part V 从 Agentic RL 基础开始，依次处理多轮强化学习、信用分配、工具调用、代码与浏览器智能体，以及多智能体协作。
 
 **核心内容**

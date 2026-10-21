@@ -1,4 +1,4 @@
-"""Build the ten self-contained chapter labs from readable percent-format sources.
+"""Build the self-contained chapter labs from readable percent-format sources.
 
 Run with Python 3.10+: python scripts/build_chapter_notebooks.py [--check].
 The original twelve Studio notebooks keep their existing, separate generator.
@@ -24,6 +24,10 @@ LABS = {
     "financial": "GRPO with mock financial tools",
     "worldmodel": "Learned dynamics and planning",
     "offline": "Offline learning and action coverage",
+    "agentic-tools": "Multi-turn tools and credit assignment",
+    "agentic-code": "A code-repair agent with actual Python tests",
+    "agentic-finqa": "A multi-turn SQL and calculator agent",
+    "agentic-research": "Retrieval, evidence selection and citations",
 }
 
 
@@ -37,6 +41,11 @@ def build_notebook(lab_id):
                 chunks.append((kind, lines))
             kind = "markdown" if "[markdown]" in line else "code"
             lines = []
+            if "[include:agentic-common]" in line:
+                lines = (SOURCES / "_agentic_common.py").read_text(encoding="utf-8").splitlines()
+        elif line.startswith("from _agentic_common import "):
+            # Inline this module above so the Notebook also runs without the source tree.
+            continue
         else:
             lines.append(line)
     if kind:

@@ -1,6 +1,6 @@
 # 中文 Studio 实验 Notebook
 
-[中文实验室](https://walkinglabs.github.io/hands-on-modern-rl/labs/)的 22 项实验均连接到中文讲解版本。本目录提供原有 12 项 Studio 实验的中文版本；新增的 10 本章节实验已有中文原版，保留在上一级目录。
+[中文实验室](https://walkinglabs.github.io/hands-on-modern-rl/labs/)的 26 项实验均连接到中文讲解版本。本目录提供原有 12 项 Studio 实验的中文版本；新增的 14 本章节实验已有中文原版，保留在上一级目录。
 
 这些版本翻译实验说明、训练边界、模型选择器和回放按钮，继续导入 Studio 原有的训练实现。训练预算、依赖和模型保存流程保持一致。科学图表和第三方库的日志可能使用英文。
 

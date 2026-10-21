@@ -44,7 +44,7 @@
   </p>
 </div>
 
-The lab now includes 10 self-contained chapter Notebooks alongside 12 Studio companions. Browse the [lab](https://walkinglabs.github.io/hands-on-modern-rl/en/labs/) or inspect the [local execution evidence](code/chapter-notebooks/README.md).
+The lab now includes 14 self-contained chapter Notebooks alongside 12 Studio companions. Browse the [lab](https://walkinglabs.github.io/hands-on-modern-rl/en/labs/) or inspect the [local execution evidence](code/chapter-notebooks/README.md).
 
 ## Learning Paths
 

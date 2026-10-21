@@ -324,7 +324,406 @@
         }
       },
       "matches_chinese_metrics": true
+    },
+    "agentic-tools": {
+      "status": "passed",
+      "seconds": 3.97,
+      "sha256": "4a1ee4ab8cc97d642f158d62dc2dce6bb8ebfdca6b9b7cb8d5c07a5ccd8de816",
+      "code_cells": 7,
+      "metrics": {
+        "runs": [
+          {
+            "seed": 3,
+            "before": {
+              "success_rate": 0.5,
+              "return": 0.47,
+              "mean_turns": 4.0
+            },
+            "after": {
+              "success_rate": 1.0,
+              "return": 0.97,
+              "mean_turns": 4.0
+            }
+          },
+          {
+            "seed": 7,
+            "before": {
+              "success_rate": 0.0,
+              "return": -0.03,
+              "mean_turns": 4.0
+            },
+            "after": {
+              "success_rate": 1.0,
+              "return": 0.97,
+              "mean_turns": 4.0
+            }
+          }
+        ],
+        "fixed_heldout_trace": [
+          {
+            "turn": 0,
+            "action": "lookup",
+            "observation": {
+              "x": 32,
+              "y": 1
+            },
+            "reward": -0.01
+          },
+          {
+            "turn": 1,
+            "action": "add",
+            "observation": {
+              "calculator_result": 33
+            },
+            "reward": -0.01
+          },
+          {
+            "turn": 2,
+            "action": "double",
+            "observation": {
+              "calculator_result": 66
+            },
+            "reward": -0.01
+          },
+          {
+            "turn": 3,
+            "action": "finish",
+            "observation": {
+              "answer": 66
+            },
+            "reward": 1.0
+          }
+        ],
+        "train_tasks": 24,
+        "heldout_tasks": 16,
+        "updates": 160,
+        "algorithm": "REINFORCE with leave-one-out baseline"
+      },
+      "matches_chinese_metrics": true
+    },
+    "agentic-code": {
+      "status": "passed",
+      "seconds": 7.96,
+      "sha256": "7e784693a1d75e9b3519ade1e07e6e1592513070da491b782897bd5415c29e1c",
+      "code_cells": 6,
+      "metrics": {
+        "runs": [
+          {
+            "seed": 3,
+            "before": {
+              "success_rate": 0.0,
+              "return": -0.07,
+              "mean_turns": 7.0
+            },
+            "after": {
+              "success_rate": 1.0,
+              "return": 0.97,
+              "mean_turns": 4.0
+            }
+          },
+          {
+            "seed": 7,
+            "before": {
+              "success_rate": 0.0,
+              "return": -0.07,
+              "mean_turns": 7.0
+            },
+            "after": {
+              "success_rate": 1.0,
+              "return": 0.97,
+              "mean_turns": 4.0
+            }
+          }
+        ],
+        "fixed_heldout_trace": [
+          {
+            "turn": 0,
+            "action": "inspect",
+            "observation": {
+              "spec": "sum",
+              "source": "def solve(x, y):\n    return x - y\n",
+              "public_case": [40, 2, 42]
+            },
+            "reward": -0.01
+          },
+          {
+            "turn": 1,
+            "action": "patch_add",
+            "observation": {
+              "source": "def solve(x, y):\n    return x + y\n"
+            },
+            "reward": -0.01
+          },
+          {
+            "turn": 2,
+            "action": "test",
+            "observation": {
+              "passed": true,
+              "exit_code": 0,
+              "output": "passed\n"
+            },
+            "reward": -0.01
+          },
+          {
+            "turn": 3,
+            "action": "submit",
+            "observation": {
+              "private_tests": {
+                "passed": true,
+                "exit_code": 0,
+                "output": "passed\n"
+              }
+            },
+            "reward": 1.0
+          }
+        ],
+        "train_tasks": 24,
+        "heldout_tasks": 16,
+        "updates": 160,
+        "algorithm": "REINFORCE with leave-one-out baseline",
+        "python_test_cache": {
+          "hits": 10490,
+          "misses": 193,
+          "maxsize": 4096,
+          "currsize": 193
+        }
+      },
+      "matches_chinese_metrics": true
+    },
+    "agentic-finqa": {
+      "status": "passed",
+      "seconds": 5.75,
+      "sha256": "22a97bd0b411cadecb6bf8cd41e63e77906469f19005b7911d521eb3586fa5f9",
+      "code_cells": 6,
+      "metrics": {
+        "runs": [
+          {
+            "seed": 3,
+            "before": {
+              "success_rate": 0.5,
+              "return": 0.44999999999999996,
+              "mean_turns": 6.0
+            },
+            "after": {
+              "success_rate": 1.0,
+              "return": 0.955,
+              "mean_turns": 5.5
+            }
+          },
+          {
+            "seed": 7,
+            "before": {
+              "success_rate": 0.0,
+              "return": -0.08,
+              "mean_turns": 8.0
+            },
+            "after": {
+              "success_rate": 1.0,
+              "return": 0.955,
+              "mean_turns": 5.5
+            }
+          }
+        ],
+        "fixed_heldout_trace": [
+          {
+            "turn": 0,
+            "action": "list_tables",
+            "observation": {
+              "tables": [["accounts"]]
+            },
+            "reward": -0.01
+          },
+          {
+            "turn": 1,
+            "action": "schema",
+            "observation": {
+              "schema": [
+                [0, "company", "TEXT", 0, null, 0],
+                [1, "year", "INT", 0, null, 0],
+                [2, "revenue", "REAL", 0, null, 0],
+                [3, "expense", "REAL", 0, null, 0]
+              ]
+            },
+            "reward": -0.01
+          },
+          {
+            "turn": 2,
+            "action": "query_current",
+            "observation": {
+              "sql": "SELECT revenue, expense FROM accounts WHERE company = ? AND year = ?",
+              "parameters": ["company-32", 2025],
+              "row": [218.0, 52.0]
+            },
+            "reward": -0.01
+          },
+          {
+            "turn": 3,
+            "action": "calculate_ratio",
+            "observation": {
+              "calculator_result": 0.23853211009174313
+            },
+            "reward": -0.01
+          },
+          {
+            "turn": 4,
+            "action": "submit",
+            "observation": {
+              "answer": 0.23853211009174313
+            },
+            "reward": 1.0
+          }
+        ],
+        "train_tasks": 24,
+        "heldout_tasks": 16,
+        "updates": 160,
+        "algorithm": "REINFORCE with leave-one-out baseline"
+      },
+      "matches_chinese_metrics": true
+    },
+    "agentic-research": {
+      "status": "passed",
+      "seconds": 2.34,
+      "sha256": "f5e90da0f73d4c17881c584af68fbd32520c02268fa8a858de802c198078d752",
+      "code_cells": 5,
+      "metrics": {
+        "runs": [
+          {
+            "seed": 3,
+            "before": {
+              "greedy": {
+                "reward": 1.0,
+                "answer_exact": 1.0,
+                "citation_support": 1.0
+              },
+              "sampled": {
+                "reward": 0.2,
+                "answer_exact": 0.2,
+                "citation_support": 0.2
+              }
+            },
+            "after": {
+              "greedy": {
+                "reward": 1.0,
+                "answer_exact": 1.0,
+                "citation_support": 1.0
+              },
+              "sampled": {
+                "reward": 1.0,
+                "answer_exact": 1.0,
+                "citation_support": 1.0
+              }
+            }
+          },
+          {
+            "seed": 7,
+            "before": {
+              "greedy": {
+                "reward": 1.0,
+                "answer_exact": 1.0,
+                "citation_support": 1.0
+              },
+              "sampled": {
+                "reward": 0.2,
+                "answer_exact": 0.2,
+                "citation_support": 0.2
+              }
+            },
+            "after": {
+              "greedy": {
+                "reward": 1.0,
+                "answer_exact": 1.0,
+                "citation_support": 1.0
+              },
+              "sampled": {
+                "reward": 1.0,
+                "answer_exact": 1.0,
+                "citation_support": 1.0
+              }
+            }
+          },
+          {
+            "seed": 11,
+            "before": {
+              "greedy": {
+                "reward": 1.0,
+                "answer_exact": 1.0,
+                "citation_support": 1.0
+              },
+              "sampled": {
+                "reward": 0.2,
+                "answer_exact": 0.2,
+                "citation_support": 0.2
+              }
+            },
+            "after": {
+              "greedy": {
+                "reward": 1.0,
+                "answer_exact": 1.0,
+                "citation_support": 1.0
+              },
+              "sampled": {
+                "reward": 1.0,
+                "answer_exact": 1.0,
+                "citation_support": 1.0
+              }
+            }
+          }
+        ],
+        "fixed_heldout_trace": {
+          "question": "Which agentic reasoning report uses a GRPO-style recipe to make smaller models competitive?",
+          "query": "GRPO style recipe smaller model competitive agentic reasoning",
+          "retrieved": [
+            "rstar2-paper",
+            "tongyi-paper",
+            "web-shepherd-paper",
+            "distractor-rag"
+          ],
+          "chosen_doc": "rstar2-paper",
+          "answer": "rStar2-Agent",
+          "reward": 1.0
+        },
+        "source_sha256": "22a043be7e04532629b6f89f8ba3fecc3accfce744b1ee4fba1212b5813e2a02",
+        "train_questions": 7,
+        "heldout_questions": 3,
+        "epochs": 220,
+        "algorithm": "Feature policy with REINFORCE-style baseline updates"
+      },
+      "matches_chinese_metrics": true
     }
   },
-  "note": "English counterparts executed in fresh local CPU kernels with default budgets. Numerical results match Chinese counterparts. Dependency installation and hosted-platform execution are excluded."
+  "note": "English counterparts executed in fresh local CPU kernels with default budgets. Numerical results match Chinese counterparts. Dependency installation and hosted-platform execution are excluded.",
+  "additional_runs": [
+    {
+      "started_at": "2026-10-21T16:02:41.023766+00:00",
+      "python": "3.12.13",
+      "platform": "macOS-26.5.1-arm64-arm-64bit",
+      "processor": "arm64",
+      "device": "CPU",
+      "locale": "en",
+      "packages": {
+        "numpy": "2.5.4",
+        "torch": "2.14.1",
+        "matplotlib": "3.11.2",
+        "gymnasium": "1.4.0",
+        "stable-baselines3": "2.9.0"
+      },
+      "hosted_platforms": "Colab and ModelScope not executed in this local run"
+    },
+    {
+      "started_at": "2026-10-21T16:13:00.249449+00:00",
+      "python": "3.12.13",
+      "platform": "macOS-26.5.1-arm64-arm-64bit",
+      "processor": "arm64",
+      "device": "CPU",
+      "locale": "en",
+      "packages": {
+        "numpy": "2.5.4",
+        "torch": "2.14.1",
+        "matplotlib": "3.11.2",
+        "gymnasium": "1.4.0",
+        "stable-baselines3": "2.9.0"
+      },
+      "hosted_platforms": "Colab and ModelScope not executed in this local run"
+    }
+  ]
 }

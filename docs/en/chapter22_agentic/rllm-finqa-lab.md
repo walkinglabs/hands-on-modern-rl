@@ -4,6 +4,8 @@ title: '19.9 Hands-On: Financial QA Agent'
 
 # 19.9 Hands-on: Training a Financial Analysis Agent with rLLM
 
+<ChapterNotebookLink chapter="agentic" locale="en" />
+
 > **Section goal**: Use rLLM to train a financial-analysis agent that inspects tables, writes SQL, calls a calculator, and answers questions, then evaluate both its tool trajectory and final answer.
 
 > **Learning path**: [19.8 DeepCoder Agent](./rllm-deepcoder-lab) → **19.9 Financial Analysis Agent** → [19.10 Building a Training System](./build-agentic-training-system)

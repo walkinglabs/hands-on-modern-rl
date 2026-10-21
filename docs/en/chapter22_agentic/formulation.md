@@ -1,5 +1,7 @@
 # 19.2 Multi-Turn Reinforcement Learning
 
+<ChapterNotebookLink chapter="agentic" locale="en" />
+
 [19.1 Overview](./overview) used the example of booking a flight to illustrate the fundamental differences between Agentic RL and single-turn RL. This section formalizes these differences into precise mathematical objects—using the POMDP formulation from the [AppWorld](https://arxiv.org/abs/2407.18901) paper, which explicitly distinguishes between "model-generated tokens" and "environment-return tokens," forming the basis for subsequent discussions on action masking, step-level advantage, and credit assignment.
 
 ## Simplified Perspective of Single-Turn RL

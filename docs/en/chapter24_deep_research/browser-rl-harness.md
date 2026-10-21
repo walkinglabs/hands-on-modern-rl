@@ -4,6 +4,8 @@ title: '21.1 Browser RL Harness'
 
 # 21.1 Browser RL Harness
 
+<ChapterNotebookLink chapter="research" locale="en" />
+
 A **Browser RL Harness** turns web pages, search engines, and a model into a repeatable reinforcement-learning environment. The model can search, read, save evidence, and receive rewards from its final answer and citations.
 
 Consider the question, “Where did the first author of a particular paper complete their undergraduate degree?” Searching the paper title yields only a name. The agent must find an author page or CV, disambiguate people with the same name, and preserve the passage that supports its conclusion. This is no longer one text generation. The model repeatedly chooses the next query, page, evidence item, and stopping time. The harness records those decisions as a trainable, replayable, scoreable trajectory.

@@ -481,6 +481,94 @@
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment12-ai2thor-embodied.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment12-ai2thor-embodied.ipynb"
       }
+    },
+    {
+      "id": "agentic-tools",
+      "g": "alignment",
+      "name": "多轮工具与信用分配",
+      "en": "MULTI-TURN · TOOLS",
+      "chapter": "19.2 多轮强化学习",
+      "lesson": "chapter22_agentic/formulation",
+      "device": "CPU",
+      "kind": "真实训练",
+      "art": "bars",
+      "desc": "工具返回后继续决策，检查终局奖励怎样更新早期动作。",
+      "result": "实际查询与计算、动作梯度检查、双种子评估和完整轨迹。",
+      "path": "code/online-experiments/hands-on-modern-rl-agentic-tools.ipynb",
+      "source": "code/chapter-notebooks/agentic-tools.py",
+      "next": "默认 CPU 配方已在本地全新内核实际运行；有限动作教学策略，含接口约束，不等同于预训练语言模型训练。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result",
+      "paths": {
+        "zh": "code/online-experiments/hands-on-modern-rl-agentic-tools.ipynb",
+        "en": "code/online-experiments/en/hands-on-modern-rl-agentic-tools.ipynb"
+      }
+    },
+    {
+      "id": "agentic-code",
+      "g": "alignment",
+      "name": "让代码 Agent 修复并通过测试",
+      "en": "CODE AGENT · TESTS",
+      "chapter": "19.8 DeepCoder Agent",
+      "lesson": "chapter22_agentic/rllm-deepcoder-lab",
+      "device": "CPU",
+      "kind": "真实训练",
+      "art": "bars",
+      "desc": "选择补丁、真实执行 Python 测试，再检查独立样例。",
+      "result": "公开与独立测试、补丁轨迹、实际子进程调用记录和策略参数。",
+      "path": "code/online-experiments/hands-on-modern-rl-agentic-code.ipynb",
+      "source": "code/chapter-notebooks/agentic-code.py",
+      "next": "默认 CPU 配方已在本地全新内核实际运行；有限动作教学策略，含接口约束，不等同于预训练语言模型训练。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result",
+      "paths": {
+        "zh": "code/online-experiments/hands-on-modern-rl-agentic-code.ipynb",
+        "en": "code/online-experiments/en/hands-on-modern-rl-agentic-code.ipynb"
+      }
+    },
+    {
+      "id": "agentic-finqa",
+      "g": "alignment",
+      "name": "让 Agent 查表、计算并作答",
+      "en": "FINQA · SQL TOOLS",
+      "chapter": "19.9 金融分析 Agent",
+      "lesson": "chapter22_agentic/rllm-finqa-lab",
+      "device": "CPU",
+      "kind": "真实训练",
+      "art": "bars",
+      "desc": "在合成公司数据库中调用 SQL 和计算器，完成多轮分析。",
+      "result": "真实 SQLite 查询、计算轨迹、独立公司评估和工具调用成本。",
+      "path": "code/online-experiments/hands-on-modern-rl-agentic-finqa.ipynb",
+      "source": "code/chapter-notebooks/agentic-finqa.py",
+      "next": "默认 CPU 配方已在本地全新内核实际运行；有限动作教学策略，含接口约束，不等同于预训练语言模型训练。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result",
+      "paths": {
+        "zh": "code/online-experiments/hands-on-modern-rl-agentic-finqa.ipynb",
+        "en": "code/online-experiments/en/hands-on-modern-rl-agentic-finqa.ipynb"
+      }
+    },
+    {
+      "id": "agentic-research",
+      "g": "alignment",
+      "name": "让研究 Agent 检索并给出证据",
+      "en": "RESEARCH · EVIDENCE",
+      "chapter": "21.2 DeepResearch 评测",
+      "lesson": "chapter24_deep_research/deep-research-eval",
+      "device": "CPU",
+      "kind": "真实训练",
+      "art": "bars",
+      "desc": "在固定教学语料中学习检索词与证据选择，分开检查答案和引用。",
+      "result": "三种子训练、同条件前后评估、证据轨迹；贪心基线已满分，采样表现提高。",
+      "path": "code/online-experiments/hands-on-modern-rl-agentic-research.ipynb",
+      "source": "code/chapter-notebooks/agentic-research.py",
+      "next": "默认 CPU 配方已在本地全新内核实际运行；有限动作教学策略，含接口约束，不等同于预训练语言模型训练。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result",
+      "paths": {
+        "zh": "code/online-experiments/hands-on-modern-rl-agentic-research.ipynb",
+        "en": "code/online-experiments/en/hands-on-modern-rl-agentic-research.ipynb"
+      }
     }
   ]
 }

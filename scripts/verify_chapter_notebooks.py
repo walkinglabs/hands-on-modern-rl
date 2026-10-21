@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 
 from build_chapter_notebooks import LABS, ROOT, build_notebook
+from build_online_experiment_notebooks import EXPERIMENTS
 
 
 def main():
@@ -18,8 +19,8 @@ def main():
     english = json.loads((component_dir / "lab-english.json").read_text())
     report = json.loads((ROOT / "code/chapter-notebooks/validation.json").read_text())
     assert set(report["notebooks"]) == set(LABS)
-    assert len(catalog["labs"]) == 22
-    assert len({lab["id"] for lab in catalog["labs"]}) == 22
+    assert len(catalog["labs"]) == len(LABS) + len(EXPERIMENTS)
+    assert len({lab["id"] for lab in catalog["labs"]}) == len(catalog["labs"])
     theme = (ROOT / "docs/.vitepress/theme/index.js").read_text()
     assert "component('ChapterNotebookLink', ChapterNotebookLink)" in theme
     for lab in catalog["labs"]:
@@ -51,7 +52,8 @@ def main():
         combined = "\n".join(texts)
         for marker in ["Checklist", "Exercise", "References", "metrics.json", "plt.show()"]:
             assert marker in combined, (lab_id, marker)
-    print("Verified 10 generated and locally executed chapter labs, 22 catalog paths, and bilingual links")
+    print(f"Verified {len(LABS)} executed chapter labs, {len(catalog['labs'])} catalog paths "
+          "and bilingual links")
 
 
 if __name__ == "__main__":

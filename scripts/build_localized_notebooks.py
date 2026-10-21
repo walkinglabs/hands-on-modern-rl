@@ -209,7 +209,7 @@ def build_all(check=False):
         else:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content, encoding="utf-8")
-    print(f"{'Checked' if check else 'Built'} 22 language counterparts; 22 labs in each language")
+    print(f"{'Checked' if check else 'Built'} {len(catalog['labs'])} language counterparts")
 
 
 if __name__ == "__main__":

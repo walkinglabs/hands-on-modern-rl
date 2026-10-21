@@ -1,5 +1,7 @@
 # 19.10 Hands-on: Building an Agentic RL Training System from Scratch
 
+<ChapterNotebookLink chapter="agentic" locale="en" />
+
 > **Section goal**: Build an Agentic RL training system in fewer than 500 lines, allowing a language model to write code, execute it, read errors, and revise its next action.
 
 > **Learning path**: [19.1 Agentic RL Foundations](./overview) → [19.8 DeepCoder Agent](./rllm-deepcoder-lab) → [19.9 Financial Analysis Agent](./rllm-finqa-lab) → **19.10 Building a Training System from Scratch**

@@ -1,5 +1,7 @@
 # 19.2 多轮强化学习
 
+<ChapterNotebookLink chapter="agentic" />
+
 [19.1 总览](./overview) 用订机票的例子说明了 Agentic RL 与单轮 RL 的根本差异。本节把这些差异写成精确的数学对象——采用 [AppWorld](https://arxiv.org/abs/2407.18901) 论文中的 POMDP 形式化，它把"模型生成的 token"与"环境返回的 token"显式区分开，是后续讨论 action mask、step-level advantage、credit assignment 的基础。
 
 ## 单轮 RL 的简化视角

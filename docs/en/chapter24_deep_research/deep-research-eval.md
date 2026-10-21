@@ -1,5 +1,7 @@
 # 21.2 Evaluation Benchmarks and Open-Source Projects
 
+<ChapterNotebookLink chapter="research" locale="en" />
+
 [21.1](./browser-rl-harness) represented search, reading, and answer submission as an executable trajectory. The next question is whether two trajectories that produce the same answer have equal research quality.
 
 Suppose the task asks where a paper's first author completed an undergraduate degree. Agent A answers from memory without opening a page. Agent B finds the author's profile, saves the education passage, and cites it. Both names may be correct, yet their evidence differs. Agent B may also cite a different person with the same name, producing a coincidentally correct answer with a broken evidence chain. Deep Research evaluation must therefore separate **answer, evidence, process, and cost**.
