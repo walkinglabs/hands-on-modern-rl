@@ -2,7 +2,7 @@
 
 这 10 个源文件补齐实验室原先没有 Notebook 的项目。每个文件用 `# %%` 分隔代码与讲解，生成的 Notebook 内含完整代码，可以独立运行，无需先克隆仓库。
 
-正文使用中文，代码和图表标签使用英文。默认配方均使用 CPU 和本地可生成数据；DPO 使用从零训练的微型语言模型，工具调用使用受限调用语言的微型自回归策略。它们的规模和能力边界在 Notebook 中说明，书中的 Qwen 实验继续保留。
+正文提供[中文原版与完整英文版](../online-experiments/en/README.md)，实验室按页面语言选择对应文件；图表标签使用英文。默认配方均使用 CPU 和本地可生成数据；DPO 使用从零训练的微型语言模型，工具调用使用受限调用语言的微型自回归策略。它们的规模和能力边界在 Notebook 中说明，书中的 Qwen 实验继续保留。
 
 每本依次包含环境安装、基线、训练或数值检查、独立评估、可视化、结果保存、练习和参考资料。练习默认关闭，填空后可自行开启；顺序“运行全部”不会被未填写的练习中断。
 
@@ -34,6 +34,8 @@ Colab 与 ModelScope 提供直接打开入口，本次没有在这两个托管�
 ```bash
 python scripts/build_chapter_notebooks.py
 python scripts/build_chapter_notebooks.py --check
+python scripts/build_localized_notebooks.py
+python scripts/build_localized_notebooks.py --check
 python scripts/verify_chapter_notebooks.py
 ```
 
@@ -47,3 +49,5 @@ python scripts/execute_chapter_notebooks.py --output-dir /tmp/modern-rl-labs
 Notebook 的第一个单元格会安装缺少的实验依赖。执行器为每本创建新的内核和工作目录，将带输出的 Notebook、图、GIF、checkpoint 和 `metrics.json` 保存在指定目录。首次联网安装的耗时受平台影响。
 
 只执行部分实验可以添加 `--labs bandit gridworld`。修改源文件后必须重新生成 Notebook 并重新执行受影响的实验；只有对应 SHA-256 的新结果才能作为更新后的本地验收证据。
+
+英文版的默认 CPU 配方也已在独立内核中实际运行，记录见 [validation.en.json](./validation.en.json)。可使用执行器的 `--locale en` 参数复现。

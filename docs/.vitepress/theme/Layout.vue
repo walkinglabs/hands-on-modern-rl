@@ -170,17 +170,32 @@ const currentLanguage = computed(() =>
 const alternateLanguage = computed(() =>
   isEnglishRoute.value ? '简体中文' : 'English'
 )
+const labLanguageContext = ref('')
+function syncLabLanguageContext() {
+  labLanguageContext.value = window.location.search + window.location.hash
+}
+onMounted(() => {
+  syncLabLanguageContext()
+  window.addEventListener('lab:context-change', syncLabLanguageContext)
+  window.addEventListener('popstate', syncLabLanguageContext)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('lab:context-change', syncLabLanguageContext)
+  window.removeEventListener('popstate', syncLabLanguageContext)
+})
+watch(() => route.path, syncLabLanguageContext)
 const alternateLanguageLink = computed(() => {
+  const suffix = isLabPage.value ? labLanguageContext.value : ''
   if (isEnglishRoute.value) {
     const zhPath = mobileRoutePath.value.replace(/^\/en(?=\/|$)/, '') || '/'
     const chineseRoutes = theme.value.chineseRoutes || []
-    return withBase(chineseRoutes.includes(zhPath) ? zhPath : '/')
+    return withBase(chineseRoutes.includes(zhPath) ? zhPath : '/') + suffix
   }
 
   const enPath =
     mobileRoutePath.value === '/' ? '/en/' : `/en${mobileRoutePath.value}`
   const englishRoutes = theme.value.englishRoutes || []
-  return withBase(englishRoutes.includes(enPath) ? enPath : '/en/')
+  return withBase(englishRoutes.includes(enPath) ? enPath : '/en/') + suffix
 })
 const alternateLanguageShort = computed(() =>
   isEnglishRoute.value ? '中' : 'EN'

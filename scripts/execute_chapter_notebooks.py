@@ -28,6 +28,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--labs", nargs="+", choices=LABS, default=list(LABS))
+    parser.add_argument("--locale", choices=["zh", "en"], default="zh")
     args = parser.parse_args()
     output = args.output_dir.resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -40,6 +41,7 @@ def main():
         "platform": platform.platform(),
         "processor": platform.machine(),
         "device": "CPU",
+        "locale": args.locale,
         "packages": {name: importlib.metadata.version(name) for name in
                      ["numpy", "torch", "matplotlib", "gymnasium", "stable-baselines3"]},
         "hosted_platforms": "Colab and ModelScope not executed in this local run",
@@ -53,7 +55,10 @@ def main():
             "display_name": "Hands-on RL validation", "language": "python",
         }))
         for lab_id in args.labs:
-            path = ROOT / "code/online-experiments" / f"hands-on-modern-rl-{lab_id}.ipynb"
+            folder = ROOT / "code/online-experiments"
+            if args.locale == "en":
+                folder = folder / "en"
+            path = folder / f"hands-on-modern-rl-{lab_id}.ipynb"
             notebook = nbformat.read(path, as_version=4)
             nbformat.validate(notebook)
             workspace = output / "workspaces" / lab_id

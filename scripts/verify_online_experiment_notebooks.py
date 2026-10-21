@@ -90,7 +90,12 @@ def main() -> None:
         if expected_url not in studio_readme.read_text(encoding="utf-8"):
             errors.append(f"{slug}: Studio README is missing its companion URL")
         for readme in root_readmes:
-            if expected_url not in readme.read_text(encoding="utf-8"):
+            readme_url = expected_url
+            if readme.name == "README.zh.md":
+                readme_url = expected_url.replace(
+                    "/code/online-experiments/", "/code/online-experiments/zh/"
+                )
+            if readme_url not in readme.read_text(encoding="utf-8"):
                 errors.append(f"{slug}: {readme.relative_to(ROOT)} is missing its companion URL")
 
         if slug.endswith("experiment-gymnasium"):

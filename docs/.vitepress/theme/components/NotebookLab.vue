@@ -252,6 +252,7 @@ const labs = chapters.flatMap((ch) =>
     const presentation = info[id]
     return {
       ...lab,
+      path: original.paths?.[english ? 'en' : 'zh'] || original.path,
       chapterId: ch.id,
       chapterName: ch.name,
       title: presentation?.[0] || lab.en.split(' · ')[0],
@@ -374,6 +375,7 @@ function setChapter(id) {
       (url.size ? '?' + url.toString() : '') +
       window.location.hash
   )
+  window.dispatchEvent(new Event('lab:context-change'))
 }
 function clickAway(event) {
   if (chapterMenu.value && !chapterMenu.value.contains(event.target))
@@ -399,10 +401,19 @@ function backdropClick(event) {
     closeDetails()
 }
 watch([selectedChapter, view], syncViewport)
+watch(view, (value) => {
+  const url = new URL(window.location.href)
+  if (value === 'list') url.searchParams.set('view', 'list')
+  else url.searchParams.delete('view')
+  window.history.replaceState(null, '', url.pathname + url.search + url.hash)
+  window.dispatchEvent(new Event('lab:context-change'))
+})
 onMounted(() => {
   const chapter = new URLSearchParams(window.location.search).get('chapter')
   if (availableChapters.some((ch) => ch.id === chapter))
     selectedChapter.value = chapter
+  if (new URLSearchParams(window.location.search).get('view') === 'list')
+    view.value = 'list'
   syncViewport()
   window.addEventListener('click', clickAway)
 })
@@ -872,7 +883,9 @@ onBeforeUnmount(() => {
             <a
               v-if="active.validation === 'local-cpu-executed'"
               :href="
-                repository + 'blob/main/code/chapter-notebooks/validation.json'
+                repository +
+                'blob/main/code/chapter-notebooks/' +
+                (english ? 'validation.en.json' : 'validation.json')
               "
               target="_blank"
               rel="noopener noreferrer"
