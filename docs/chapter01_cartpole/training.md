@@ -1,5 +1,11 @@
 # 1.3 动手：PPO 训练可视化
 
+<script setup>
+import ChapterNotebookLink from '../.vitepress/theme/components/ChapterNotebookLink.vue'
+</script>
+
+<ChapterNotebookLink />
+
 > **本节目标**：运行纯 PyTorch PPO，保存原始训练指标，从 CSV 生成曲线，并用训练后的模型完成一次可见的 CartPole 评估。
 
 > **学习路径**：[1.1 跑通 CartPole](./principles) → [1.2 CartPole 原理](./metrics) → **1.3 PPO 训练可视化**

@@ -4,6 +4,12 @@ title: 1.3 Hands-On PPO Training Visualization
 
 # 1.3 Hands-on: PPO Training Visualization
 
+<script setup>
+import ChapterNotebookLink from '../../.vitepress/theme/components/ChapterNotebookLink.vue'
+</script>
+
+<ChapterNotebookLink locale="en" />
+
 > **Section goal**: Run the pure PyTorch PPO implementation, save the raw metrics, generate curves from the CSV file, and evaluate the trained policy in CartPole.
 
 > **Learning path**: [1.1 Run CartPole](./principles) → [1.2 CartPole Principles](./metrics) → **1.3 PPO Training Visualization**

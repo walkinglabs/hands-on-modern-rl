@@ -645,33 +645,66 @@ function optimizedMermaidPlugin(md) {
 }
 
 const zhNav = [
-  { text: '预备知识', link: '/preface/introduction' },
-  { text: '基础与经典 RL', link: '/chapter01_cartpole/principles' },
-  { text: '深度强化学习', link: '/chapter07_dqn/from-q-to-dqn' },
-  { text: '大模型对齐', link: '/chapter15_rlhf/base-model-to-assistant' },
-  { text: 'Agentic 与多模态', link: '/chapter22_agentic/overview' },
   {
-    text: '安全与前沿',
-    link: '/chapter30_alignment_failures/classical-failures'
+    text: '基础课程',
+    activeMatch: '^/(?:preface/|chapter(?:0[1-9]|1[0-4])_)',
+    items: [
+      { text: '预备知识', link: '/preface/introduction' },
+      { text: '基础与经典 RL', link: '/chapter01_cartpole/principles' },
+      { text: '深度强化学习', link: '/chapter07_dqn/from-q-to-dqn' }
+    ]
+  },
+  {
+    text: '进阶专题',
+    activeMatch: '^/chapter(?:1[5-9]|2[0-9]|3[0-2])_',
+    items: [
+      { text: '大模型对齐', link: '/chapter15_rlhf/base-model-to-assistant' },
+      { text: 'Agentic 与多模态', link: '/chapter22_agentic/overview' },
+      {
+        text: '安全与前沿',
+        link: '/chapter30_alignment_failures/classical-failures'
+      }
+    ]
   },
   { text: '附录', link: '/appendix_industrial_training/training-debugging' }
 ]
 
 const enNav = [
-  { text: 'Preface', link: '/en/preface/introduction' },
-  { text: 'Fundamentals', link: '/en/chapter01_cartpole/principles' },
-  { text: 'Deep RL', link: '/en/chapter07_dqn/from-q-to-dqn' },
-  { text: 'LLM Alignment', link: '/en/chapter15_rlhf/base-model-to-assistant' },
-  { text: 'Agentic RL', link: '/en/chapter22_agentic/overview' },
   {
-    text: 'Safety & Frontiers',
-    link: '/en/chapter32_selfplay/self-play-outlook/'
+    text: 'Foundations',
+    activeMatch: '^/en/(?:preface/|chapter(?:0[1-9]|1[0-4])_)',
+    items: [
+      { text: 'Preface', link: '/en/preface/introduction' },
+      { text: 'Fundamentals', link: '/en/chapter01_cartpole/principles' },
+      { text: 'Deep RL', link: '/en/chapter07_dqn/from-q-to-dqn' }
+    ]
+  },
+  {
+    text: 'Advanced Topics',
+    activeMatch: '^/en/chapter(?:1[5-9]|2[0-9]|3[0-2])_',
+    items: [
+      {
+        text: 'LLM Alignment',
+        link: '/en/chapter15_rlhf/base-model-to-assistant'
+      },
+      { text: 'Agentic RL', link: '/en/chapter22_agentic/overview' },
+      {
+        text: 'Safety & Frontiers',
+        link: '/en/chapter32_selfplay/self-play-outlook/'
+      }
+    ]
   },
   {
     text: 'Appendices',
     link: '/en/appendix_industrial_training/training-debugging'
   }
 ]
+
+function courseNav(items) {
+  return items.map((item) =>
+    item.items ? { component: 'CourseNavMenu', props: item } : item
+  )
+}
 
 const zhSidebar = {
   '/': [
@@ -2637,7 +2670,7 @@ export default defineConfig({
       themeConfig: {
         englishRoutes,
         chineseRoutes,
-        nav: zhNav,
+        nav: courseNav(zhNav),
         sidebar: zhSidebar,
         editLink: {
           pattern: editLinkPattern,
@@ -2684,7 +2717,7 @@ export default defineConfig({
       themeConfig: {
         englishRoutes,
         chineseRoutes,
-        nav: enNav,
+        nav: courseNav(enNav),
         sidebar: enSidebar,
         editLink: {
           pattern: editLinkPattern,
@@ -2728,7 +2761,7 @@ export default defineConfig({
     i18nRouting: false,
     logo: '/readme/logo-symbol.svg',
     siteTitle: 'Hands on Modern RL',
-    nav: zhNav,
+    nav: courseNav(zhNav),
     sidebar: zhSidebar,
     socialLinks: [
       { icon: 'github', link: `https://github.com/${owner}/${repo}` }

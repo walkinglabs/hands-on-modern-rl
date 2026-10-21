@@ -1,0 +1,84 @@
+{
+  "cartpole": {
+    "name": "Keep the cart balanced",
+    "desc": "Inspect the reward curve, then replay the policy learned by the model.",
+    "result": "Reward curves, training logs, a checkpoint, and a policy GIF.",
+    "next": "Reuse the existing Notebook and verify each hosted environment separately."
+  },
+  "gymnasium": {
+    "name": "Try different control environments",
+    "desc": "Choose an environment and compare its observations, actions, and training feedback.",
+    "result": "Evaluation curves, model files, and policy replays for the selected task.",
+    "next": "Install only the dependencies needed by the selected environment."
+  },
+  "vizdoom": {
+    "name": "Make decisions from a first-person view",
+    "desc": "Train in a small shooting scenario and replay the current policy.",
+    "result": "DQN training logs, evaluation curves, and first-person GIFs.",
+    "next": "Verify system dependencies and headless rendering on each platform."
+  },
+  "atari": {
+    "name": "Turn pixels into actions",
+    "desc": "Use frame stacking and a CNN to learn actions from game images.",
+    "result": "Evaluation checkpoints, model selection, and ALE environment replays.",
+    "next": "Verify GPU availability and the ROM installation workflow."
+  },
+  "minecraft": {
+    "name": "Train a first-person visual policy",
+    "desc": "Train a visual PPO policy inside the Minecraft simulator.",
+    "result": "Visual PPO logs, evaluation, and first-person policy replays.",
+    "next": "Verify simulator downloads, native dependencies, and Xvfb support."
+  },
+  "jax": {
+    "name": "Train pixel games with vectorized updates",
+    "desc": "Compile the update function, then inspect training and policy replays.",
+    "result": "Compilation logs, policy losses, evaluation returns, and pixel replays.",
+    "next": "Verify a compatible JAX and Flax dependency combination."
+  },
+  "unity": {
+    "name": "Learn control in a physics scene",
+    "desc": "Choose a scene and inspect the behavior learned by PPO.",
+    "result": "Training metrics and replays from the selected Unity environment.",
+    "next": "Verify the Python version and native ML-Agents environment."
+  },
+  "minigrid": {
+    "name": "Discover rewards in a maze",
+    "desc": "Start with a small maze and observe exploration under sparse rewards.",
+    "result": "Evaluation curves, maze replays, and model checkpoints.",
+    "next": "Verify native dependencies and headless rendering."
+  },
+  "multiagent": {
+    "name": "Teach several agents to cooperate",
+    "desc": "Train a shared policy in cooperative and competitive settings.",
+    "result": "Team rewards, synchronized multi-agent replays, and checkpoints.",
+    "next": "Verify PettingZoo and the environment dependency versions."
+  },
+  "maniskill": {
+    "name": "Train a robot in simulation",
+    "desc": "Train a policy in a robot manipulation task and replay its actions.",
+    "result": "Policy evaluation in PhysX simulation and robot GIFs.",
+    "next": "Verify the graphics driver, CUDA, and simulator combination."
+  },
+  "ai2thor": {
+    "name": "Find a target in a room",
+    "desc": "Navigate an interactive room by choosing actions from visual observations.",
+    "result": "Navigation evaluation, training curves, and first-person room replays.",
+    "next": "Verify simulator downloads and the headless graphics backend."
+  },
+  "selfplay": {
+    "name": "Improve by playing against an opponent",
+    "desc": "Start with tic-tac-toe and small poker games to observe interacting policies.",
+    "result": "Win rates, equilibrium gaps, and complete game replays.",
+    "next": "Reuse the existing CFR+ and tabular self-play runtime."
+  },
+  "bandit": { "name": "Explore or exploit?" },
+  "gridworld": { "name": "Learn a path through GridWorld" },
+  "dqn": { "name": "Compare DQN and Double DQN" },
+  "reinforce": { "name": "Stabilize policy gradients with a baseline" },
+  "pendulum": { "name": "Learn continuous control in Pendulum" },
+  "dpo": { "name": "Change responses with preference data" },
+  "grpo": { "name": "Turn verifiable answers into rewards" },
+  "financial": { "name": "Train a model to call tools" },
+  "worldmodel": { "name": "Learn to predict, then plan" },
+  "offline": { "name": "Evaluate actions beyond the dataset" }
+}

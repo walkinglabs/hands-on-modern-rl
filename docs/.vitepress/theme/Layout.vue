@@ -11,6 +11,7 @@ import {
 import {
   ChevronsDown,
   ChevronsUp,
+  FlaskConical,
   HandHeart,
   MessageCircle,
   Moon,
@@ -153,6 +154,12 @@ const mobileRoutePath = computed(() => {
 const isEnglishRoute = computed(
   () =>
     mobileRoutePath.value === '/en' || mobileRoutePath.value.startsWith('/en/')
+)
+const labLink = computed(() =>
+  withBase(isEnglishRoute.value ? '/en/labs/' : '/labs/')
+)
+const isLabPage = computed(() =>
+  /^\/(?:en\/)?labs(?:\/|$)/.test(mobileRoutePath.value)
 )
 const sidebarGroupsToggleLabel = computed(() =>
   allSidebarGroupsExpanded.value ? 'Collapse all' : 'Expand all'
@@ -1267,8 +1274,16 @@ watch(
 <template>
   <PopoverRoot v-model:open="readingToolsOpen">
     <DefaultTheme.Layout>
-      <template v-if="showDocChrome" #nav-bar-content-after>
+      <template #nav-bar-content-after>
         <div class="ct-nav-tools">
+          <a
+            class="ct-lab-button ct-lab-desktop"
+            :href="labLink"
+            :aria-current="isLabPage ? 'page' : undefined"
+          >
+            <FlaskConical :size="15" :stroke-width="1.8" aria-hidden="true" />
+            <span>{{ isEnglishRoute ? 'Lab' : '实验室' }}</span>
+          </a>
           <a
             class="ct-nav-tool-button ct-language-toggle"
             :href="alternateLanguageLink"
@@ -1280,6 +1295,26 @@ watch(
               {{ alternateLanguageShort }}
             </span>
           </a>
+
+          <button
+            v-if="frontmatter.layout === 'page'"
+            class="ct-nav-tool-button"
+            type="button"
+            :aria-label="
+              isDark
+                ? readingToolsCopy.switchLight
+                : readingToolsCopy.switchDark
+            "
+            @click="setAppearance(!isDark)"
+          >
+            <Sun
+              v-if="isDark"
+              :size="16"
+              :stroke-width="1.8"
+              aria-hidden="true"
+            />
+            <Moon v-else :size="16" :stroke-width="1.8" aria-hidden="true" />
+          </button>
 
           <PopoverPortal>
             <Transition name="ct-reading-tools-fade">
@@ -1608,6 +1643,14 @@ watch(
       </template>
 
       <template #nav-screen-content-after>
+        <a
+          class="ct-lab-button ct-lab-mobile"
+          :href="labLink"
+          :aria-current="isLabPage ? 'page' : undefined"
+        >
+          <FlaskConical :size="16" :stroke-width="1.8" aria-hidden="true" />
+          <span>{{ isEnglishRoute ? 'Lab' : '实验室' }}</span>
+        </a>
         <div class="ct-mobile-language-switcher">
           <div class="ct-mobile-language-title">
             {{ isEnglishRoute ? 'Change language' : '切换语言' }}
@@ -1626,7 +1669,7 @@ watch(
 
     <ClientOnly>
       <div
-        v-if="showDocChrome"
+        v-if="showDocChrome && frontmatter.sidebar !== false"
         class="ct-sidebar-hover-area"
         :class="{ collapsed: sidebarCollapsed, resizing: sidebarResizing }"
       >
@@ -1676,7 +1719,7 @@ watch(
     </ClientOnly>
 
     <ClientOnly>
-      <ReadingProgress v-if="showDocChrome" />
+      <ReadingProgress v-if="showDocChrome && frontmatter.layout !== 'page'" />
     </ClientOnly>
 
     <ClientOnly>
@@ -1772,6 +1815,46 @@ watch(
 </template>
 
 <style>
+.ct-lab-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 35px;
+  padding: 7px 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--vp-c-brand-1);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 550;
+  line-height: 20px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.18s ease;
+}
+.ct-lab-button:hover {
+  background: var(--vp-c-brand-2);
+}
+.ct-lab-desktop {
+  margin-right: 12px;
+  margin-left: 14px;
+}
+.ct-lab-mobile {
+  display: none;
+}
+@media (max-width: 1099px) {
+  .ct-lab-desktop {
+    display: none;
+  }
+  .ct-lab-mobile {
+    display: flex;
+    width: 100%;
+    min-height: 44px;
+    margin: 18px 0 24px;
+  }
+}
+
 .ct-nav-tools {
   position: relative;
   display: inline-flex;

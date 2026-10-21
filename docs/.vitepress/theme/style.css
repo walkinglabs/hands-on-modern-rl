@@ -195,6 +195,20 @@
   background: transparent !important;
 }
 
+/* Keep the fixed mobile menu relative to the viewport, not the 64px header.
+   A backdrop filter creates a containing block for fixed descendants. */
+@media (max-width: 1099px) {
+  .VPNav {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .VPNavBar {
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+  }
+}
+
 .VPNavBar .container {
   max-width: 100% !important;
 }
@@ -426,6 +440,16 @@
     background-color 0.18s ease,
     border-color 0.18s ease,
     color 0.18s ease;
+}
+
+.VPNavBar .VPNavBarMenuGroup {
+  display: flex;
+  align-items: center;
+}
+
+.VPNavBar .VPNavBarMenuGroup.active > .button {
+  color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
 }
 
 .VPNavBar .VPFlyout .button:hover,
