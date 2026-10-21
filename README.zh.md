@@ -44,6 +44,8 @@
   </p>
 </div>
 
+实验室已补齐 10 本可独立运行的章节 Notebook，与 12 本 Studio 实验合计 22 项。查看[实验室](https://walkinglabs.github.io/hands-on-modern-rl/labs/)或[本地验收记录](code/chapter-notebooks/README.md)。
+
 ## 学习路线
 
 **传统与深度强化学习（第 1–12 章）。** 从 CartPole 开始，观察动作怎样改变环境、奖励怎样影响策略，再学习 MDP 和价值函数。在游戏与连续控制实验中实现 DQN、策略梯度、Actor-Critic 和 PPO，并扩展到离线强化学习、模仿学习、探索与世界模型。

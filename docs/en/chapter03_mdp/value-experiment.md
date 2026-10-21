@@ -1,5 +1,7 @@
 # 3.3 Hands-on: Value Iteration and Q-Learning
 
+<ChapterNotebookLink chapter="mdp" locale="en" />
+
 > **Section goal**: Run value iteration and Q-Learning in the same 4×4 GridWorld, observe how the goal reward reaches the starting state, and compare how the two algorithms obtain information.
 
 > **Learning path**: [3.1 State Values and the Bellman Expectation Equation](./value-bellman) → [3.2 Action Values and the Bellman Optimality Equation](./value-q) → **3.3 Value Iteration and Q-Learning**

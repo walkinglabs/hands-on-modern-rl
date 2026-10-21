@@ -1,5 +1,7 @@
 # 14.4 动手：DPO 对齐实验
 
+<ChapterNotebookLink chapter="dpo" />
+
 > **本节目标**：用成对偏好数据训练小型语言模型，先纠正"过度顺从"，再把偏好方向换成"减少讽刺"，并通过训练指标和训练前后回答判断 DPO 是否产生了预期偏好。
 
 > **学习路径**：[14.1 DPO 目标与推导](./dpo-objective-derivation) → [14.2 训练与评测指标](./metrics) → [14.3 DPO 改进方法](./dpo-theory-and-family) → **14.4 DPO 对齐实验**

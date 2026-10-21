@@ -4,6 +4,7 @@ import './style.css'
 import DpoCodeFocus from '../../chapter17_dpo/components/DpoCodeFocus.vue'
 import Layout from './Layout.vue'
 import CourseNavMenu from './components/CourseNavMenu.vue'
+import ChapterNotebookLink from './components/ChapterNotebookLink.vue'
 import NavCard from './components/NavCard.vue'
 import NavGrid from './components/NavGrid.vue'
 import OnlineTraining from './components/OnlineTraining.vue'
@@ -30,6 +31,7 @@ export default {
     ctx.app.component('PpoCodeFocus', PpoCodeFocus)
     ctx.app.component('StepBar', StepBar)
     ctx.app.component('CourseNavMenu', CourseNavMenu)
+    ctx.app.component('ChapterNotebookLink', ChapterNotebookLink)
     loadFonts()
   }
 }

@@ -1,5 +1,7 @@
 # 3.3 动手：价值迭代与 Q-Learning
 
+<ChapterNotebookLink chapter="mdp" />
+
 > **本节目标**：在同一个 4×4 GridWorld 中运行价值迭代和 Q-Learning，观察目标奖励怎样传到起点，并比较两种算法获取信息的方式。
 
 > **学习路径**：[3.1 状态价值与贝尔曼期望方程](./value-bellman) → [3.2 动作价值与贝尔曼最优方程](./value-q) → **3.3 价值迭代与 Q-Learning**

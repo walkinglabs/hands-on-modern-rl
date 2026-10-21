@@ -4,6 +4,8 @@ title: 2.1 Exploration and Exploitation
 
 # 2.1 Exploration and Exploitation
 
+<ChapterNotebookLink chapter="mdp" locale="en" />
+
 **Core Content**
 
 - Master the unified language of the MDP tuple, discounted cumulative return, value functions, and the Bellman equation.

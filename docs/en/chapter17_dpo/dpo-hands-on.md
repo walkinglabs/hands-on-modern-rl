@@ -1,5 +1,7 @@
 # 14.4 Hands-on: A DPO Alignment Experiment
 
+<ChapterNotebookLink chapter="dpo" locale="en" />
+
 > **Section goal**: Train a small language model on paired preferences: first to stop blindly agreeing with the user, then to reduce sarcastic responses. Use training metrics and before-and-after generations to check the learned preference.
 
 > **Learning path**: [14.1 The DPO Objective and Derivation](./dpo-objective-derivation) → [14.2 Training and Evaluation Metrics](./metrics) → [14.3 The DPO Family](./dpo-theory-and-family) → **14.4 DPO Alignment Experiment**

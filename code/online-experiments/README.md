@@ -1,4 +1,27 @@
-# Online experiment notebooks
+# Chapter and Studio experiment notebooks
+
+The [lab](https://walkinglabs.github.io/hands-on-modern-rl/labs/) contains 22 Notebook entries: 10 self-contained chapter experiments and the original 12 Studio companions. The chapter experiments below have been executed locally with their default CPU budgets. Colab and ModelScope links open the files; hosted execution is a separate verification step.
+
+## Self-contained chapter experiments
+
+Each Notebook contains setup, a baseline, the experiment, evaluation, figures, saved results, and optional exercises. Explanations are in Chinese; code and plot labels are in English. DPO and tool GRPO train tiny CPU models, with their scope distinguished from the book’s pretrained-model recipes.
+
+| Experiment                | Colab                                                                                                                                                 | ModelScope                                                                                                                                               |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BANDIT · EXPLORATION      | [Open](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-bandit.ipynb)     | [Open](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-bandit.ipynb)     |
+| GRIDWORLD · Q-LEARNING    | [Open](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-gridworld.ipynb)  | [Open](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-gridworld.ipynb)  |
+| DQN · DOUBLE DQN          | [Open](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-dqn.ipynb)        | [Open](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-dqn.ipynb)        |
+| REINFORCE · BASELINE      | [Open](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-reinforce.ipynb)  | [Open](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-reinforce.ipynb)  |
+| PENDULUM · ACTOR-CRITIC   | [Open](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-pendulum.ipynb)   | [Open](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-pendulum.ipynb)   |
+| DPO · PREFERENCE          | [Open](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-dpo.ipynb)        | [Open](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-dpo.ipynb)        |
+| GRPO · RLVR               | [Open](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-grpo.ipynb)       | [Open](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-grpo.ipynb)       |
+| TOOL CALLING · GRPO       | [Open](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-financial.ipynb)  | [Open](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-financial.ipynb)  |
+| WORLD MODEL · PLANNING    | [Open](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-worldmodel.ipynb) | [Open](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-worldmodel.ipynb) |
+| OFFLINE RL · DISTRIBUTION | [Open](https://colab.research.google.com/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-offline.ipynb)    | [Open](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-offline.ipynb)    |
+
+See the [local execution record and limits](../chapter-notebooks/README.md) and [machine-readable results](../chapter-notebooks/validation.json).
+
+## Studio companion notebooks
 
 These are the companion notebooks for the WalkingLab × Hands-On Modern RL ModelScope Studios. Each notebook installs the matching runtime once, imports the same training implementation used by its Studio, streams the training log, plots checkpoint metrics, and displays the learned-policy replay or result artifact.
 

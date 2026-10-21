@@ -44,6 +44,8 @@
   </p>
 </div>
 
+The lab now includes 10 self-contained chapter Notebooks alongside 12 Studio companions. Browse the [lab](https://walkinglabs.github.io/hands-on-modern-rl/en/labs/) or inspect the [local execution evidence](code/chapter-notebooks/README.md).
+
 ## Learning Paths
 
 **Classical & deep RL (Chapters 1–12).** Start with CartPole: choose an action, observe the next state, and collect a reward. Build MDPs and value functions around that interaction, then implement DQN, policy gradients, Actor-Critic, and PPO in games and control tasks. Offline RL, imitation learning, exploration, and world models extend these foundations.

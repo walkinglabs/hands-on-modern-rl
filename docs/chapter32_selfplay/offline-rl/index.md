@@ -1,5 +1,7 @@
 # 补充阅读：离线强化学习——从历史数据到可靠策略
 
+<ChapterNotebookLink chapter="selfplay" />
+
 <a id="article-start"></a>
 
 到目前为止，我们见过的大多数强化学习算法都有一个隐含前提：智能体可以一边学习，一边继续和环境交互。DQN 可以反复玩 Atari，PPO 可以在仿真器里摔倒再重来，GRPO 可以让模型不断生成新答案再用规则打分。

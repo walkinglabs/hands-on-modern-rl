@@ -1,5 +1,7 @@
 # 2.1 探索与利用
 
+<ChapterNotebookLink chapter="mdp" />
+
 ## 本节导读
 
 **核心内容**

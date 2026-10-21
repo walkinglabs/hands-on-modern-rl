@@ -1,5 +1,7 @@
 # 7.4 动手：Pendulum 连续控制
 
+<ChapterNotebookLink chapter="ac" />
+
 > **本节目标**：用 A2C 训练 `Pendulum-v1`，理解连续动作 Actor-Critic 为什么要输出高斯分布，以及 Critic 如何帮助 Actor 在连续控制中稳定学习。
 
 > **学习路径**：[7.1 优势函数](./advantage-function) → [7.2 Actor-Critic](./actor-critic) → **7.4 Pendulum 连续控制**

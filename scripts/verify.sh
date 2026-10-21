@@ -1,6 +1,9 @@
 #!/bin/sh
 set -eu
 
+echo "Checking Notebook catalog..."
+npm run verify:notebooks
+
 echo "Checking formatting..."
 npm run format:check
 

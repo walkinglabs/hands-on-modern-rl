@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "npm run assets:optimize && vitepress dev docs",
     "dev:fast": "vitepress dev docs",
-    "build": "npm run assets:optimize && npm run sitemap && vitepress build docs",
-    "build:force": "npm run assets:optimize && npm run sitemap && vitepress build docs --force",
+    "build": "npm run verify:notebooks && npm run assets:optimize && npm run sitemap && vitepress build docs",
+    "build:force": "npm run verify:notebooks && npm run assets:optimize && npm run sitemap && vitepress build docs --force",
     "pdf:build": "node scripts/build-pdf.mjs",
     "epub:build": "node scripts/build-epub.mjs",
     "preview": "vitepress preview docs",
@@ -20,7 +20,8 @@
     "verify:bilingual": "node scripts/check-bilingual-sync.mjs",
     "verify:english": "node scripts/check-english-quality.mjs",
     "sitemap": "node scripts/generate-sitemap.mjs",
-    "fix:headings": "node scripts/fix-heading-numbers.mjs"
+    "fix:headings": "node scripts/fix-heading-numbers.mjs",
+    "verify:notebooks": "python3 scripts/verify_chapter_notebooks.py && python3 scripts/verify_online_experiment_notebooks.py"
   },
   "keywords": [
     "walkinglabs",

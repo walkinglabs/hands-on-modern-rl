@@ -4,6 +4,8 @@ title: 'Supplementary Reading: Model-Based RL'
 
 # Supplementary Reading: Model-Based RL
 
+<ChapterNotebookLink chapter="embodied" locale="en" />
+
 <a id="article-start"></a>
 
 In embodied intelligence, the real world is not a Gym environment that can be `reset()` indefinitely. If a robotic arm misses a grasp, it may hit the table. If a quadruped falls, a person may have to pick it up. Autonomous driving certainly cannot explore boundary conditions through real accidents. Therefore, one of the central questions in embodied RL is: **can we do less trial and error in the real world, and more reasoning inside a "mental world"?**

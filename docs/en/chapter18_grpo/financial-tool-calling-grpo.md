@@ -1,5 +1,7 @@
 # 15.6 Hands-on: GRPO for Financial Tool Calling
 
+<ChapterNotebookLink chapter="grpo" locale="en" />
+
 > **Section goal**: Train a small model to produce financial API calls with GRPO, using JSON, schema, and execution checks to verify the selected tool and its arguments.
 
 > **Learning path**: [15.3 Building RLVR Rewards](./rlvr) → [15.5 RL Environments and Verifiers](./rl-environments) → **15.6 Financial Tool Calling**

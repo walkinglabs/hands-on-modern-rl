@@ -1,5 +1,7 @@
 # 6.5 动手：价值基线控制 CartPole
 
+<ChapterNotebookLink chapter="pg" />
+
 > **本节目标**：用 `CartPole-v1` 对比原始 REINFORCE 和带价值基线（Value Baseline, VB）的 REINFORCE，观察 $V(s)$ 如何让策略梯度训练更快、更稳。
 
 > **学习路径**：[6.3 摇骰子赌博机](./dice-game) → [6.4 REINFORCE 控制 CartPole](./cartpole) → **6.5 价值基线控制 CartPole**

@@ -4,6 +4,8 @@ title: '15.3 RLVR: Verifiable Rewards'
 
 # 15.3 Hands-on: Building RLVR Rewards
 
+<ChapterNotebookLink chapter="grpo" locale="en" />
+
 > **Section goal**: Implement a verifiable reward for mathematical reasoning, connect it to a minimal GRPO loop, and test whether format, answer, and total rewards behave as intended.
 
 > **Learning path**: [15.1 How GRPO Training Works](./grpo-practice-and-mechanism) → [15.2 DeepSeek-R1-Zero and DAPO](./deepseek-dapo) → **15.3 Building RLVR Rewards**

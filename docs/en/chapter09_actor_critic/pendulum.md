@@ -4,6 +4,8 @@ title: '7.4 Hands-on: Pendulum Swing-Up and Balance'
 
 # 7.4 Hands-on: Pendulum Continuous Control
 
+<ChapterNotebookLink chapter="ac" locale="en" />
+
 > **Section goal**: Train `Pendulum-v1` with A2C, understand why a continuous-action Actor outputs a Gaussian distribution, and see how the Critic stabilizes learning.
 
 > **Learning path**: [7.1 The Advantage Function](./advantage-function) → [7.2 Actor-Critic](./actor-critic) → **7.4 Pendulum Continuous Control**

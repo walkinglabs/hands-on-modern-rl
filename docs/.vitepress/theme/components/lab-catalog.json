@@ -50,9 +50,11 @@
       "art": "bars",
       "desc": "让随机、贪心和 UCB 在同一组老虎机上做选择。",
       "result": "累计收益、遗憾曲线与多随机种子的策略比较。",
-      "path": null,
+      "path": "code/online-experiments/hands-on-modern-rl-bandit.ipynb",
       "source": "code/chapter03_mdp/two_armed_bandit.py",
-      "next": "新增 notebook：展开策略选择与对照实验。"
+      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result"
     },
     {
       "id": "gridworld",
@@ -66,9 +68,11 @@
       "art": "grid",
       "desc": "从一张价值表出发，看到路径怎样一步步形成。",
       "result": "价值表、策略箭头、学习曲线与最终路径。",
-      "path": null,
+      "path": "code/online-experiments/hands-on-modern-rl-gridworld.ipynb",
       "source": "code/chapter03_mdp/gridworld_q_learning.py",
-      "next": "新增 notebook：复用已存在的完整实验脚本。"
+      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result"
     },
     {
       "id": "dqn",
@@ -77,14 +81,16 @@
       "en": "DQN · DOUBLE DQN",
       "chapter": "5.2 DQN 的结构与实现",
       "lesson": "chapter07_dqn/dqn-components",
-      "device": "CPU / GPU",
+      "device": "CPU",
       "kind": "真实训练",
       "art": "bars",
       "desc": "对照 DQN 与 Double DQN，拆开回放与目标网络。",
       "result": "两种算法的奖励曲线、Q 值估计与策略回放。",
-      "path": null,
+      "path": "code/online-experiments/hands-on-modern-rl-dqn.ipynb",
       "source": "code/chapter04_dqn/double_dqn_cartpole.py",
-      "next": "新增 notebook：小环境为默认，LunarLander 作为选做。"
+      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result"
     },
     {
       "id": "reinforce",
@@ -98,9 +104,11 @@
       "art": "bars",
       "desc": "在同一个 CartPole 中，比较回报与优势带来的更新。",
       "result": "多种子奖励曲线、方差对照与训练后的回放。",
-      "path": null,
+      "path": "code/online-experiments/hands-on-modern-rl-reinforce.ipynb",
       "source": "code/chapter05_policy_gradient",
-      "next": "新增 notebook：把原始 REINFORCE 和基线放到同一本。"
+      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result"
     },
     {
       "id": "pendulum",
@@ -113,10 +121,12 @@
       "kind": "真实训练",
       "art": "cart",
       "desc": "动作从左与右变成连续力矩，观察 Actor 与 Critic。",
-      "result": "控制力矩、价值估计、回报曲线与摆杆动画。",
-      "path": null,
+      "result": "原始回报、控制力矩、归一化价值估计和真实摆杆动画；短训练仍有失败。",
+      "path": "code/online-experiments/hands-on-modern-rl-pendulum.ipynb",
       "source": "code/chapter06_actor_critic/actor_critic_pendulum.py",
-      "next": "新增 notebook：内联展示回放，保留训练源码。"
+      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result"
     },
     {
       "id": "minigrid",
@@ -157,14 +167,16 @@
       "en": "DPO · PREFERENCE",
       "chapter": "14.4 DPO 对齐实验",
       "lesson": "chapter17_dpo/dpo-hands-on",
-      "device": "单卡 GPU",
+      "device": "CPU",
       "kind": "真实训练",
       "art": "code",
-      "desc": "自己构造 chosen / rejected，再对比训练前后回答。",
-      "result": "DPO loss、reward margin、留出集与回答对照。",
-      "path": null,
+      "desc": "从零训练微型 GRU，再用成对偏好实际更新语言模型参数。",
+      "result": "DPO 损失、留出偏好间隔、回答对照与主题保持率；含内容退化反例。",
+      "path": "code/online-experiments/hands-on-modern-rl-dpo.ipynb",
       "source": "code/chapter17_dpo",
-      "next": "新增 notebook：串联现有五步脚本；显存与平台待实测。"
+      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result"
     },
     {
       "id": "grpo",
@@ -177,10 +189,12 @@
       "kind": "机制演示",
       "art": "bars",
       "desc": "手算一组回答的奖励与优势，检验规则验证器。",
-      "result": "组内归一化、优势数值与奖励函数测试。",
-      "path": null,
+      "result": "组内优势、验证器测试、逐 token 裁剪与 padding 梯度检查。",
+      "path": "code/online-experiments/hands-on-modern-rl-grpo.ipynb",
       "source": "code/chapter09_grpo_rlvr",
-      "next": "新增 notebook：明确区分机制演示与简化语言模型训练。"
+      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result"
     },
     {
       "id": "financial",
@@ -189,14 +203,16 @@
       "en": "TOOL CALLING · GRPO",
       "chapter": "15.6 金融工具调用 GRPO",
       "lesson": "chapter18_grpo/financial-tool-calling-grpo",
-      "device": "单卡 GPU",
+      "device": "CPU",
       "kind": "真实训练",
       "art": "code",
-      "desc": "通过 JSON、schema 和执行结果，验证模拟工具调用。",
-      "result": "格式通过率、参数正确率与留出请求成功率。",
-      "path": null,
+      "desc": "训练受限调用语言的小型 GRU，再将调用渲染为 JSON 并执行模拟工具。",
+      "result": "真实 GRPO 更新、格式与参数指标、训练和留出请求对照；含泛化失败。",
+      "path": "code/online-experiments/hands-on-modern-rl-financial.ipynb",
       "source": "docs/chapter18_grpo/financial-tool-calling-grpo.md",
-      "next": "新增 notebook：把正文的合成数据、mock 工具和训练器串联。"
+      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result"
     },
     {
       "id": "vizdoom",
@@ -290,9 +306,11 @@
       "art": "cart",
       "desc": "在小型点质量环境中，学习动作怎样改变未来。",
       "result": "动力学预测误差、规划轨迹与真实环境回报。",
-      "path": null,
+      "path": "code/online-experiments/hands-on-modern-rl-worldmodel.ipynb",
       "source": "docs/chapter28_vla/embodied-intelligence/model-based-rl/snippets/minimal_mbrl_point_mass.py",
-      "next": "新增 notebook：展开小模型训练、规划与误差分析。"
+      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result"
     },
     {
       "id": "offline",
@@ -305,10 +323,12 @@
       "kind": "真实训练",
       "art": "bars",
       "desc": "只用一份固定数据，检查策略是否被分布外估计误导。",
-      "result": "数据覆盖图、价值估计与策略回报对照。",
-      "path": null,
+      "result": "固定数据覆盖、分布外价值估计、三种子策略对照与保守性分析。",
+      "path": "code/online-experiments/hands-on-modern-rl-offline.ipynb",
       "source": "docs/chapter32_selfplay/offline-rl/snippets/minimal_offline_rl_contextual_bandit.py",
-      "next": "新增 notebook：复用自生成数据与保守价值学习实验。"
+      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "validation": "local-cpu-executed",
+      "previewKind": "result"
     },
     {
       "id": "maniskill",

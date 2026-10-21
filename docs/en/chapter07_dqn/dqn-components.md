@@ -3,6 +3,8 @@ title: 5.2 DQN Architecture and Implementation
 ---
 
 # 5.2 DQN Architecture and Implementation
+
+<ChapterNotebookLink chapter="dqn" locale="en" />
 ## Section Guide
 
 **Core ideas**

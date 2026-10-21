@@ -1,5 +1,7 @@
 # 补充阅读：Model-Based RL——从 Model-Free 到 Model-Based
 
+<ChapterNotebookLink chapter="embodied" />
+
 <a id="article-start"></a>
 
 在具身智能中，真实世界不是一个可以无限 `reset()` 的 Gym 环境。机械臂夹错一次可能会撞到桌面，四足机器人摔一次可能要人工扶起，自动驾驶更不可能靠真实事故来探索边界条件。因此，具身 RL 最核心的问题之一是：**能不能少在真实世界试错，多在“脑内世界”里推演？**

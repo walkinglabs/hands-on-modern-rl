@@ -50,6 +50,8 @@ const copy = english
         'Hosted environments will be verified individually. Resource requirements and reproduction notes are available in each experiment’s details.',
       close: 'Close experiment details',
       bookPreview: 'Environment preview from the book',
+      experimentPreview: 'Local experiment result',
+      verification: 'Local execution record',
       method: 'Method',
       resource: 'Resources',
       kind: 'Experiment type',
@@ -93,6 +95,8 @@ const copy = english
         '现有 Notebook 的平台环境将逐项验收；硬件需求与复现说明可在实验详情中查看。',
       close: '关闭实验说明',
       bookPreview: '书中环境预览',
+      experimentPreview: '本地实验结果',
+      verification: '本地运行记录',
       method: '方法',
       resource: '运行资源',
       kind: '实验类型',
@@ -176,6 +180,51 @@ const methodNames = {
   '自博弈 · CFR+': 'Self-play · CFR+'
 }
 const info = {
+  bandit: [
+    'Bandit',
+    '在尝试中找到更好的动作',
+    'UCB · ε-greedy',
+    'bandit-result.png'
+  ],
+  gridworld: [
+    'GridWorld',
+    '从价值表走到终点',
+    'Q-learning',
+    'gridworld-result.png'
+  ],
+  dqn: [
+    'DQN · Double DQN',
+    '拆开动作选择和价值评价',
+    'DQN · Double DQN',
+    'dqn-result.gif'
+  ],
+  reinforce: [
+    'REINFORCE',
+    '用状态基线检查策略梯度',
+    'REINFORCE',
+    'reinforce-result.gif'
+  ],
+  pendulum: ['Pendulum', '学习连续力矩控制', 'A2C', 'pendulum-result.gif'],
+  dpo: ['DPO', '训练一个微型语言模型的偏好', 'DPO · GRU', 'dpo-result.png'],
+  grpo: ['GRPO · RLVR', '逐项检查奖励和优势', 'GRPO', 'grpo-result.png'],
+  financial: [
+    'Tool Calling',
+    '用模拟执行结果更新策略',
+    'GRPO · GRU',
+    'financial-result.png'
+  ],
+  worldmodel: [
+    'World Model',
+    '预测动作后果，再规划',
+    'Model-based RL',
+    'worldmodel-result.png'
+  ],
+  offline: [
+    'Offline RL',
+    '检查数据之外的价值估计',
+    'CQL-style · BC',
+    'offline-result.png'
+  ],
   cartpole: ['CartPole', '让小车保持平衡', 'PPO', 'cartpole.gif'],
   gymnasium: ['Gymnasium', '尝试不同的控制环境', '经典控制', 'gymnasium.gif'],
   vizdoom: ['ViZDoom', '从第一人称画面做决策', 'DQN', 'vizdoom.gif'],
@@ -415,7 +464,8 @@ onBeforeUnmount(() => {
             </div>
           </details>
           <span class="nl-total" aria-live="polite">
-            {{ filtered.length }} {{ copy.notebooks }}
+            {{ filtered.length }}
+            {{ english && filtered.length === 1 ? 'Notebook' : copy.notebooks }}
           </span>
         </div>
         <div class="nl-view-switch" :aria-label="copy.browse">
@@ -457,7 +507,10 @@ onBeforeUnmount(() => {
               <button
                 type="button"
                 class="nl-cover"
-                :class="'nl-scene-' + lab.id"
+                :class="[
+                  'nl-scene-' + lab.id,
+                  { 'nl-result-preview': lab.previewKind === 'result' }
+                ]"
                 :aria-label="
                   copy.review + ' ' + lab.title + ' · ' + copy.details
                 "
@@ -466,7 +519,13 @@ onBeforeUnmount(() => {
                 <img
                   v-if="lab.image"
                   :src="lab.image"
-                  :alt="lab.title + ' · ' + copy.environment"
+                  :alt="
+                    lab.title +
+                    ' · ' +
+                    (lab.previewKind === 'result'
+                      ? copy.experimentPreview
+                      : copy.environment)
+                  "
                   :loading="lab.id === 'cartpole' ? 'eager' : 'lazy'"
                   decoding="async"
                 />
@@ -532,7 +591,13 @@ onBeforeUnmount(() => {
                   <div class="nl-target"></div>
                 </div>
                 <span class="nl-cover-label">
-                  {{ lab.image ? copy.environment : copy.schematic }}
+                  {{
+                    lab.previewKind === 'result'
+                      ? copy.experimentPreview
+                      : lab.image
+                        ? copy.environment
+                        : copy.schematic
+                  }}
                 </span>
                 <span class="nl-cover-more"><ArrowUpRight :size="17" /></span>
               </button>
@@ -670,7 +735,7 @@ onBeforeUnmount(() => {
             <ArrowRight :size="14" />
           </a>
         </div>
-        <details class="nl-planned">
+        <details v-if="planned.length" class="nl-planned">
           <summary>
             <span>{{ copy.planned }}</span>
             <span class="nl-planned-count">
@@ -722,9 +787,21 @@ onBeforeUnmount(() => {
         <div v-if="active.image" class="nl-dialog-image">
           <img
             :src="active.image"
-            :alt="active.title + ' · ' + copy.environment"
+            :alt="
+              active.title +
+              ' · ' +
+              (active.previewKind === 'result'
+                ? copy.experimentPreview
+                : copy.environment)
+            "
           />
-          <span>{{ copy.bookPreview }}</span>
+          <span>
+            {{
+              active.previewKind === 'result'
+                ? copy.experimentPreview
+                : copy.bookPreview
+            }}
+          </span>
         </div>
         <div class="nl-dialog-content">
           <span class="nl-dialog-chapter">{{ active.chapterName }}</span>
@@ -792,6 +869,17 @@ onBeforeUnmount(() => {
               {{ copy.runtimeDesc }}
             </p>
             <p>{{ active.next }}</p>
+            <a
+              v-if="active.validation === 'local-cpu-executed'"
+              :href="
+                repository + 'blob/main/code/chapter-notebooks/validation.json'
+              "
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {{ copy.verification }}
+              <ArrowUpRight :size="13" />
+            </a>
           </details>
         </div>
       </template>
@@ -998,6 +1086,11 @@ onBeforeUnmount(() => {
 }
 .nl-cover:hover img {
   transform: scale(1.035);
+}
+.nl-result-preview img {
+  object-fit: contain;
+  padding: 12px;
+  background: #fff;
 }
 .nl-scene-cartpole img {
   object-fit: contain;

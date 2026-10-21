@@ -1,5 +1,7 @@
 # 15.3 动手：构建 RLVR 奖励
 
+<ChapterNotebookLink chapter="grpo" />
+
 > **本节目标**：为数学推理实现一个可验证奖励函数，并把它接入最小 GRPO 训练循环，检查格式奖励、答案奖励和总奖励是否符合预期。
 
 > **学习路径**：[15.1 GRPO 训练机制](./grpo-practice-and-mechanism) → [15.2 DeepSeek-R1-Zero 与 DAPO](./deepseek-dapo) → **15.3 构建 RLVR 奖励**

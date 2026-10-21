@@ -71,14 +71,64 @@
     "result": "Win rates, equilibrium gaps, and complete game replays.",
     "next": "Reuse the existing CFR+ and tabular self-play runtime."
   },
-  "bandit": { "name": "Explore or exploit?" },
-  "gridworld": { "name": "Learn a path through GridWorld" },
-  "dqn": { "name": "Compare DQN and Double DQN" },
-  "reinforce": { "name": "Stabilize policy gradients with a baseline" },
-  "pendulum": { "name": "Learn continuous control in Pendulum" },
-  "dpo": { "name": "Change responses with preference data" },
-  "grpo": { "name": "Turn verifiable answers into rewards" },
-  "financial": { "name": "Train a model to call tools" },
-  "worldmodel": { "name": "Learn to predict, then plan" },
-  "offline": { "name": "Evaluate actions beyond the dataset" }
+  "bandit": {
+    "name": "Explore or exploit?",
+    "desc": "Compare random, greedy, epsilon-greedy and UCB under fixed and changing reward probabilities.",
+    "result": "Multi-seed reward and regret curves, plus a changing-environment counterexample.",
+    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. Notebook explanations are in Chinese, with English code and plots. Colab and ModelScope execution has not been verified."
+  },
+  "gridworld": {
+    "name": "Learn a path through GridWorld",
+    "desc": "Compare known-model value iteration and interaction-based Q-learning on the same map.",
+    "result": "Value tables, policy arrows, learning curves and the final six-step path.",
+    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. Notebook explanations are in Chinese, with English code and plots. Colab and ModelScope execution has not been verified."
+  },
+  "dqn": {
+    "name": "Compare DQN and Double DQN",
+    "desc": "Train DQN and Double DQN with the same budget and separate evaluation seeds.",
+    "result": "Two-seed evaluation curves, Q estimates, a saved model and an actual policy replay.",
+    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. Notebook explanations are in Chinese, with English code and plots. Colab and ModelScope execution has not been verified."
+  },
+  "reinforce": {
+    "name": "Stabilize policy gradients with a baseline",
+    "desc": "Enumerate gradient variance, then train policies with and without a learned state baseline.",
+    "result": "Multi-seed returns, gradient diagnostics and a fixed-seed policy replay.",
+    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. Notebook explanations are in Chinese, with English code and plots. Colab and ModelScope execution has not been verified."
+  },
+  "pendulum": {
+    "name": "Learn continuous control in Pendulum",
+    "desc": "Train continuous-torque A2C and save both the policy and normalization statistics.",
+    "result": "Raw-return evaluation, normalized value estimates, torque traces and a real replay.",
+    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. Notebook explanations are in Chinese, with English code and plots. Colab and ModelScope execution has not been verified."
+  },
+  "dpo": {
+    "name": "Change responses with preference data",
+    "desc": "Train a tiny autoregressive GRU on CPU, then update its parameters using paired preferences.",
+    "result": "DPO loss, held-out reward margins, generated responses and a content-retention counterexample.",
+    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. Notebook explanations are in Chinese, with English code and plots. Colab and ModelScope execution has not been verified."
+  },
+  "grpo": {
+    "name": "Turn verifiable answers into rewards",
+    "desc": "Check a strict answer verifier and inspect token-level clipping, KL and padding gradients.",
+    "result": "Group-relative advantages, verifier tests and one real probability-table update.",
+    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. Notebook explanations are in Chinese, with English code and plots. Colab and ModelScope execution has not been verified."
+  },
+  "financial": {
+    "name": "Train a model to call tools",
+    "desc": "Train a tiny autoregressive policy in a restricted tool language, then render calls as JSON.",
+    "result": "Mock execution, separate format and argument metrics, and held-out generalization failures.",
+    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. Notebook explanations are in Chinese, with English code and plots. Colab and ModelScope execution has not been verified."
+  },
+  "worldmodel": {
+    "name": "Learn to predict, then plan",
+    "desc": "Learn point-mass dynamics, measure open-loop drift and plan in the actual environment.",
+    "result": "Trajectory-held-out errors, planning traces and matched-start real-environment returns.",
+    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. Notebook explanations are in Chinese, with English code and plots. Colab and ModelScope execution has not been verified."
+  },
+  "offline": {
+    "name": "Evaluate actions beyond the dataset",
+    "desc": "Train only on fixed data and compare naive Q maximization, conservative penalties and behavior constraints.",
+    "result": "Coverage plots, out-of-distribution Q estimates and three-seed policy-return comparisons.",
+    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. Notebook explanations are in Chinese, with English code and plots. Colab and ModelScope execution has not been verified."
+  }
 }

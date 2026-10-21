@@ -4,6 +4,8 @@ title: '6.5 Hands-on: Value Baseline on CartPole'
 
 # 6.5 Hands-on: Value Baseline on CartPole
 
+<ChapterNotebookLink chapter="pg" locale="en" />
+
 > **Section goal**: Compare vanilla REINFORCE with REINFORCE plus a value baseline on `CartPole-v1`, and observe how estimating $V(s)$ changes training speed and stability.
 
 > **Learning path**: [6.3 Dice-Game Bandit](./dice-game) → [6.4 REINFORCE on CartPole](./cartpole) → **6.5 Value Baseline on CartPole**

@@ -1,14 +1,19 @@
 <script setup>
 import { withBase } from 'vitepress'
 import { FlaskConical, ArrowRight } from 'lucide-vue-next'
-defineProps({ locale: { type: String, default: 'zh' } })
+defineProps({
+  locale: { type: String, default: 'zh' },
+  chapter: { type: String, default: 'intro' }
+})
 </script>
 
 <template>
   <a
     class="chapter-notebook-entry"
     :href="
-      withBase((locale === 'en' ? '/en/labs/' : '/labs/') + '?chapter=intro')
+      withBase(
+        (locale === 'en' ? '/en/labs/' : '/labs/') + '?chapter=' + chapter
+      )
     "
   >
     <FlaskConical :size="16" aria-hidden="true" />

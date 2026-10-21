@@ -4,6 +4,8 @@ title: 'Supplement: Offline Reinforcement Learning'
 
 # Supplement: Offline Reinforcement Learning from Historical Data
 
+<ChapterNotebookLink chapter="selfplay" locale="en" />
+
 <a id="article-start"></a>
 
 Most RL algorithms we have studied share an implicit assumption: the agent can keep interacting with the environment while learning. DQN can repeatedly play Atari, PPO can fall and restart in simulation, GRPO can keep generating new answers and scoring them with rules.

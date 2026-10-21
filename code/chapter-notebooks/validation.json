@@ -1,0 +1,319 @@
+{
+  "started_at": "2026-10-21T10:53:33.638473+00:00",
+  "python": "3.12.13",
+  "platform": "macOS-26.5.1-arm64-arm-64bit",
+  "processor": "arm64",
+  "device": "CPU",
+  "packages": {
+    "numpy": "2.5.4",
+    "torch": "2.14.1",
+    "matplotlib": "3.11.2",
+    "gymnasium": "1.4.0",
+    "stable-baselines3": "2.9.0"
+  },
+  "hosted_platforms": "Colab and ModelScope not executed in this local run",
+  "notebooks": {
+    "bandit": {
+      "status": "passed",
+      "seconds": 6.19,
+      "sha256": "69fdb2a9a47430fc3328532f906185647f02e8c28183e4cd5d5187ec4e2938ef",
+      "code_cells": 5,
+      "metrics": {
+        "random": {
+          "reward": 997.56,
+          "regret": 100.4699999999986
+        },
+        "greedy": {
+          "reward": 1036.92,
+          "regret": 60.35599999999788
+        },
+        "epsilon": {
+          "reward": 1081.94,
+          "regret": 19.387999999999884
+        },
+        "ucb": {
+          "reward": 1061.82,
+          "regret": 37.72000000000026
+        }
+      }
+    },
+    "dpo": {
+      "status": "passed",
+      "seconds": 2.78,
+      "sha256": "64701dd6221988fa4dc66c2d4c763c52da39c0d8ec4d13a2ecd46a7a16521a3c",
+      "code_cells": 6,
+      "metrics": {
+        "before": {
+          "chosen_pair_rate": 0.125,
+          "logprob_gap": -0.008088342845439911,
+          "reward_margin": -1.1622906015418266e-7
+        },
+        "after": {
+          "chosen_pair_rate": 1.0,
+          "logprob_gap": 30.52556610107422,
+          "reward_margin": 6.106730937957764
+        },
+        "requested_topic_retention": {
+          "before": 1.0,
+          "after": 0.375
+        },
+        "examples": [
+          {
+            "prompt": "help topic8",
+            "before": "please read topic8 carefully",
+            "after": "please read topic3 carefully"
+          },
+          {
+            "prompt": "explain topic8",
+            "before": "go away topic8 now",
+            "after": "please read topic3 carefully"
+          },
+          {
+            "prompt": "help topic9",
+            "before": "go away topic9 now",
+            "after": "please read topic9 carefully"
+          },
+          {
+            "prompt": "explain topic9",
+            "before": "go away topic9 now",
+            "after": "please read topic9 carefully"
+          },
+          {
+            "prompt": "help topic10",
+            "before": "please read topic10 carefully",
+            "after": "please read topic10 carefully"
+          },
+          {
+            "prompt": "explain topic10",
+            "before": "go away topic10 now",
+            "after": "please read topic3 carefully"
+          },
+          {
+            "prompt": "help topic11",
+            "before": "go away topic11 now",
+            "after": "please read topic3 carefully"
+          },
+          {
+            "prompt": "explain topic11",
+            "before": "go away topic11 now",
+            "after": "please read topic3 carefully"
+          }
+        ]
+      }
+    },
+    "dqn": {
+      "status": "passed",
+      "seconds": 25.63,
+      "sha256": "0bf910f1b960021ca1870107eb27d42db848398257c199c5a3b8fe3e6537c811",
+      "code_cells": 5,
+      "metrics": {
+        "DQN": {
+          "evaluation_returns": [143.3, 105.4],
+          "initial_state_q": [52.85267181396485, 48.256884765625]
+        },
+        "Double DQN": {
+          "evaluation_returns": [159.4, 110.9],
+          "initial_state_q": [51.59617614746094, 47.4152530670166]
+        }
+      }
+    },
+    "financial": {
+      "status": "passed",
+      "seconds": 2.84,
+      "sha256": "dc14570578ab55fcd71d63ad985b45c1c048ae1e0a4bff7cb7d6a889c60f74e1",
+      "code_cells": 6,
+      "metrics": {
+        "before": {
+          "rendered_json_rate": 1.0,
+          "schema_rate": 1.0,
+          "argument_accuracy": 0.14285714285714285,
+          "execution_success": 0.14285714285714285
+        },
+        "after": {
+          "rendered_json_rate": 1.0,
+          "schema_rate": 1.0,
+          "argument_accuracy": 0.14285714285714285,
+          "execution_success": 0.14285714285714285
+        },
+        "training_before": {
+          "rendered_json_rate": 1.0,
+          "schema_rate": 1.0,
+          "argument_accuracy": 0.3076923076923077,
+          "execution_success": 0.3076923076923077
+        },
+        "training_after": {
+          "rendered_json_rate": 1.0,
+          "schema_rate": 1.0,
+          "argument_accuracy": 0.5384615384615384,
+          "execution_success": 0.5384615384615384
+        },
+        "examples": [
+          {
+            "prompt": ["price", "AAPL", "day1"],
+            "before": "{\"arguments\": {\"date\": \"day2\", \"ticker\": \"AAPL\"}, \"name\": \"get_stock_price\"}",
+            "after": "{\"arguments\": {\"date\": \"day2\", \"ticker\": \"AAPL\"}, \"name\": \"get_stock_price\"}"
+          },
+          {
+            "prompt": ["price", "TSLA", "day2"],
+            "before": "{\"arguments\": {\"date\": \"day2\", \"ticker\": \"AAPL\"}, \"name\": \"get_stock_price\"}",
+            "after": "{\"arguments\": {\"date\": \"day2\", \"ticker\": \"AAPL\"}, \"name\": \"get_stock_price\"}"
+          },
+          {
+            "prompt": ["revenue", "Apple", "2024"],
+            "before": "{\"arguments\": {\"company\": \"Apple\", \"fiscal_year\": 2025}, \"name\": \"get_revenue\"}",
+            "after": "{\"arguments\": {\"company\": \"Apple\", \"fiscal_year\": 2025}, \"name\": \"get_revenue\"}"
+          },
+          {
+            "prompt": ["revenue", "Tesla", "2025"],
+            "before": "{\"arguments\": {\"company\": \"Apple\", \"fiscal_year\": 2025}, \"name\": \"get_revenue\"}",
+            "after": "{\"arguments\": {\"company\": \"Microsoft\", \"fiscal_year\": 2025}, \"name\": \"get_revenue\"}"
+          },
+          {
+            "prompt": ["convert", "100", "USD_EUR"],
+            "before": "{\"arguments\": {\"amount\": 100, \"from_currency\": \"EUR\", \"to_currency\": \"USD\"}, \"name\": \"convert_currency\"}",
+            "after": "{\"arguments\": {\"amount\": 100, \"from_currency\": \"EUR\", \"to_currency\": \"USD\"}, \"name\": \"convert_currency\"}"
+          },
+          {
+            "prompt": ["convert", "300", "EUR_USD"],
+            "before": "{\"arguments\": {\"amount\": 100, \"from_currency\": \"EUR\", \"to_currency\": \"USD\"}, \"name\": \"convert_currency\"}",
+            "after": "{\"arguments\": {\"amount\": 100, \"from_currency\": \"EUR\", \"to_currency\": \"USD\"}, \"name\": \"convert_currency\"}"
+          },
+          {
+            "prompt": ["story", "none", "none"],
+            "before": "{\"arguments\": {}, \"name\": \"no_call\"}",
+            "after": "{\"arguments\": {}, \"name\": \"no_call\"}"
+          }
+        ]
+      }
+    },
+    "gridworld": {
+      "status": "passed",
+      "seconds": 2.35,
+      "sha256": "f2d980cc1ec64f7267b95b2052eaa42e84f1b7ab4a7aa3690680a2e6aeab1e8f",
+      "code_cells": 5,
+      "metrics": {
+        "success_rate": 1.0,
+        "mean_steps": 6.0
+      }
+    },
+    "grpo": {
+      "status": "passed",
+      "seconds": 1.57,
+      "sha256": "8325bb091430459e94e7f2cd3c81516ee044440d13fa4d47a24b670cb16ed22e",
+      "code_cells": 5,
+      "metrics": {
+        "verifier_tests": 6,
+        "token_surrogate": 0.8500000238418579,
+        "sequence_surrogate": 0.75,
+        "logprob_change": [
+          -0.13198477029800415, -0.08652293682098389, 0.11663806438446045,
+          0.07964777946472168
+        ]
+      }
+    },
+    "offline": {
+      "status": "passed",
+      "seconds": 5.2,
+      "sha256": "9da7d24d25ed24086ddf0f82228920e9f75b0cb828560f952dfd7fc7cc7ac584",
+      "code_cells": 5,
+      "metrics": {
+        "Naive Q": {
+          "true_returns": [
+            -0.13183709979057312, -0.21818819642066956, -0.057053759694099426
+          ],
+          "support_gaps": [
+            0.5113945603370667, 0.6254499554634094, 0.3834943175315857
+          ]
+        },
+        "Conservative": {
+          "true_returns": [
+            -0.05030469968914986, -0.04521385580301285, -0.04875820875167847
+          ],
+          "support_gaps": [
+            0.021189402788877487, 0.01570889726281166, 0.013902311213314533
+          ]
+        },
+        "Q + BC": {
+          "true_returns": [
+            -0.02849150076508522, -0.026607640087604523, -0.029490111395716667
+          ],
+          "support_gaps": [
+            0.0489652082324028, 0.05315358191728592, 0.0440630204975605
+          ]
+        },
+        "Behavior": {
+          "true_return": -0.04669926315546036
+        },
+        "Oracle": {
+          "true_return": 0.0
+        }
+      }
+    },
+    "pendulum": {
+      "status": "passed",
+      "seconds": 5.73,
+      "sha256": "f78de80d00e5cedb0818c127e2c9d9bc39761f3c819bb0e9aa55ba73548d6f59",
+      "code_cells": 5,
+      "metrics": {
+        "zero_torque_returns": [
+          -616.5846227403325, -942.2967150490249, -970.1812460538372,
+          -1322.12299706458, -1830.6665369115167, -1606.7303503800854,
+          -1069.423959214765, -1651.8971687435771, -1374.9455493560688,
+          -1705.9816890440609
+        ],
+        "before_returns": [
+          -629.337306154083, -958.8697477183122, -969.5552225354786,
+          -1325.3578921569165, -1831.741622901378, -1609.063323066726,
+          -1070.1215137590723, -1654.01809973512, -1378.9232341319007,
+          -1707.944495410518
+        ],
+        "after_returns": [
+          -1100.886027923237, -1160.8816830907372, -1137.8037433976367,
+          -1124.841653518832, -1632.8321858670245, -1222.962293879415,
+          -1096.4351639798394, -1348.2304777619054, -1166.695450868538,
+          -1460.174869038021
+        ]
+      }
+    },
+    "reinforce": {
+      "status": "passed",
+      "seconds": 3.73,
+      "sha256": "4ae709eabe1daf880553b2f8d461f16e7bce65fd090f1019057e8e247786f2a0",
+      "code_cells": 5,
+      "metrics": {
+        "REINFORCE": {
+          "heldout_returns": [196.3, 142.1]
+        },
+        "With baseline": {
+          "heldout_returns": [304.9, 383.0]
+        }
+      }
+    },
+    "worldmodel": {
+      "status": "passed",
+      "seconds": 3.64,
+      "sha256": "d93aff1d5b02f6bdc686eda9e1ccaac9a351cd93c9f119fc7ac38078451b396c",
+      "code_cells": 5,
+      "metrics": {
+        "test_state_mse": 0.032912276685237885,
+        "zero_delta_state_mse": 0.0724581927061081,
+        "open_loop_mse_at_29": 21.297061988245694,
+        "true_returns": {
+          "Random": [
+            -804.86215302255, -2626.5262360572815, -118.54748625401407,
+            -2516.35036611557, -80.57731036795303, -142.7590591609478
+          ],
+          "Zero torque": [
+            -250.0, -250.0, -1010.3533520698547, -1010.3533520698547,
+            -329.9672239422798, -329.9672239422798
+          ],
+          "Learned MPC": [
+            -29.049718314316124, -23.740234406664968, -19.19470847863704,
+            -17.72059811418876, -5.8373159766197205, -4.604384808801115
+          ]
+        }
+      }
+    }
+  },
+  "note": "Default CPU budgets executed in fresh kernels. Installation time excluded because dependencies were preinstalled. No hosted-platform or pretrained-Qwen execution is claimed."
+}

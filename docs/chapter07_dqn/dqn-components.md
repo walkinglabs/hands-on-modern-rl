@@ -1,5 +1,7 @@
 # 5.2 DQN 的结构与实现
 
+<ChapterNotebookLink chapter="dqn" />
+
 ## 本节导读
 
 **核心内容**

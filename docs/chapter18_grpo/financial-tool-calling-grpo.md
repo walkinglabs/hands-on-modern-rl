@@ -1,5 +1,7 @@
 # 15.6 动手：GRPO 训练金融工具调用
 
+<ChapterNotebookLink chapter="grpo" />
+
 > **本节目标**：用 GRPO 训练小模型生成金融 API 调用，通过 JSON、schema 和执行结果三层验证器判断工具是否选对、参数是否填对。
 
 > **学习路径**：[15.3 构建 RLVR 奖励](./rlvr) → [15.5 强化学习环境与验证器](./rl-environments) → **15.6 金融工具调用**
