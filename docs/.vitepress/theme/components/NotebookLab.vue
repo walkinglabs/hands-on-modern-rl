@@ -305,14 +305,7 @@ const sourceUrl = (lab) =>
   'main/' +
   lab.source
 let observer
-let wheelEnd
-let wheelViewport
 
-function finishWheel() {
-  clearTimeout(wheelEnd)
-  wheelViewport?.style.removeProperty('scroll-snap-type')
-  wheelViewport = undefined
-}
 function scrollShelf(event) {
   const el = viewport.value
   if (event.ctrlKey || !el || el.scrollWidth <= el.clientWidth + 2) return
@@ -324,11 +317,7 @@ function scrollShelf(event) {
   event.preventDefault()
   const unit =
     event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? el.clientWidth : 1
-  clearTimeout(wheelEnd)
-  wheelViewport = el
-  el.style.scrollSnapType = 'none'
   el.scrollLeft += delta * unit
-  wheelEnd = setTimeout(finishWheel, 180)
 }
 function navigateShelf(event) {
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
@@ -381,7 +370,6 @@ function slide(direction) {
   })
 }
 async function syncViewport() {
-  finishWheel()
   await nextTick()
   observer?.disconnect()
   if (viewport.value) {
@@ -469,7 +457,6 @@ onMounted(() => {
   window.addEventListener('resize', fitChapterMenu)
 })
 onBeforeUnmount(() => {
-  finishWheel()
   observer?.disconnect()
   window.removeEventListener('click', clickAway)
   window.removeEventListener('resize', fitChapterMenu)
@@ -1154,7 +1141,6 @@ onBeforeUnmount(() => {
 .nl-viewport {
   overflow-x: auto;
   scrollbar-width: none;
-  scroll-snap-type: x mandatory;
   overscroll-behavior-x: contain;
   padding: 2px 1px 10px;
   margin: 0 -1px;
@@ -1175,7 +1161,6 @@ onBeforeUnmount(() => {
   border-radius: 16px;
   background: var(--nl-bg);
   overflow: hidden;
-  scroll-snap-align: start;
   transition: box-shadow 0.2s;
 }
 .nl-card:hover {
