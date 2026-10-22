@@ -349,22 +349,18 @@ function scrollShelf(event) {
       : event.deltaY
   if (!delta) return
   const direction = Math.sign(delta)
-  if (!canScrollShelf(el, direction)) {
-    stopShelfScroll()
-    return
-  }
   event.preventDefault()
   const unit =
     event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? el.clientWidth : 1
   if (!wheelFrame || direction !== wheelDirection) wheelTarget = el.scrollLeft
   wheelDirection = direction
+  const requested = wheelTarget + delta * unit * wheelDistanceMultiplier
   wheelTarget = Math.max(
     0,
-    Math.min(
-      el.scrollWidth - el.clientWidth,
-      wheelTarget + delta * unit * wheelDistanceMultiplier
-    )
+    Math.min(el.scrollWidth - el.clientWidth, requested)
   )
+  const overflow = (requested - wheelTarget) / wheelDistanceMultiplier
+  if (overflow) window.scrollBy({ top: overflow, behavior: 'instant' })
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     stopShelfScroll()
     el.scrollLeft = wheelTarget
