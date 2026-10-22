@@ -17,6 +17,7 @@ import {
 } from 'lucide-vue-next'
 import catalog from './lab-catalog.json'
 import englishLabs from './lab-english.json'
+import { labSections, resolveLabSection } from './lab-sections.js'
 
 const props = defineProps({ locale: { type: String, default: 'zh' } })
 const english = props.locale === 'en'
@@ -25,8 +26,8 @@ const copy = english
       heading: 'Lab',
       intro: 'Turn the ideas in the book into an experiment of your own.',
       subintro: 'Choose a Notebook and open it in ModelScope or Colab.',
-      all: 'All chapters',
-      chapterFilter: 'Filter by chapter',
+      all: 'All experiments',
+      chapterFilter: 'Filter by section',
       notebooks: 'Notebooks',
       browse: 'Browse experiments',
       cards: 'Cards',
@@ -73,8 +74,8 @@ const copy = english
       heading: '实验室',
       intro: '把书中的原理，变成一次亲手完成的实验。',
       subintro: '选择 Notebook，在 ModelScope 或 Colab 中开始。',
-      all: '全部章节',
-      chapterFilter: '按章节筛选',
+      all: '全部实验',
+      chapterFilter: '按内容分类',
       notebooks: '个 Notebook',
       browse: '浏览方式',
       cards: '卡片',
@@ -118,64 +119,10 @@ const copy = english
       cpu: 'CPU'
     }
 
-const chapters = [
-  { id: 'intro', name: '第 1 章 · RL 入门', ids: ['cartpole', 'gymnasium'] },
-  { id: 'mdp', name: '第 3 章 · MDP', ids: ['bandit', 'gridworld'] },
-  {
-    id: 'dqn',
-    name: '第 5 章 · DQN',
-    ids: ['dqn', 'vizdoom', 'atari', 'minecraft']
-  },
-  { id: 'pg', name: '第 6 章 · 策略梯度', ids: ['reinforce'] },
-  { id: 'ac', name: '第 7 章 · Actor-Critic', ids: ['pendulum'] },
-  { id: 'ppo', name: '第 8 章 · PPO', ids: ['jax', 'unity'] },
-  {
-    id: 'explore',
-    name: '第 12 章 · 探索与多智能体',
-    ids: ['minigrid', 'multiagent']
-  },
-  { id: 'dpo', name: '第 14 章 · DPO', ids: ['dpo'] },
-  { id: 'grpo', name: '第 15 章 · GRPO', ids: ['grpo', 'financial'] },
-  {
-    id: 'agentic',
-    name: '第 19 章 · Agentic RL',
-    ids: ['agentic-tools', 'agentic-code', 'agentic-finqa']
-  },
-  {
-    id: 'research',
-    name: '第 21 章 · DeepResearch',
-    ids: ['agentic-research']
-  },
-  {
-    id: 'embodied',
-    name: '专题 · 世界模型与具身',
-    ids: ['worldmodel', 'maniskill', 'ai2thor']
-  },
-  {
-    id: 'selfplay',
-    name: '专题 · 自博弈与离线 RL',
-    ids: ['selfplay', 'offline']
-  }
-]
-const englishChapters = {
-  intro: 'Chapter 1 · RL introduction',
-  mdp: 'Chapter 3 · MDP',
-  dqn: 'Chapter 5 · DQN',
-  pg: 'Chapter 6 · Policy gradients',
-  ac: 'Chapter 7 · Actor-Critic',
-  ppo: 'Chapter 8 · PPO',
-  explore: 'Chapter 12 · Exploration and MARL',
-  dpo: 'Chapter 14 · DPO',
-  grpo: 'Chapter 15 · GRPO',
-  agentic: 'Chapter 19 · Agentic RL',
-  research: 'Chapter 21 · DeepResearch',
-  embodied: 'Topic · World models and embodiment',
-  selfplay: 'Topic · Self-play and offline RL'
-}
-if (english)
-  chapters.forEach((chapter) => {
-    chapter.name = englishChapters[chapter.id]
-  })
+const chapters = labSections.map((section) => ({
+  ...section,
+  name: section.name[english ? 'en' : 'zh']
+}))
 const kindNames = {
   真实训练: 'Training',
   数值实验: 'Numerical experiment',
@@ -413,8 +360,9 @@ function setChapter(id) {
   selectedChapter.value = id
   if (chapterMenu.value) chapterMenu.value.open = false
   const url = new URLSearchParams(window.location.search)
-  if (id === 'all') url.delete('chapter')
-  else url.set('chapter', id)
+  url.delete('chapter')
+  if (id === 'all') url.delete('section')
+  else url.set('section', id)
   window.history.replaceState(
     null,
     '',
@@ -473,9 +421,12 @@ watch(view, (value) => {
   window.dispatchEvent(new Event('lab:context-change'))
 })
 onMounted(() => {
-  const chapter = new URLSearchParams(window.location.search).get('chapter')
-  if (availableChapters.some((ch) => ch.id === chapter))
-    selectedChapter.value = chapter
+  const query = new URLSearchParams(window.location.search)
+  const section = resolveLabSection(
+    query.get('section') || query.get('chapter')
+  )
+  if (section !== 'all') setChapter(section)
+  else if (query.has('chapter') || query.has('section')) setChapter('all')
   if (new URLSearchParams(window.location.search).get('view') === 'list')
     view.value = 'list'
   syncViewport()

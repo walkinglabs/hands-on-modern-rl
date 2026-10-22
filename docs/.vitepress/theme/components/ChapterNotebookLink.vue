@@ -1,5 +1,6 @@
 <script setup>
 import { withBase } from 'vitepress'
+import { resolveLabSection } from './lab-sections.js'
 import { FlaskConical, ArrowRight } from 'lucide-vue-next'
 defineProps({
   locale: { type: String, default: 'zh' },
@@ -12,7 +13,9 @@ defineProps({
     class="chapter-notebook-entry"
     :href="
       withBase(
-        (locale === 'en' ? '/en/labs/' : '/labs/') + '?chapter=' + chapter
+        (locale === 'en' ? '/en/labs/' : '/labs/') +
+          '?section=' +
+          resolveLabSection(chapter)
       )
     "
   >
@@ -20,8 +23,8 @@ defineProps({
     <span>
       {{
         locale === 'en'
-          ? 'Open this chapter’s Notebooks in the lab'
-          : '在实验室打开本章 Notebook'
+          ? 'Browse related experiments in the lab'
+          : '在实验室浏览相关实验'
       }}
     </span>
     <ArrowRight :size="16" aria-hidden="true" />
