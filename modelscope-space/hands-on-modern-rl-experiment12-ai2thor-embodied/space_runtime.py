@@ -197,6 +197,7 @@ def _prepare_thor_build() -> Iterator[str]:
 
 
 def _start_xvfb() -> subprocess.Popen[str]:
+    os.environ["SDL_VIDEODRIVER"] = "x11"
     return subprocess.Popen(["Xvfb", os.environ["DISPLAY"], "-screen", "0", "1280x720x24", "-ac", "+extension", "GLX"], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT, text=True, start_new_session=True)
 
 

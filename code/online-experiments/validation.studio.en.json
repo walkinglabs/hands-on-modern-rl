@@ -211,6 +211,167 @@
         },
         "hosted_platforms": "Colab and ModelScope not executed in this local run"
       }
+    },
+    "atari": {
+      "status": "passed",
+      "seconds": 30.85,
+      "sha256": "b892cdb9a4e3aae1f05e569d3e13db0400c048eda72957fb2ae78592fbd137ef",
+      "code_cells": 6,
+      "code_sha256": "9f84797f57507fdf794fdaa6654e5fff23eb442c97c248bb80a61fc0d004310a",
+      "metrics": {
+        "score": 0.0,
+        "steps": 2000,
+        "epochs": 2,
+        "checkpoints": 2,
+        "preview": "freeway-model-r1792678519106672000-step-000002000-preview.gif"
+      },
+      "environment": {
+        "started_at": "2026-10-22T14:15:16.533059+00:00",
+        "python": "3.12.13",
+        "platform": "macOS-26.5.1-arm64-arm-64bit",
+        "processor": "arm64",
+        "device": "CPU",
+        "locale": "en",
+        "packages": {
+          "numpy": "2.5.4",
+          "torch": "2.14.1",
+          "matplotlib": "3.11.2",
+          "gymnasium": "1.4.0",
+          "stable-baselines3": "2.9.0"
+        },
+        "hosted_platforms": "Colab and ModelScope not executed in this local run"
+      }
+    },
+    "maniskill": {
+      "status": "passed",
+      "seconds": 22.66,
+      "sha256": "e06165a3f784fbbe87976c93ea1cd1a8245d1c54fa8eb13be0aad7e00bb53cc4",
+      "code_cells": 6,
+      "code_sha256": "1ac2a6f7fb329eb03e88b111a32fdaaf4108119da06e20567011ef514c8a1124",
+      "metrics": {
+        "score": 1.6157939434051514,
+        "steps": 10000,
+        "epochs": 2,
+        "checkpoints": 2,
+        "preview": "learned-policy.gif"
+      },
+      "environment": {
+        "started_at": "2026-10-22T15:52:09.243239+00:00",
+        "python": "3.10.12",
+        "platform": "Linux-6.12.76-linuxkit-x86_64-with-glibc2.35",
+        "processor": "x86_64",
+        "device": "CPU",
+        "locale": "en",
+        "engine": "ipython",
+        "packages": {
+          "numpy": "1.26.4",
+          "torch": "2.3.1+cpu",
+          "matplotlib": "3.10.9",
+          "gymnasium": "1.0.0",
+          "stable-baselines3": "2.4.1"
+        },
+        "hosted_platforms": "Colab and ModelScope not executed in this local run"
+      }
+    },
+    "minecraft": {
+      "status": "passed",
+      "seconds": 287.67,
+      "sha256": "2b2d008c9a28a44eac03e8e6911faddc1580990bf1464ffa985578fab5107951",
+      "code_cells": 6,
+      "code_sha256": "84932ad4e29375273c9dba77d472cf0cb909bd0330237253225c02062e4abd9d",
+      "metrics": {
+        "score": 0.5903348049521453,
+        "steps": 1024,
+        "epochs": 2,
+        "checkpoints": 2,
+        "preview": "learned-policy.gif"
+      },
+      "environment": {
+        "started_at": "2026-10-22T15:25:36.339631+00:00",
+        "python": "3.10.12",
+        "platform": "Linux-6.12.76-linuxkit-x86_64-with-glibc2.35",
+        "processor": "x86_64",
+        "device": "CPU",
+        "locale": "en",
+        "engine": "ipython",
+        "packages": {
+          "numpy": "1.26.4",
+          "torch": "2.3.1+cpu",
+          "matplotlib": "3.10.9",
+          "gymnasium": "1.0.0",
+          "stable-baselines3": "2.4.1"
+        },
+        "hosted_platforms": "Colab and ModelScope not executed in this local run"
+      }
     }
-  }
+  },
+  "additional_runs": [
+    {
+      "started_at": "2026-10-22T14:15:16.533059+00:00",
+      "python": "3.12.13",
+      "platform": "macOS-26.5.1-arm64-arm-64bit",
+      "processor": "arm64",
+      "device": "CPU",
+      "locale": "en",
+      "packages": {
+        "numpy": "2.5.4",
+        "torch": "2.14.1",
+        "matplotlib": "3.11.2",
+        "gymnasium": "1.4.0",
+        "stable-baselines3": "2.9.0"
+      },
+      "hosted_platforms": "Colab and ModelScope not executed in this local run"
+    },
+    {
+      "started_at": "2026-10-22T15:05:12.589376+00:00",
+      "python": "3.10.12",
+      "platform": "Linux-6.12.76-linuxkit-x86_64-with-glibc2.35",
+      "processor": "x86_64",
+      "device": "CPU",
+      "locale": "en",
+      "engine": "ipython",
+      "packages": {
+        "numpy": "1.26.4",
+        "torch": "2.3.1+cpu",
+        "matplotlib": "3.10.9",
+        "gymnasium": "1.0.0",
+        "stable-baselines3": "2.4.1"
+      },
+      "hosted_platforms": "Colab and ModelScope not executed in this local run"
+    },
+    {
+      "started_at": "2026-10-22T15:25:36.339631+00:00",
+      "python": "3.10.12",
+      "platform": "Linux-6.12.76-linuxkit-x86_64-with-glibc2.35",
+      "processor": "x86_64",
+      "device": "CPU",
+      "locale": "en",
+      "engine": "ipython",
+      "packages": {
+        "numpy": "1.26.4",
+        "torch": "2.3.1+cpu",
+        "matplotlib": "3.10.9",
+        "gymnasium": "1.0.0",
+        "stable-baselines3": "2.4.1"
+      },
+      "hosted_platforms": "Colab and ModelScope not executed in this local run"
+    },
+    {
+      "started_at": "2026-10-22T15:52:09.243239+00:00",
+      "python": "3.10.12",
+      "platform": "Linux-6.12.76-linuxkit-x86_64-with-glibc2.35",
+      "processor": "x86_64",
+      "device": "CPU",
+      "locale": "en",
+      "engine": "ipython",
+      "packages": {
+        "numpy": "1.26.4",
+        "torch": "2.3.1+cpu",
+        "matplotlib": "3.10.9",
+        "gymnasium": "1.0.0",
+        "stable-baselines3": "2.4.1"
+      },
+      "hosted_platforms": "Colab and ModelScope not executed in this local run"
+    }
+  ]
 }

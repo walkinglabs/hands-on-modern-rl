@@ -21,13 +21,13 @@
     "name": "Turn pixels into actions",
     "desc": "Use frame stacking and a CNN to learn actions from game images.",
     "result": "Evaluation checkpoints, model selection, and ALE environment replays.",
-    "next": "Train from pixels on a CUDA instance and inspect each checkpoint and policy replay."
+    "next": "Complete the quick run on CPU, then increase the budget or use CUDA to compare checkpoints and policy replays."
   },
   "minecraft": {
     "name": "Train a first-person visual policy",
     "desc": "Train a visual PPO policy inside the Minecraft simulator.",
     "result": "Visual PPO logs, evaluation, and first-person policy replays.",
-    "next": "Prepare Linux, CUDA and the Minecraft engine, then run training and the first-person replay."
+    "next": "Start the Linux Minecraft engine, then train visual PPO on CPU or CUDA and replay the first-person policy."
   },
   "jax": {
     "name": "Train pixel games with vectorized updates",
@@ -56,8 +56,8 @@
   "maniskill": {
     "name": "Train a robot in simulation",
     "desc": "Train a policy in a robot manipulation task and replay its actions.",
-    "result": "Policy evaluation in PhysX simulation and robot GIFs.",
-    "next": "Prepare CUDA, PhysX and the graphics backend, then run robot training and replay."
+    "result": "Policy evaluation, training curves, and action trajectory replays from PhysX simulation.",
+    "next": "Train with CPU PhysX and inspect the policy trajectory, then use CUDA to increase the number of parallel environments."
   },
   "ai2thor": {
     "name": "Find a target in a room",

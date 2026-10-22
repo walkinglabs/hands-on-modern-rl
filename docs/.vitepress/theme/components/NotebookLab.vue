@@ -217,13 +217,23 @@ const info = {
   cartpole: ['CartPole', '让小车保持平衡', 'PPO', 'cartpole.gif'],
   gymnasium: ['Gymnasium', '尝试不同的控制环境', '经典控制', 'gymnasium.gif'],
   vizdoom: ['ViZDoom', '从第一人称画面做决策', 'DQN', 'vizdoom.gif'],
-  atari: ['Atari', '让像素变成动作', 'DQN · CNN', 'atari.gif'],
-  minecraft: ['Minecraft', '训练第一人称视觉策略', '视觉 PPO', 'minecraft.jpg'],
+  atari: ['Atari', '让像素变成动作', 'DQN · CNN', 'atari-result.webp'],
+  minecraft: [
+    'Minecraft',
+    '训练第一人称视觉策略',
+    '视觉 PPO',
+    'minecraft-result.webp'
+  ],
   jax: ['JAX · MinAtar', '向量化训练像素小游戏', '策略梯度', null],
   unity: ['Unity ML-Agents', '在物理场景里学习控制', 'PPO', 'unity.webp'],
   minigrid: ['MiniGrid', '在迷宫里发现奖励', 'PPO · 探索', null],
   multiagent: ['PettingZoo', '让多个智能体学会合作', '多智能体', null],
-  maniskill: ['ManiSkill', '在仿真中训练机器人', '机器人控制', 'maniskill.jpg'],
+  maniskill: [
+    'ManiSkill',
+    '在仿真中训练机器人',
+    '机器人控制',
+    'maniskill-result.webp'
+  ],
   ai2thor: ['AI2-THOR', '在房间里寻找目标', '视觉导航', 'ai2thor.jpg'],
   selfplay: ['OpenSpiel', '通过对手发现更好的策略', '自博弈 · CFR+', null]
 }
@@ -650,7 +660,11 @@ onBeforeUnmount(() => {
                       ? copy.experimentPreview
                       : copy.environment)
                   "
-                  :loading="lab.id === 'cartpole' ? 'eager' : 'lazy'"
+                  :loading="
+                    lab.id === 'cartpole' || !lab.image.endsWith('.gif')
+                      ? 'eager'
+                      : 'lazy'
+                  "
                   decoding="async"
                 />
                 <div

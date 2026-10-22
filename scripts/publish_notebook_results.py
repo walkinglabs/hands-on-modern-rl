@@ -64,6 +64,7 @@ def publish(run_dir, locale):
     for lab_id, record in report["notebooks"].items():
         if record["status"] != "passed":
             continue
+        record["environment"] = {key: value for key, value in report.items() if key != "notebooks"}
         lab = by_id[lab_id]
         path = ROOT / lab["paths"][locale]
         current = without_execution(json.loads(path.read_text()))
@@ -121,8 +122,14 @@ small{{color:#68778b}}@media(max-width:600px){{main{{margin:0;padding:20px;borde
     target.write_text(json.dumps(evidence, ensure_ascii=False, indent=2) + "\n")
     studio = {key: value for key, value in report["notebooks"].items() if key not in LABS}
     if studio:
-        (ROOT / f"code/online-experiments/validation.studio.{locale}.json").write_text(
-            json.dumps(report, ensure_ascii=False, indent=2) + "\n")
+        studio_path = ROOT / f"code/online-experiments/validation.studio.{locale}.json"
+        saved = json.loads(studio_path.read_text()) if studio_path.exists() else {"notebooks": {}}
+        saved["notebooks"].update(studio)
+        run_metadata = {key: value for key, value in report.items() if key != "notebooks"}
+        runs = saved.get("additional_runs", [])
+        saved["additional_runs"] = [item for item in runs
+            if item.get("started_at") != report["started_at"]] + [run_metadata]
+        studio_path.write_text(json.dumps(saved, ensure_ascii=False, indent=2) + "\n")
     passed = sum(item["status"] == "passed" for item in report["notebooks"].values())
     print(f"Published outputs and result pages for {passed} {locale} Notebooks")
 

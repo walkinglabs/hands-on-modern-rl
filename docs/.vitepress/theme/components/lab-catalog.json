@@ -333,18 +333,23 @@
       "en": "ATARI · ALE",
       "chapter": "5.5 视觉游戏项目",
       "lesson": "chapter07_dqn/visual-game-projects",
-      "device": "GPU",
+      "device": "CPU / GPU",
       "kind": "真实训练",
       "art": "grid",
       "desc": "使用帧堆叠与 CNN，让 DQN 从游戏画面中学习。",
       "result": "分轮评估、模型选择与 ALE 模拟器回放。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment03-atari.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment03-atari",
-      "next": "在 CUDA 实例中运行像素训练，按检查点查看奖励与策略回放。",
+      "next": "先在 CPU 上完成快速训练，再增加预算或切换 CUDA，比较各轮检查点与策略回放。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment03-atari.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment03-atari.ipynb"
-      }
+      },
+      "results": {
+        "zh": "lab-results/atari-zh.html",
+        "en": "lab-results/atari-en.html"
+      },
+      "previewKind": "result"
     },
     {
       "id": "selfplay",
@@ -477,17 +482,22 @@
       "en": "MANISKILL · ROBOTICS",
       "chapter": "具身任务进阶实验",
       "lesson": "chapter28_vla/embodied-intelligence/model-based-rl/",
-      "device": "GPU · Vulkan",
+      "device": "CPU / GPU",
       "kind": "真实训练",
       "art": "cart",
       "desc": "从机器人任务出发，训练并回放当前模型的动作。",
-      "result": "PhysX 仿真中的策略评估与机器人 GIF。",
+      "result": "PhysX 仿真中的策略评估、训练曲线与动作轨迹回放。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment08-maniskill.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment08-maniskill",
-      "next": "准备 CUDA、PhysX 与图形后端，运行机器人训练和回放。",
+      "next": "先在 CPU PhysX 中训练并查看策略轨迹，再使用 CUDA 增加并行环境数量。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment08-maniskill.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment08-maniskill.ipynb"
+      },
+      "previewKind": "result",
+      "results": {
+        "zh": "lab-results/maniskill-zh.html",
+        "en": "lab-results/maniskill-en.html"
       }
     },
     {
@@ -497,17 +507,22 @@
       "en": "MINESTUDIO · VISUAL PPO",
       "chapter": "视觉交互进阶实验",
       "lesson": "chapter07_dqn/visual-game-projects",
-      "device": "GPU · 原生模拟器",
+      "device": "CPU / GPU",
       "kind": "真实训练",
       "art": "grid",
       "desc": "在真实 Minecraft 模拟器中，训练第一人称视觉策略。",
       "result": "视觉 PPO 日志、评估与当前策略的第一人称回放。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment10-minestudio.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment10-minestudio",
-      "next": "准备 Linux、CUDA 与 Minecraft 引擎，依次运行训练和第一人称回放。",
+      "next": "启动 Linux Minecraft 引擎，在 CPU 或 CUDA 上完成视觉 PPO 训练和第一人称回放。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment10-minestudio.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment10-minestudio.ipynb"
+      },
+      "previewKind": "result",
+      "results": {
+        "zh": "lab-results/minecraft-zh.html",
+        "en": "lab-results/minecraft-en.html"
       }
     },
     {

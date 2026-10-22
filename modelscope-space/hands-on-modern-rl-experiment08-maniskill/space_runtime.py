@@ -89,7 +89,7 @@ def _task(key: str, env_id: str, title: str, zh: str, description: str, descript
         "key": key, "title": {"en": title, "zh": zh}, "environment": env_id,
         "description": {"en": description, "zh": description_zh},
         "observation": {"en": "Robot joint state + object pose", "zh": "机器人关节状态与物体位姿"},
-        "action": {"en": action, "zh": action}, "algorithm": "GPU PPO", "policy": "MlpPolicy",
+        "action": {"en": action, "zh": action}, "algorithm": "PPO", "policy": "MlpPolicy",
         "device": "cuda", "preview": preview, "budget": (8_000, 5_000_000, epoch_steps * 6, 800),
         "steps_per_epoch": (8_000, 5_000_000, epoch_steps, rollout_quantum), "epochs": (1, 12, 6, 1),
         "learning_rate": (1e-5, 0.001, 0.0003, 1e-5), "gamma": (0.8, 1.0, gamma, 0.005),
@@ -246,7 +246,7 @@ def runtime_status() -> str:
                 renderer = "Mesa software Vulkan" if SOFTWARE_VULKAN_ICD else "Vulkan device pending"
                 return f"ManiSkill {mani_skill.__version__} · {torch.cuda.get_device_name(0)} · {renderer}"
             return f"ManiSkill {mani_skill.__version__} · {torch.cuda.get_device_name(0)} · {warmup['detail']}"
-        return f"ManiSkill {mani_skill.__version__} · waiting for xGPU"
+        return f"ManiSkill {mani_skill.__version__} · CPU PhysX"
     except Exception as exc:
         return f"installing ManiSkill runtime · {type(exc).__name__}"
 
@@ -345,8 +345,8 @@ def _task_state_frame(
     draw = ImageDraw.Draw(image)
     font = ImageFont.load_default()
     draw.rounded_rectangle((18, 18, width - 18, height - 18), radius=24, fill="#ffffff", outline="#d9def4", width=2)
-    draw.text((42, 36), "ACTUAL MANISKILL STATE · CAMERA-FREE REPLAY", fill="#5661e9", font=font)
-    draw.text((42, 63), f"{task['environment']}  ·  learned GPU PPO policy", fill="#151a38", font=font)
+    draw.text((42, 36), "MANISKILL · POLICY TRAJECTORY", fill="#5661e9", font=font)
+    draw.text((42, 63), f"{task['environment']}  ·  learned PPO policy", fill="#151a38", font=font)
     draw.text((42, 86), f"Simulator step {step + 1:03d} / {len(states):03d}", fill="#59617a", font=font)
     draw.text((width - 270, 86), "Schematic projection of real poses", fill="#8a91a8", font=font)
 
@@ -465,21 +465,22 @@ def run(
     from stable_baselines3 import PPO
     from stable_baselines3.common.callbacks import BaseCallback
 
-    if not torch.cuda.is_available():
-        raise RuntimeError("This experiment requires a scheduled ModelScope xGPU; CUDA is not currently visible")
-    for detail in _wait_for_runtime():
-        yield {"phase": "initializing", "step": 0, "log": detail}
+    use_cuda = torch.cuda.is_available()
+    device = "cuda" if use_cuda else "cpu"
+    if use_cuda:
+        for detail in _wait_for_runtime():
+            yield {"phase": "initializing", "step": 0, "log": detail}
     task = next(item for item in TASKS if item["key"] == key)
     # Keep simulator topology independent from the requested training length.
     # Scaling a long run from 16 to 128 scenes caused SAPIEN to exhaust the
     # graphics/PhysX initialization resources on the ModelScope T4 container,
     # even though the same task is stable with 16 GPU scenes. A larger budget
     # should produce more PPO updates, not silently request a larger simulator.
-    parallel_envs = 16
-    yield {"phase": "initializing", "step": 0, "log": f"Creating {parallel_envs} parallel {task['environment']} simulations on {torch.cuda.get_device_name(0)}"}
-    gpu_sim = True
+    parallel_envs = 16 if use_cuda else 1
+    yield {"phase": "initializing", "step": 0, "log": f"Creating {parallel_envs} parallel {task['environment']} simulations on {device}"}
+    gpu_sim = use_cuda
     try:
-        raw, train_env = _make_vec_env(task, parallel_envs)
+        raw, train_env = _make_vec_env(task, parallel_envs, gpu_sim=gpu_sim)
     except RuntimeError as exc:
         message = str(exc).lower()
         if not any(marker in message for marker in ("rendering device", "vulkan", "vk::")):
@@ -509,7 +510,7 @@ def run(
     callback = MetricsCallback()
     model = PPO("MlpPolicy", train_env, learning_rate=float(learning_rate), gamma=float(gamma),
                 gae_lambda=0.9, ent_coef=max(0.0, float(epsilon)), n_steps=n_steps,
-                batch_size=batch_size, n_epochs=6, device="cuda", seed=int(seed), verbose=0)
+                batch_size=batch_size, n_epochs=6, device=device, seed=int(seed), verbose=0)
     checkpoint_count = max(1, min(12, int(checkpoints or task["checkpoints"])))
     checkpoint_targets = [
         max(1, round(int(budget) * index / checkpoint_count))
@@ -556,7 +557,7 @@ def run(
         train_env = None
         raw = None
         for checkpoint_index, saved_step, score, spread, model_file in saved_models:
-            replay_model = PPO.load(str(model_file), device="cuda")
+            replay_model = PPO.load(str(model_file), device=device)
             epoch_dir = model_file.parent
             preview, preview_detail = _record(
                 replay_model,

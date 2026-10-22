@@ -124,6 +124,8 @@ def studio_markdown(lab, spec):
     budget = FULL_BUDGETS[lab["id"]]
     gpu = ("需要调度支持 CUDA 的 ModelScope xGPU 实例，CUDA 不可用时训练会停止。"
            if spec["resource"] == "xGPU" else "使用普通 CPU Notebook 实例即可。")
+    if spec["resource"] == "CPU / GPU":
+        gpu = "默认快速实验可在 CPU 上运行；检测到 CUDA 时自动使用 GPU。"
     return [
         f"""# {lab['name']}
 

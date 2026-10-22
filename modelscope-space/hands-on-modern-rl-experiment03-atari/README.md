@@ -12,7 +12,7 @@ license: apache-2.0
 
 # WalkingLab × Hands-On Modern RL · Atari xGPU Training Arcade
 
-**WalkingLab** 与开源课程 **Hands-On Modern RL（《动手学现代强化学习》）** 的 Atari/ALE 配套实验。每次运行都会在 ModelScope xGPU 容器中使用 CUDA 训练 DQN、评估 checkpoint，并从当前策略生成真实模拟器回放。训练入口会先验证 CUDA；xGPU 未被正确调度时会明确停止，不会静默退回 CPU。
+**WalkingLab** 与开源课程 **Hands-On Modern RL（《动手学现代强化学习》）** 的 Atari/ALE 配套实验。使用 ALE 游戏画面训练 DQN，评估 checkpoint，并从保存的策略生成模拟器回放。默认快速实验可在 CPU 上运行；检测到 CUDA 时自动使用 GPU。
 
 Studio 用两个参数定义一次训练：`Environment steps per epoch` 和 `Training epochs`。这里的 epoch 指一段固定步数的环境交互，不是遍历固定数据集；每个 epoch 结束时评估一次并保存一个独立模型。总训练预算由两者相乘得到，例如 `200,000 步/epoch × 5 epochs = 1,000,000 总步数 = 5 个模型`。即使训练中途停止，已经完成的 epoch 模型仍会保留。
 
@@ -28,4 +28,4 @@ WalkingLab：<https://modelscope.cn/organization/walkinglab>
 
 ## 配套实验 Notebook
 
-[直接在 ModelScope Notebook 中运行 Atari 实验](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-experiment03-atari.ipynb)。Notebook 与当前创空间复用同一份 ALE/DQN 训练运行时，并显示完整日志、评估曲线和本次策略回放；运行时需要选择 xGPU Notebook。
+[直接在 ModelScope Notebook 中运行 Atari 实验](https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/code/online-experiments/hands-on-modern-rl-experiment03-atari.ipynb)。Notebook 与当前创空间复用同一份 ALE/DQN 训练运行时，并显示完整日志、评估曲线和本次策略回放；普通 CPU Notebook 可完成默认的 2,000 步快速实验，也可以选择 GPU 实例增加训练预算。

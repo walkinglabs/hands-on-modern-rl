@@ -134,11 +134,8 @@ def runtime_status() -> str:
 def _find_unity_executable(cache: Path, relative_path: str | None) -> Path | None:
     if relative_path:
         exact = cache / relative_path
-        if exact.is_file():
-            return exact
+        return exact if exact.is_file() else None
     candidates = [path for path in cache.rglob("Startup.x86_64") if path.is_file()]
-    if not candidates:
-        candidates = [path for path in cache.rglob("*.x86_64") if path.is_file()]
     if candidates:
         candidates[0].chmod(0o755)
         return candidates[0]
@@ -255,6 +252,7 @@ def _ffmpeg_executable() -> str:
 def _start_xvfb() -> subprocess.Popen[str]:
     display = os.environ.get("UNITY_DISPLAY", ":99")
     os.environ["DISPLAY"] = display
+    os.environ["SDL_VIDEODRIVER"] = "x11"
     os.environ.setdefault("LIBGL_ALWAYS_SOFTWARE", "1")
     os.environ.setdefault("MESA_GL_VERSION_OVERRIDE", "4.5")
     xvfb = shutil.which("Xvfb")

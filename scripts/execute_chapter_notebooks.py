@@ -11,6 +11,7 @@ import json
 import os
 import platform
 import shutil
+import subprocess
 import sys
 import tempfile
 import time
@@ -33,6 +34,7 @@ def main():
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--labs", nargs="+", choices=all_labs, default=list(LABS))
     parser.add_argument("--locale", choices=["zh", "en"], default="zh")
+    parser.add_argument("--engine", choices=["jupyter", "ipython"], default="jupyter")
     args = parser.parse_args()
     output = args.output_dir.resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -49,6 +51,7 @@ def main():
         "processor": platform.machine(),
         "device": "CPU",
         "locale": args.locale,
+        "engine": args.engine,
         "packages": {name: importlib.metadata.version(name) for name in
                      ["numpy", "torch", "matplotlib", "gymnasium", "stable-baselines3"]},
         "hosted_platforms": "Colab and ModelScope not executed in this local run",
@@ -62,6 +65,10 @@ def main():
             "display_name": "Hands-on RL validation", "language": "python",
         }))
         for lab_id in args.labs:
+            if lab_id in {"unity", "ai2thor", "minecraft"}:
+                os.environ.pop("SDL_VIDEODRIVER", None)
+            else:
+                os.environ["SDL_VIDEODRIVER"] = "dummy"
             path = ROOT / all_labs[lab_id]["paths"][args.locale]
             os.environ["HANDS_ON_LAB_ID"] = lab_id
             notebook = nbformat.read(path, as_version=4)
@@ -77,10 +84,17 @@ def main():
                                     KernelSpecManager(kernel_dirs=[directory]))
             client = NotebookClient(notebook, km=manager, timeout=1200,
                                     resources={"metadata": {"path": str(workspace)}})
-            print(f"Running {lab_id} in a fresh CPU kernel...", flush=True)
+            print(f"Running {lab_id} in a fresh {args.engine} process on CPU...", flush=True)
             started = time.monotonic()
             try:
-                client.execute()
+                if args.engine == "ipython":
+                    subprocess.run([
+                        sys.executable, str(ROOT / "scripts/execute_notebook_ipython.py"),
+                        str(path), str(output / f"{lab_id}-executed.ipynb"), str(workspace),
+                    ], check=True, timeout=1200 * sum(c.cell_type == "code" for c in notebook.cells))
+                    notebook = nbformat.read(output / f"{lab_id}-executed.ipynb", as_version=4)
+                else:
+                    client.execute()
                 metrics_path = output / "artifacts" / lab_id / "metrics.json"
                 metrics = json.loads(metrics_path.read_text())
                 item = {"status": "passed", "seconds": round(time.monotonic() - started, 2),
@@ -93,6 +107,8 @@ def main():
                         "error": str(error)}
                 raise
             finally:
+                if args.engine == "ipython" and (output / f"{lab_id}-executed.ipynb").exists():
+                    notebook = nbformat.read(output / f"{lab_id}-executed.ipynb", as_version=4)
                 nbformat.write(notebook, output / f"{lab_id}-executed.ipynb")
                 report["notebooks"][lab_id] = item
                 (output / "validation.json").write_text(json.dumps(report, indent=2))

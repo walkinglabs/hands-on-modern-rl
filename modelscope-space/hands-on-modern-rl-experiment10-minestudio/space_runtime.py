@@ -82,7 +82,7 @@ def runtime_status() -> str:
     try:
         import minestudio
         import torch
-        device = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "waiting for xGPU"
+        device = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU"
         return f"MineStudio {getattr(minestudio, '__version__', '1.1.6')} · {device} · ENGINE CACHE"
     except Exception as exc:
         return f"installing MineStudio runtime · {type(exc).__name__}"
@@ -323,8 +323,7 @@ def run(
     from stable_baselines3 import PPO
     from stable_baselines3.common.callbacks import BaseCallback
 
-    if not torch.cuda.is_available():
-        raise RuntimeError("This visual experiment requires a scheduled ModelScope xGPU; CUDA is not currently visible")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     task = next(item for item in TASKS if item["key"] == key)
     xvfb: subprocess.Popen[str] | None = None
     env = None
@@ -355,7 +354,7 @@ def run(
 
         callback = MetricsCallback()
         model = PPO("CnnPolicy", env, learning_rate=float(learning_rate), gamma=float(gamma), ent_coef=float(epsilon),
-                    n_steps=256, batch_size=64, n_epochs=4, device="cuda", seed=int(seed), verbose=0)
+                    n_steps=256, batch_size=64, n_epochs=4, device=device, seed=int(seed), verbose=0)
         x: list[float] = []
         y: list[float] = []
         completed = 0
@@ -397,7 +396,7 @@ def run(
         replay_env = _make_env(task, int(seed) + 10_000)
         try:
             for checkpoint_index, saved_step, score, model_file in saved_models:
-                replay_model = PPO.load(str(model_file), device="cuda")
+                replay_model = PPO.load(str(model_file), device=device)
                 epoch_dir = model_file.parent
                 preview, evaluation = _record_episode(
                     replay_model,

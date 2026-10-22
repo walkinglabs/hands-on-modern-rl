@@ -47,7 +47,7 @@
         "before": {
           "chosen_pair_rate": 0.125,
           "logprob_gap": -0.008088342845439911,
-          "reward_margin": -1.1622906015418266e-07
+          "reward_margin": -1.1622906015418266e-7
         },
         "after": {
           "chosen_pair_rate": 1.0,
@@ -110,24 +110,12 @@
       "code_cells": 5,
       "metrics": {
         "DQN": {
-          "evaluation_returns": [
-            143.3,
-            105.4
-          ],
-          "initial_state_q": [
-            52.85267181396485,
-            48.256884765625
-          ]
+          "evaluation_returns": [143.3, 105.4],
+          "initial_state_q": [52.85267181396485, 48.256884765625]
         },
         "Double DQN": {
-          "evaluation_returns": [
-            159.4,
-            110.9
-          ],
-          "initial_state_q": [
-            51.59617614746094,
-            47.4152530670166
-          ]
+          "evaluation_returns": [159.4, 110.9],
+          "initial_state_q": [51.59617614746094, 47.4152530670166]
         }
       },
       "code_sha256": "386faa565c4d7fd81a6647a8203a486c0e028a09d313cb7307d74b8520db0a99"
@@ -164,65 +152,37 @@
         },
         "examples": [
           {
-            "prompt": [
-              "price",
-              "AAPL",
-              "day1"
-            ],
+            "prompt": ["price", "AAPL", "day1"],
             "before": "{\"arguments\": {\"date\": \"day2\", \"ticker\": \"AAPL\"}, \"name\": \"get_stock_price\"}",
             "after": "{\"arguments\": {\"date\": \"day2\", \"ticker\": \"AAPL\"}, \"name\": \"get_stock_price\"}"
           },
           {
-            "prompt": [
-              "price",
-              "TSLA",
-              "day2"
-            ],
+            "prompt": ["price", "TSLA", "day2"],
             "before": "{\"arguments\": {\"date\": \"day2\", \"ticker\": \"AAPL\"}, \"name\": \"get_stock_price\"}",
             "after": "{\"arguments\": {\"date\": \"day2\", \"ticker\": \"AAPL\"}, \"name\": \"get_stock_price\"}"
           },
           {
-            "prompt": [
-              "revenue",
-              "Apple",
-              "2024"
-            ],
+            "prompt": ["revenue", "Apple", "2024"],
             "before": "{\"arguments\": {\"company\": \"Apple\", \"fiscal_year\": 2025}, \"name\": \"get_revenue\"}",
             "after": "{\"arguments\": {\"company\": \"Apple\", \"fiscal_year\": 2025}, \"name\": \"get_revenue\"}"
           },
           {
-            "prompt": [
-              "revenue",
-              "Tesla",
-              "2025"
-            ],
+            "prompt": ["revenue", "Tesla", "2025"],
             "before": "{\"arguments\": {\"company\": \"Apple\", \"fiscal_year\": 2025}, \"name\": \"get_revenue\"}",
             "after": "{\"arguments\": {\"company\": \"Microsoft\", \"fiscal_year\": 2025}, \"name\": \"get_revenue\"}"
           },
           {
-            "prompt": [
-              "convert",
-              "100",
-              "USD_EUR"
-            ],
+            "prompt": ["convert", "100", "USD_EUR"],
             "before": "{\"arguments\": {\"amount\": 100, \"from_currency\": \"EUR\", \"to_currency\": \"USD\"}, \"name\": \"convert_currency\"}",
             "after": "{\"arguments\": {\"amount\": 100, \"from_currency\": \"EUR\", \"to_currency\": \"USD\"}, \"name\": \"convert_currency\"}"
           },
           {
-            "prompt": [
-              "convert",
-              "300",
-              "EUR_USD"
-            ],
+            "prompt": ["convert", "300", "EUR_USD"],
             "before": "{\"arguments\": {\"amount\": 100, \"from_currency\": \"EUR\", \"to_currency\": \"USD\"}, \"name\": \"convert_currency\"}",
             "after": "{\"arguments\": {\"amount\": 100, \"from_currency\": \"EUR\", \"to_currency\": \"USD\"}, \"name\": \"convert_currency\"}"
           },
           {
-            "prompt": [
-              "story",
-              "none",
-              "none"
-            ],
+            "prompt": ["story", "none", "none"],
             "before": "{\"arguments\": {}, \"name\": \"no_call\"}",
             "after": "{\"arguments\": {}, \"name\": \"no_call\"}"
           }
@@ -251,9 +211,7 @@
         "token_surrogate": 0.8500000238418579,
         "sequence_surrogate": 0.75,
         "logprob_change": [
-          -0.13198477029800415,
-          -0.08652293682098389,
-          0.11663806438446045,
+          -0.13198477029800415, -0.08652293682098389, 0.11663806438446045,
           0.07964777946472168
         ]
       },
@@ -267,38 +225,26 @@
       "metrics": {
         "Naive Q": {
           "true_returns": [
-            -0.13183709979057312,
-            -0.21818819642066956,
-            -0.057053759694099426
+            -0.13183709979057312, -0.21818819642066956, -0.057053759694099426
           ],
           "support_gaps": [
-            0.5113945603370667,
-            0.6254499554634094,
-            0.3834943175315857
+            0.5113945603370667, 0.6254499554634094, 0.3834943175315857
           ]
         },
         "Conservative": {
           "true_returns": [
-            -0.05030469968914986,
-            -0.04521385580301285,
-            -0.04875820875167847
+            -0.05030469968914986, -0.04521385580301285, -0.04875820875167847
           ],
           "support_gaps": [
-            0.021189402788877487,
-            0.01570889726281166,
-            0.013902311213314533
+            0.021189402788877487, 0.01570889726281166, 0.013902311213314533
           ]
         },
         "Q + BC": {
           "true_returns": [
-            -0.02849150076508522,
-            -0.026607640087604523,
-            -0.029490111395716667
+            -0.02849150076508522, -0.026607640087604523, -0.029490111395716667
           ],
           "support_gaps": [
-            0.0489652082324028,
-            0.05315358191728592,
-            0.0440630204975605
+            0.0489652082324028, 0.05315358191728592, 0.0440630204975605
           ]
         },
         "Behavior": {
@@ -317,39 +263,21 @@
       "code_cells": 5,
       "metrics": {
         "zero_torque_returns": [
-          -616.5846227403325,
-          -942.2967150490249,
-          -970.1812460538372,
-          -1322.12299706458,
-          -1830.6665369115167,
-          -1606.7303503800854,
-          -1069.423959214765,
-          -1651.8971687435771,
-          -1374.9455493560688,
+          -616.5846227403325, -942.2967150490249, -970.1812460538372,
+          -1322.12299706458, -1830.6665369115167, -1606.7303503800854,
+          -1069.423959214765, -1651.8971687435771, -1374.9455493560688,
           -1705.9816890440609
         ],
         "before_returns": [
-          -629.337306154083,
-          -958.8697477183122,
-          -969.5552225354786,
-          -1325.3578921569165,
-          -1831.741622901378,
-          -1609.063323066726,
-          -1070.1215137590723,
-          -1654.01809973512,
-          -1378.9232341319007,
+          -629.337306154083, -958.8697477183122, -969.5552225354786,
+          -1325.3578921569165, -1831.741622901378, -1609.063323066726,
+          -1070.1215137590723, -1654.01809973512, -1378.9232341319007,
           -1707.944495410518
         ],
         "after_returns": [
-          -1100.886027923237,
-          -1160.8816830907372,
-          -1137.8037433976367,
-          -1124.841653518832,
-          -1632.8321858670245,
-          -1222.962293879415,
-          -1096.4351639798394,
-          -1348.2304777619054,
-          -1166.695450868538,
+          -1100.886027923237, -1160.8816830907372, -1137.8037433976367,
+          -1124.841653518832, -1632.8321858670245, -1222.962293879415,
+          -1096.4351639798394, -1348.2304777619054, -1166.695450868538,
           -1460.174869038021
         ]
       },
@@ -362,16 +290,10 @@
       "code_cells": 5,
       "metrics": {
         "REINFORCE": {
-          "heldout_returns": [
-            196.3,
-            142.1
-          ]
+          "heldout_returns": [196.3, 142.1]
         },
         "With baseline": {
-          "heldout_returns": [
-            304.9,
-            383.0
-          ]
+          "heldout_returns": [304.9, 383.0]
         }
       },
       "code_sha256": "6fefa272dfe059892b7550bffa143712451fe485ac15c29f633c1f415e38c75a"
@@ -387,28 +309,16 @@
         "open_loop_mse_at_29": 21.297061988245694,
         "true_returns": {
           "Random": [
-            -804.86215302255,
-            -2626.5262360572815,
-            -118.54748625401407,
-            -2516.35036611557,
-            -80.57731036795303,
-            -142.7590591609478
+            -804.86215302255, -2626.5262360572815, -118.54748625401407,
+            -2516.35036611557, -80.57731036795303, -142.7590591609478
           ],
           "Zero torque": [
-            -250.0,
-            -250.0,
-            -1010.3533520698547,
-            -1010.3533520698547,
-            -329.9672239422798,
-            -329.9672239422798
+            -250.0, -250.0, -1010.3533520698547, -1010.3533520698547,
+            -329.9672239422798, -329.9672239422798
           ],
           "Learned MPC": [
-            -29.049718314316124,
-            -23.740234406664968,
-            -19.19470847863704,
-            -17.72059811418876,
-            -5.8373159766197205,
-            -4.604384808801115
+            -29.049718314316124, -23.740234406664968, -19.19470847863704,
+            -17.72059811418876, -5.8373159766197205, -4.604384808801115
           ]
         }
       },
@@ -531,11 +441,7 @@
             "observation": {
               "spec": "sum",
               "source": "def solve(x, y):\n    return x - y\n",
-              "public_case": [
-                40,
-                2,
-                42
-              ]
+              "public_case": [40, 2, 42]
             },
             "reward": -0.01
           },
@@ -622,11 +528,7 @@
             "turn": 0,
             "action": "list_tables",
             "observation": {
-              "tables": [
-                [
-                  "accounts"
-                ]
-              ]
+              "tables": [["accounts"]]
             },
             "reward": -0.01
           },
@@ -635,38 +537,10 @@
             "action": "schema",
             "observation": {
               "schema": [
-                [
-                  0,
-                  "company",
-                  "TEXT",
-                  0,
-                  null,
-                  0
-                ],
-                [
-                  1,
-                  "year",
-                  "INT",
-                  0,
-                  null,
-                  0
-                ],
-                [
-                  2,
-                  "revenue",
-                  "REAL",
-                  0,
-                  null,
-                  0
-                ],
-                [
-                  3,
-                  "expense",
-                  "REAL",
-                  0,
-                  null,
-                  0
-                ]
+                [0, "company", "TEXT", 0, null, 0],
+                [1, "year", "INT", 0, null, 0],
+                [2, "revenue", "REAL", 0, null, 0],
+                [3, "expense", "REAL", 0, null, 0]
               ]
             },
             "reward": -0.01
@@ -676,14 +550,8 @@
             "action": "query_current",
             "observation": {
               "sql": "SELECT revenue, expense FROM accounts WHERE company = ? AND year = ?",
-              "parameters": [
-                "company-32",
-                2025
-              ],
-              "row": [
-                218.0,
-                52.0
-              ]
+              "parameters": ["company-32", 2025],
+              "row": [218.0, 52.0]
             },
             "reward": -0.01
           },
@@ -825,18 +693,19 @@
   "note": "Default CPU budgets executed in fresh kernels. Installation time excluded because dependencies were preinstalled. No hosted-platform or pretrained-Qwen execution is claimed.",
   "additional_runs": [
     {
-      "started_at": "2026-10-22T01:04:31.833467+00:00",
-      "python": "3.12.13",
-      "platform": "macOS-26.5.1-arm64-arm-64bit",
-      "processor": "arm64",
+      "started_at": "2026-10-22T15:53:17.916576+00:00",
+      "python": "3.10.12",
+      "platform": "Linux-6.12.76-linuxkit-x86_64-with-glibc2.35",
+      "processor": "x86_64",
       "device": "CPU",
       "locale": "zh",
+      "engine": "ipython",
       "packages": {
-        "numpy": "2.5.4",
-        "torch": "2.14.1",
-        "matplotlib": "3.11.2",
-        "gymnasium": "1.4.0",
-        "stable-baselines3": "2.9.0"
+        "numpy": "1.26.4",
+        "torch": "2.3.1+cpu",
+        "matplotlib": "3.10.9",
+        "gymnasium": "1.0.0",
+        "stable-baselines3": "2.4.1"
       },
       "hosted_platforms": "Colab and ModelScope not executed in this local run"
     }

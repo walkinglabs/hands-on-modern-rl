@@ -22,7 +22,7 @@ SPACE = {
         "preview": {"en": "The first clip shows the selected Atari game. The completed run replaces it with a replay rendered by this run's learned DQN policy.", "zh": "初始画面展示所选 Atari 游戏；训练完成后会替换为本次 DQN 策略在模拟器中生成的回放。"},
         "time": {"en": "The recommended baselines prioritize learned behavior over a short demo and can still take tens of minutes on xGPU because ALE environment stepping and replay evaluation remain CPU-bound. The estimate beside each game is a planning range, not a timeout.", "zh": "推荐 baseline 优先保证能学到行为。即使使用 xGPU，ALE 环境步进和回放评估仍受 CPU 限制，完整训练仍可能需要几十分钟。每个游戏旁的时间是规划区间，不是超时限制。"},
     },
-    "device": "xGPU · CUDA DQN",
+    "device": "CPU / GPU · DQN",
     "course_url": "https://walkinglabs.github.io/hands-on-modern-rl/chapter07_dqn/dqn-family",
     "source_url": "https://modelscope.cn/studios/walkinglab/hands-on-modern-rl-experiment03-atari/file/view/master/space_runtime.py",
     "notebook_url": "https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/"
@@ -95,14 +95,12 @@ def runtime_status():
         import gymnasium as gym
         import torch
 
-        if not torch.cuda.is_available():
-            return f"ALE {ale_py.__version__} · waiting for xGPU"
-
         gym.register_envs(ale_py)
         env = gym.make("ALE/Pong-v5", render_mode="rgb_array", frameskip=4)
         env.reset(seed=0)
         env.close()
-        return f"ALE {ale_py.__version__} · {torch.cuda.get_device_name(0)} · ROM READY"
+        device = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "CPU"
+        return f"ALE {ale_py.__version__} · {device} · ROM READY"
     except Exception as exc:
         return f"startup check pending · {type(exc).__name__}"
 
@@ -268,12 +266,8 @@ def run(
 ):
     import torch
 
-    if not torch.cuda.is_available():
-        raise RuntimeError(
-            "This experiment requires a ModelScope xGPU, but CUDA is not visible. "
-            "Restart the Studio after selecting an xGPU cloud resource."
-        )
-    task = next(item for item in TASKS if item["key"] == key)
+    task = dict(next(item for item in TASKS if item["key"] == key))
+    task["device"] = "cuda" if torch.cuda.is_available() else "cpu"
     environment = task["environment"]
     yield from train_sb3(
         root=ROOT,

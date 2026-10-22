@@ -57,7 +57,7 @@ EXPERIMENTS = [
         "slug": "hands-on-modern-rl-experiment03-atari",
         "title": "Experiment 03 · Atari xGPU Arcade",
         "summary": "Train DQN from ALE pixels, evaluate checkpoints, and replay the learned Atari policy.",
-        "resource": "xGPU",
+        "resource": "CPU / GPU",
         "kind": "runtime",
         "task": "freeway",
         "budget": 2_000,
@@ -108,8 +108,8 @@ EXPERIMENTS = [
     {
         "slug": "hands-on-modern-rl-experiment08-maniskill",
         "title": "Experiment 08 · ManiSkill Robot Lab",
-        "summary": "Train a robot policy with CUDA PPO and PhysX, then render the learned manipulation trajectory.",
-        "resource": "xGPU",
+        "summary": "Train a robot policy with PPO and PhysX on CPU or CUDA, then replay its manipulation trajectory.",
+        "resource": "CPU / GPU",
         "kind": "runtime",
         "task": "push-cube",
         "budget": 10_000,
@@ -118,8 +118,8 @@ EXPERIMENTS = [
     {
         "slug": "hands-on-modern-rl-experiment10-minestudio",
         "title": "Experiment 10 · MineStudio Minecraft Agent",
-        "summary": "Start the real Minecraft simulator, train visual PPO on xGPU, and record a first-person replay.",
-        "resource": "xGPU",
+        "summary": "Start the Minecraft simulator on Linux, train visual PPO on CPU or CUDA, and record a first-person replay.",
+        "resource": "CPU / GPU",
         "kind": "runtime",
         "task": "mine-dirt",
         "budget": 1_024,
@@ -200,6 +200,8 @@ def learning_cell(spec: dict) -> dict:
         if spec["resource"] == "xGPU"
         else "A normal ModelScope **CPU Notebook** is sufficient; no GPU is required."
     )
+    if spec["resource"] == "CPU / GPU":
+        gpu_note = "Run the quick experiment on CPU; CUDA is selected automatically when available."
     return markdown_cell(
         f"""
         ## 1. Experiment and training schedule
@@ -323,6 +325,8 @@ def runtime_run_cell(spec: dict) -> dict:
 if not torch.cuda.is_available():
     raise RuntimeError("This experiment requires a scheduled ModelScope xGPU Notebook; CUDA is not visible.")
 print("CUDA:", torch.cuda.get_device_name(0))""" if spec["resource"] == "xGPU" else "print('Device: CPU')"
+    if spec["resource"] == "CPU / GPU":
+        gpu_check = "import torch\nprint('Device:', 'CUDA' if torch.cuda.is_available() else 'CPU')"
     return code_cell(
         f'''from IPython.display import display
 import json
@@ -641,7 +645,7 @@ def reflection_cell(spec: dict) -> dict:
 
 
 def saved_result_cell(spec):
-    return code_cell("""
+    source = """
 import json
 from IPython.display import Image as NotebookImage, display
 
@@ -658,7 +662,15 @@ metrics = {"score": latest.get("score"), "steps": latest.get("step"),
            "epochs": EPOCHS, "checkpoints": len(records), "preview": preview.name}
 (output / "metrics.json").write_text(json.dumps(metrics, indent=2))
 print(json.dumps(metrics, indent=2))
-""")
+"""
+    if spec["slug"].endswith("experiment03-atari"):
+        source = source.replace(
+            'preview = Path(str(latest.get("preview", "")))',
+            'rendered = runtime.render_preview(latest["model_id"])\n'
+            'latest["preview"] = str(rendered["preview"])\n'
+            'persist_epoch_models()\n'
+            'preview = Path(latest["preview"])')
+    return code_cell(source)
 
 def build_notebook(spec: dict) -> dict:
     cells = [intro_cell(spec), learning_cell(spec), markdown_cell("## 2. Prepare the matching Studio runtime"), setup_cell(spec)]
