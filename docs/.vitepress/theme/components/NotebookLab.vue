@@ -309,6 +309,7 @@ let wheelFrame = 0
 let wheelTarget = 0
 let wheelTime = 0
 let wheelDirection = 0
+const wheelDistanceMultiplier = 3
 let shelfMetrics = { width: 0, stride: 1, inset: 0, count: 0 }
 
 function stopShelfScroll() {
@@ -349,7 +350,10 @@ function scrollShelf(event) {
   wheelDirection = direction
   wheelTarget = Math.max(
     0,
-    Math.min(el.scrollWidth - el.clientWidth, wheelTarget + delta * unit)
+    Math.min(
+      el.scrollWidth - el.clientWidth,
+      wheelTarget + delta * unit * wheelDistanceMultiplier
+    )
   )
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     stopShelfScroll()
