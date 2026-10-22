@@ -305,6 +305,40 @@ const sourceUrl = (lab) =>
   'main/' +
   lab.source
 let observer
+let wheelEnd
+let wheelViewport
+
+function finishWheel() {
+  clearTimeout(wheelEnd)
+  wheelViewport?.style.removeProperty('scroll-snap-type')
+  wheelViewport = undefined
+}
+function scrollShelf(event) {
+  const el = viewport.value
+  if (event.ctrlKey || !el || el.scrollWidth <= el.clientWidth + 2) return
+  const delta =
+    Math.abs(event.deltaX) > Math.abs(event.deltaY)
+      ? event.deltaX
+      : event.deltaY
+  if (!delta) return
+  event.preventDefault()
+  const unit =
+    event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? el.clientWidth : 1
+  clearTimeout(wheelEnd)
+  wheelViewport = el
+  el.style.scrollSnapType = 'none'
+  el.scrollLeft += delta * unit
+  wheelEnd = setTimeout(finishWheel, 180)
+}
+function navigateShelf(event) {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
+  const direction = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[
+    event.key
+  ]
+  if (!direction) return
+  event.preventDefault()
+  slide(direction)
+}
 
 function updatePosition() {
   const el = viewport.value
@@ -347,6 +381,7 @@ function slide(direction) {
   })
 }
 async function syncViewport() {
+  finishWheel()
   await nextTick()
   observer?.disconnect()
   if (viewport.value) {
@@ -434,6 +469,7 @@ onMounted(() => {
   window.addEventListener('resize', fitChapterMenu)
 })
 onBeforeUnmount(() => {
+  finishWheel()
   observer?.disconnect()
   window.removeEventListener('click', clickAway)
   window.removeEventListener('resize', fitChapterMenu)
@@ -528,8 +564,12 @@ onBeforeUnmount(() => {
         <div
           ref="viewport"
           class="nl-viewport"
+          role="region"
+          tabindex="0"
           :aria-label="copy.shelfLabel"
           @scroll.passive="updatePosition"
+          @wheel="scrollShelf"
+          @keydown="navigateShelf"
         >
           <div class="nl-track">
             <article
