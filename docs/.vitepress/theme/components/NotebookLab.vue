@@ -305,6 +305,33 @@ const sourceUrl = (lab) =>
   'main/' +
   lab.source
 let observer
+let wheelFrame = 0
+let wheelTarget = 0
+let wheelTime = 0
+let wheelDirection = 0
+let shelfMetrics = { width: 0, stride: 1, inset: 0, count: 0 }
+
+function stopShelfScroll() {
+  cancelAnimationFrame(wheelFrame)
+  wheelFrame = 0
+  wheelTime = 0
+  wheelDirection = 0
+}
+function animateShelf(time) {
+  const el = viewport.value
+  if (!el) return stopShelfScroll()
+  const elapsed = wheelTime ? time - wheelTime : 16
+  wheelTime = time
+  wheelTarget = Math.min(wheelTarget, el.scrollWidth - el.clientWidth)
+  const remaining = wheelTarget - el.scrollLeft
+  if (Math.abs(remaining) <= 1) {
+    el.scrollLeft = wheelTarget
+    stopShelfScroll()
+    return
+  }
+  el.scrollLeft += remaining * (1 - Math.exp(-elapsed / 45))
+  wheelFrame = requestAnimationFrame(animateShelf)
+}
 
 function scrollShelf(event) {
   const el = viewport.value
@@ -317,7 +344,19 @@ function scrollShelf(event) {
   event.preventDefault()
   const unit =
     event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? el.clientWidth : 1
-  el.scrollLeft += delta * unit
+  const direction = Math.sign(delta)
+  if (!wheelFrame || direction !== wheelDirection) wheelTarget = el.scrollLeft
+  wheelDirection = direction
+  wheelTarget = Math.max(
+    0,
+    Math.min(el.scrollWidth - el.clientWidth, wheelTarget + delta * unit)
+  )
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    stopShelfScroll()
+    el.scrollLeft = wheelTarget
+  } else if (!wheelFrame) {
+    wheelFrame = requestAnimationFrame(animateShelf)
+  }
 }
 function navigateShelf(event) {
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
@@ -331,24 +370,33 @@ function navigateShelf(event) {
 
 function updatePosition() {
   const el = viewport.value
-  if (!el?.clientWidth) return
-  const rect = el.getBoundingClientRect()
-  const children = [...el.querySelectorAll('.nl-card')]
-  const fullyVisible = children
-    .map((child, i) => ({ i, rect: child.getBoundingClientRect() }))
-    .filter(
-      (item) =>
-        item.rect.left >= rect.left - 3 && item.rect.right <= rect.right + 3
-    )
+  const { width, stride, inset, count } = shelfMetrics
+  if (!el?.clientWidth || !count) return
+  const first = Math.max(0, Math.ceil((el.scrollLeft - inset - 3) / stride))
+  const last = Math.min(
+    count - 1,
+    Math.floor((el.scrollLeft + el.clientWidth - inset - width + 3) / stride)
+  )
   start.value =
-    fullyVisible[0]?.i ??
-    Math.round(
-      el.scrollLeft /
-        ((children[0]?.getBoundingClientRect().width || 1) + cardGap())
-    )
-  end.value = fullyVisible.at(-1)?.i ?? start.value
+    first <= last
+      ? first
+      : Math.min(count - 1, Math.round(el.scrollLeft / stride))
+  end.value = first <= last ? last : start.value
   canPrev.value = el.scrollLeft > 2
   canNext.value = el.scrollLeft + el.clientWidth < el.scrollWidth - 2
+}
+function measureShelf() {
+  const el = viewport.value
+  const card = el?.querySelector('.nl-card')
+  if (!card) return
+  const rect = card.getBoundingClientRect()
+  shelfMetrics = {
+    width: rect.width,
+    stride: rect.width + cardGap(),
+    inset: rect.left - el.getBoundingClientRect().left + el.scrollLeft,
+    count: filtered.value.length
+  }
+  updatePosition()
 }
 function cardGap() {
   return (
@@ -358,6 +406,7 @@ function cardGap() {
   )
 }
 function slide(direction) {
+  stopShelfScroll()
   const width =
     viewport.value?.querySelector('.nl-card')?.getBoundingClientRect().width ||
     300
@@ -370,13 +419,14 @@ function slide(direction) {
   })
 }
 async function syncViewport() {
+  stopShelfScroll()
   await nextTick()
   observer?.disconnect()
   if (viewport.value) {
     viewport.value.scrollLeft = 0
-    observer = new ResizeObserver(updatePosition)
+    observer = new ResizeObserver(measureShelf)
     observer.observe(viewport.value)
-    updatePosition()
+    measureShelf()
   }
 }
 function setChapter(id) {
@@ -457,6 +507,7 @@ onMounted(() => {
   window.addEventListener('resize', fitChapterMenu)
 })
 onBeforeUnmount(() => {
+  stopShelfScroll()
   observer?.disconnect()
   window.removeEventListener('click', clickAway)
   window.removeEventListener('resize', fitChapterMenu)
@@ -556,6 +607,7 @@ onBeforeUnmount(() => {
           :aria-label="copy.shelfLabel"
           @scroll.passive="updatePosition"
           @wheel="scrollShelf"
+          @pointerdown="stopShelfScroll"
           @keydown="navigateShelf"
         >
           <div class="nl-track">
