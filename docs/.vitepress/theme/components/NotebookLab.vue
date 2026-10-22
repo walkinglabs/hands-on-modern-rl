@@ -333,6 +333,12 @@ function animateShelf(time) {
   el.scrollLeft += remaining * (1 - Math.exp(-elapsed / 45))
   wheelFrame = requestAnimationFrame(animateShelf)
 }
+function canScrollShelf(el, direction) {
+  if (!el) return false
+  return direction < 0
+    ? el.scrollLeft > 2
+    : el.scrollLeft < el.scrollWidth - el.clientWidth - 2
+}
 
 function scrollShelf(event) {
   const el = viewport.value
@@ -342,10 +348,14 @@ function scrollShelf(event) {
       ? event.deltaX
       : event.deltaY
   if (!delta) return
+  const direction = Math.sign(delta)
+  if (!canScrollShelf(el, direction)) {
+    stopShelfScroll()
+    return
+  }
   event.preventDefault()
   const unit =
     event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? el.clientWidth : 1
-  const direction = Math.sign(delta)
   if (!wheelFrame || direction !== wheelDirection) wheelTarget = el.scrollLeft
   wheelDirection = direction
   wheelTarget = Math.max(
@@ -368,6 +378,7 @@ function navigateShelf(event) {
     event.key
   ]
   if (!direction) return
+  if (!canScrollShelf(viewport.value, direction)) return
   event.preventDefault()
   slide(direction)
 }
