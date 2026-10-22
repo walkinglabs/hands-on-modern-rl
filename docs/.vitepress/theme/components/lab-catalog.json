@@ -36,10 +36,14 @@
       "result": "奖励曲线、训练日志、独立 checkpoint 与策略 GIF。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment01-cartpole.ipynb",
       "source": "code/chapter01_cartpole",
-      "next": "复用现有 notebook，补 Colab 环境验收。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment01-cartpole.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment01-cartpole.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/cartpole-zh.html",
+        "en": "lab-results/cartpole-en.html"
       }
     },
     {
@@ -56,12 +60,16 @@
       "result": "累计收益、遗憾曲线与多随机种子的策略比较。",
       "path": "code/online-experiments/hands-on-modern-rl-bandit.ipynb",
       "source": "code/chapter03_mdp/two_armed_bandit.py",
-      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-bandit.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-bandit.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/bandit-zh.html",
+        "en": "lab-results/bandit-en.html"
       }
     },
     {
@@ -78,12 +86,16 @@
       "result": "价值表、策略箭头、学习曲线与最终路径。",
       "path": "code/online-experiments/hands-on-modern-rl-gridworld.ipynb",
       "source": "code/chapter03_mdp/gridworld_q_learning.py",
-      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-gridworld.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-gridworld.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/gridworld-zh.html",
+        "en": "lab-results/gridworld-en.html"
       }
     },
     {
@@ -100,12 +112,16 @@
       "result": "两种算法的奖励曲线、Q 值估计与策略回放。",
       "path": "code/online-experiments/hands-on-modern-rl-dqn.ipynb",
       "source": "code/chapter04_dqn/double_dqn_cartpole.py",
-      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-dqn.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-dqn.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/dqn-zh.html",
+        "en": "lab-results/dqn-en.html"
       }
     },
     {
@@ -122,12 +138,16 @@
       "result": "多种子奖励曲线、方差对照与训练后的回放。",
       "path": "code/online-experiments/hands-on-modern-rl-reinforce.ipynb",
       "source": "code/chapter05_policy_gradient",
-      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-reinforce.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-reinforce.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/reinforce-zh.html",
+        "en": "lab-results/reinforce-en.html"
       }
     },
     {
@@ -144,12 +164,16 @@
       "result": "原始回报、控制力矩、归一化价值估计和真实摆杆动画；短训练仍有失败。",
       "path": "code/online-experiments/hands-on-modern-rl-pendulum.ipynb",
       "source": "code/chapter06_actor_critic/actor_critic_pendulum.py",
-      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-pendulum.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-pendulum.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/pendulum-zh.html",
+        "en": "lab-results/pendulum-en.html"
       }
     },
     {
@@ -166,10 +190,14 @@
       "result": "评估曲线、迷宫策略回放与每轮模型。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment06-minigrid-adventure.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment06-minigrid-adventure",
-      "next": "复用现有 notebook，检查原生依赖与无窗口渲染。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment06-minigrid-adventure.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment06-minigrid-adventure.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/minigrid-zh.html",
+        "en": "lab-results/minigrid-en.html"
       }
     },
     {
@@ -186,10 +214,14 @@
       "result": "所选任务的评估曲线、模型文件和真实回放。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment-gymnasium.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment-gymnasium",
-      "next": "复用现有 notebook，按任务安装最小依赖。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment-gymnasium.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment-gymnasium.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/gymnasium-zh.html",
+        "en": "lab-results/gymnasium-en.html"
       }
     },
     {
@@ -206,12 +238,16 @@
       "result": "DPO 损失、留出偏好间隔、回答对照与主题保持率；含内容退化反例。",
       "path": "code/online-experiments/hands-on-modern-rl-dpo.ipynb",
       "source": "code/chapter17_dpo",
-      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-dpo.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-dpo.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/dpo-zh.html",
+        "en": "lab-results/dpo-en.html"
       }
     },
     {
@@ -228,12 +264,16 @@
       "result": "组内优势、验证器测试、逐 token 裁剪与 padding 梯度检查。",
       "path": "code/online-experiments/hands-on-modern-rl-grpo.ipynb",
       "source": "code/chapter09_grpo_rlvr",
-      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-grpo.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-grpo.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/grpo-zh.html",
+        "en": "lab-results/grpo-en.html"
       }
     },
     {
@@ -250,12 +290,16 @@
       "result": "真实 GRPO 更新、格式与参数指标、训练和留出请求对照；含泛化失败。",
       "path": "code/online-experiments/hands-on-modern-rl-financial.ipynb",
       "source": "docs/chapter18_grpo/financial-tool-calling-grpo.md",
-      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-financial.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-financial.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/financial-zh.html",
+        "en": "lab-results/financial-en.html"
       }
     },
     {
@@ -272,10 +316,14 @@
       "result": "DQN 训练日志、评估曲线与第一人称 GIF。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment02-vizdoom.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment02-vizdoom",
-      "next": "已有 notebook，Colab 的系统依赖与图形环境待验证。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment02-vizdoom.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment02-vizdoom.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/vizdoom-zh.html",
+        "en": "lab-results/vizdoom-en.html"
       }
     },
     {
@@ -292,7 +340,7 @@
       "result": "分轮评估、模型选择与 ALE 模拟器回放。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment03-atari.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment03-atari",
-      "next": "已有 notebook，GPU 调度与 ROM 安装流程待平台验证。",
+      "next": "在 CUDA 实例中运行像素训练，按检查点查看奖励与策略回放。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment03-atari.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment03-atari.ipynb"
@@ -312,10 +360,14 @@
       "result": "对随机策略胜率、均衡差距与完整对局回放。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment04-board-selfplay.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment04-board-selfplay",
-      "next": "复用已有 CFR+ 和表格自博弈运行时。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment04-board-selfplay.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment04-board-selfplay.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/selfplay-zh.html",
+        "en": "lab-results/selfplay-en.html"
       }
     },
     {
@@ -332,10 +384,14 @@
       "result": "团队奖励、多智能体同步回放与 checkpoint。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment05-multiagent-games.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment05-multiagent-games",
-      "next": "复用现有 notebook，核对 PettingZoo 与依赖版本。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment05-multiagent-games.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment05-multiagent-games.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/multiagent-zh.html",
+        "en": "lab-results/multiagent-en.html"
       }
     },
     {
@@ -352,10 +408,14 @@
       "result": "编译日志、策略梯度损失、评估回报与语义像素回放。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment07-jax-games.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment07-jax-games",
-      "next": "复用现有 notebook，验证 JAX / Flax 版本组合。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment07-jax-games.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment07-jax-games.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/jax-zh.html",
+        "en": "lab-results/jax-en.html"
       }
     },
     {
@@ -372,12 +432,16 @@
       "result": "动力学预测误差、规划轨迹与真实环境回报。",
       "path": "code/online-experiments/hands-on-modern-rl-worldmodel.ipynb",
       "source": "docs/chapter28_vla/embodied-intelligence/model-based-rl/snippets/minimal_mbrl_point_mass.py",
-      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-worldmodel.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-worldmodel.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/worldmodel-zh.html",
+        "en": "lab-results/worldmodel-en.html"
       }
     },
     {
@@ -394,12 +458,16 @@
       "result": "固定数据覆盖、分布外价值估计、三种子策略对照与保守性分析。",
       "path": "code/online-experiments/hands-on-modern-rl-offline.ipynb",
       "source": "docs/chapter32_selfplay/offline-rl/snippets/minimal_offline_rl_contextual_bandit.py",
-      "next": "默认 CPU 配方已在本地全新内核中顺序运行通过；安装耗时未计入。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-offline.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-offline.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/offline-zh.html",
+        "en": "lab-results/offline-en.html"
       }
     },
     {
@@ -416,7 +484,7 @@
       "result": "PhysX 仿真中的策略评估与机器人 GIF。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment08-maniskill.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment08-maniskill",
-      "next": "已有 notebook，图形驱动、CUDA 与模拟器组合需要专项适配。",
+      "next": "准备 CUDA、PhysX 与图形后端，运行机器人训练和回放。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment08-maniskill.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment08-maniskill.ipynb"
@@ -436,7 +504,7 @@
       "result": "视觉 PPO 日志、评估与当前策略的第一人称回放。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment10-minestudio.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment10-minestudio",
-      "next": "已有 notebook，资源下载、Xvfb 与原生依赖需要专项适配。",
+      "next": "准备 Linux、CUDA 与 Minecraft 引擎，依次运行训练和第一人称回放。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment10-minestudio.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment10-minestudio.ipynb"
@@ -456,7 +524,7 @@
       "result": "Unity 场景训练指标与本次运行产生的画面。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment11-unity-mlagents.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment11-unity-mlagents",
-      "next": "已有 notebook，Python 与 ML-Agents 原生环境需要专项适配。",
+      "next": "准备 Linux、CUDA 与 Unity 场景，逐轮保存模型并播放回放。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment11-unity-mlagents.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment11-unity-mlagents.ipynb"
@@ -476,7 +544,7 @@
       "result": "导航评估、训练曲线与真实房间第一人称回放。",
       "path": "code/online-experiments/hands-on-modern-rl-experiment12-ai2thor-embodied.ipynb",
       "source": "modelscope-space/hands-on-modern-rl-experiment12-ai2thor-embodied",
-      "next": "已有 notebook，模拟器下载与无窗口图形环境需要专项适配。",
+      "next": "准备 Linux、CUDA 与无窗口渲染环境，在房间场景中运行导航训练。",
       "paths": {
         "zh": "code/online-experiments/zh/hands-on-modern-rl-experiment12-ai2thor-embodied.ipynb",
         "en": "code/online-experiments/hands-on-modern-rl-experiment12-ai2thor-embodied.ipynb"
@@ -496,12 +564,16 @@
       "result": "实际查询与计算、动作梯度检查、双种子评估和完整轨迹。",
       "path": "code/online-experiments/hands-on-modern-rl-agentic-tools.ipynb",
       "source": "code/chapter-notebooks/agentic-tools.py",
-      "next": "默认 CPU 配方已在本地全新内核实际运行；有限动作教学策略，含接口约束，不等同于预训练语言模型训练。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-agentic-tools.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-agentic-tools.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/agentic-tools-zh.html",
+        "en": "lab-results/agentic-tools-en.html"
       }
     },
     {
@@ -518,12 +590,16 @@
       "result": "公开与独立测试、补丁轨迹、实际子进程调用记录和策略参数。",
       "path": "code/online-experiments/hands-on-modern-rl-agentic-code.ipynb",
       "source": "code/chapter-notebooks/agentic-code.py",
-      "next": "默认 CPU 配方已在本地全新内核实际运行；有限动作教学策略，含接口约束，不等同于预训练语言模型训练。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-agentic-code.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-agentic-code.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/agentic-code-zh.html",
+        "en": "lab-results/agentic-code-en.html"
       }
     },
     {
@@ -540,12 +616,16 @@
       "result": "真实 SQLite 查询、计算轨迹、独立公司评估和工具调用成本。",
       "path": "code/online-experiments/hands-on-modern-rl-agentic-finqa.ipynb",
       "source": "code/chapter-notebooks/agentic-finqa.py",
-      "next": "默认 CPU 配方已在本地全新内核实际运行；有限动作教学策略，含接口约束，不等同于预训练语言模型训练。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-agentic-finqa.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-agentic-finqa.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/agentic-finqa-zh.html",
+        "en": "lab-results/agentic-finqa-en.html"
       }
     },
     {
@@ -562,12 +642,16 @@
       "result": "三种子训练、同条件前后评估、证据轨迹；贪心基线已满分，采样表现提高。",
       "path": "code/online-experiments/hands-on-modern-rl-agentic-research.ipynb",
       "source": "code/chapter-notebooks/agentic-research.py",
-      "next": "默认 CPU 配方已在本地全新内核实际运行；有限动作教学策略，含接口约束，不等同于预训练语言模型训练。Colab / ModelScope 托管运行仍需分别实测。",
+      "next": "Notebook 已保存本次运行的图表与输出，可以直接查看结果页或重新运行。",
       "validation": "local-cpu-executed",
       "previewKind": "result",
       "paths": {
         "zh": "code/online-experiments/hands-on-modern-rl-agentic-research.ipynb",
         "en": "code/online-experiments/en/hands-on-modern-rl-agentic-research.ipynb"
+      },
+      "results": {
+        "zh": "lab-results/agentic-research-zh.html",
+        "en": "lab-results/agentic-research-en.html"
       }
     }
   ]

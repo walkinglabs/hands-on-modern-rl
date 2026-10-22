@@ -5,8 +5,8 @@
 # `go away topic0 now`。我们先让小模型学会生成这两种回答，再用成对偏好提高第一种回答的相对概率。
 #
 # 本实验用 CPU 从零训练一个微型 GRU 自回归语言模型，再执行真实 DPO 参数更新。
-# 数据完全合成，默认 400 步预训练、120 步 DPO，无模型下载。它验证的是有限词表内的偏好学习，
-# 不能证明通用对话能力或消除迎合。书中 Qwen 0.5B 训练继续使用 `code/chapter17_dpo` 五步脚本。
+# 数据由代码生成，默认 400 步预训练、120 步 DPO。
+# 书中 Qwen 0.5B 训练见 `code/chapter17_dpo` 五步脚本。
 
 # %%
 import importlib.util
@@ -187,11 +187,10 @@ for row, old, new in zip(heldout[:4], before_text, after_text):
     print(row["prompt"], "\n before:", old, "\n after:", new)
 
 # %% [markdown]
-# ## 4. 偏好指标与生成质量分开检查 / Evaluation and limits
+# ## 4. 偏好指标与生成内容 / Evaluation
 #
-# 偏好间隔增大只说明这组 chosen 相对于 rejected 更受偏好。
-# 生成样例可能丢失主题或重复词，因此还要检查回答内容。真实大模型实验应使用新的请求、
-# 人工偏好和独立质量评价；这本小实验不替代 Qwen 的显存与平台测试。
+# 我们同时查看 chosen 与 rejected 的偏好间隔，以及留出主题上的生成内容。
+# 下表逐条展示更新前后的回答，图中记录偏好率与主题保持率。
 
 # %%
 fig, axes = plt.subplots(1, 3, figsize=(12, 3))
@@ -234,4 +233,4 @@ else:
 # - [DPO 原论文](https://arxiv.org/abs/2305.18290)：
 #   DPO 使用成对回答相对于固定参考策略的对数概率差。
 # - [本书 Qwen DPO 实验](https://walkinglabs.github.io/hands-on-modern-rl/chapter17_dpo/dpo-hands-on)：
-#   使用同样目标训练预训练模型，数据、模型规模和资源需求与本实验不同。
+#   使用同样的目标训练 Qwen 语言模型。

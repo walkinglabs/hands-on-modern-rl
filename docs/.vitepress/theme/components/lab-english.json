@@ -3,156 +3,156 @@
     "name": "Keep the cart balanced",
     "desc": "Inspect the reward curve, then replay the policy learned by the model.",
     "result": "Reward curves, training logs, a checkpoint, and a policy GIF.",
-    "next": "Reuse the existing Notebook and verify each hosted environment separately."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "gymnasium": {
     "name": "Try different control environments",
     "desc": "Choose an environment and compare its observations, actions, and training feedback.",
     "result": "Evaluation curves, model files, and policy replays for the selected task.",
-    "next": "Install only the dependencies needed by the selected environment."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "vizdoom": {
     "name": "Make decisions from a first-person view",
     "desc": "Train in a small shooting scenario and replay the current policy.",
     "result": "DQN training logs, evaluation curves, and first-person GIFs.",
-    "next": "Verify system dependencies and headless rendering on each platform."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "atari": {
     "name": "Turn pixels into actions",
     "desc": "Use frame stacking and a CNN to learn actions from game images.",
     "result": "Evaluation checkpoints, model selection, and ALE environment replays.",
-    "next": "Verify GPU availability and the ROM installation workflow."
+    "next": "Train from pixels on a CUDA instance and inspect each checkpoint and policy replay."
   },
   "minecraft": {
     "name": "Train a first-person visual policy",
     "desc": "Train a visual PPO policy inside the Minecraft simulator.",
     "result": "Visual PPO logs, evaluation, and first-person policy replays.",
-    "next": "Verify simulator downloads, native dependencies, and Xvfb support."
+    "next": "Prepare Linux, CUDA and the Minecraft engine, then run training and the first-person replay."
   },
   "jax": {
     "name": "Train pixel games with vectorized updates",
     "desc": "Compile the update function, then inspect training and policy replays.",
     "result": "Compilation logs, policy losses, evaluation returns, and pixel replays.",
-    "next": "Verify a compatible JAX and Flax dependency combination."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "unity": {
     "name": "Learn control in a physics scene",
     "desc": "Choose a scene and inspect the behavior learned by PPO.",
     "result": "Training metrics and replays from the selected Unity environment.",
-    "next": "Verify the Python version and native ML-Agents environment."
+    "next": "Prepare Linux, CUDA and the Unity scene, then save and replay each epoch model."
   },
   "minigrid": {
     "name": "Discover rewards in a maze",
     "desc": "Start with a small maze and observe exploration under sparse rewards.",
     "result": "Evaluation curves, maze replays, and model checkpoints.",
-    "next": "Verify native dependencies and headless rendering."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "multiagent": {
     "name": "Teach several agents to cooperate",
     "desc": "Train a shared policy in cooperative and competitive settings.",
     "result": "Team rewards, synchronized multi-agent replays, and checkpoints.",
-    "next": "Verify PettingZoo and the environment dependency versions."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "maniskill": {
     "name": "Train a robot in simulation",
     "desc": "Train a policy in a robot manipulation task and replay its actions.",
     "result": "Policy evaluation in PhysX simulation and robot GIFs.",
-    "next": "Verify the graphics driver, CUDA, and simulator combination."
+    "next": "Prepare CUDA, PhysX and the graphics backend, then run robot training and replay."
   },
   "ai2thor": {
     "name": "Find a target in a room",
     "desc": "Navigate an interactive room by choosing actions from visual observations.",
     "result": "Navigation evaluation, training curves, and first-person room replays.",
-    "next": "Verify simulator downloads and the headless graphics backend."
+    "next": "Prepare Linux, CUDA and headless rendering, then run navigation training in the room scene."
   },
   "selfplay": {
     "name": "Improve by playing against an opponent",
     "desc": "Start with tic-tac-toe and small poker games to observe interacting policies.",
     "result": "Win rates, equilibrium gaps, and complete game replays.",
-    "next": "Reuse the existing CFR+ and tabular self-play runtime."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "bandit": {
     "name": "Explore or exploit?",
     "desc": "Compare random, greedy, epsilon-greedy and UCB under fixed and changing reward probabilities.",
     "result": "Multi-seed reward and regret curves, plus a changing-environment counterexample.",
-    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. The linked Notebook includes English explanations, exercises and references. Colab and ModelScope execution has not been verified."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "gridworld": {
     "name": "Learn a path through GridWorld",
     "desc": "Compare known-model value iteration and interaction-based Q-learning on the same map.",
     "result": "Value tables, policy arrows, learning curves and the final six-step path.",
-    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. The linked Notebook includes English explanations, exercises and references. Colab and ModelScope execution has not been verified."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "dqn": {
     "name": "Compare DQN and Double DQN",
     "desc": "Train DQN and Double DQN with the same budget and separate evaluation seeds.",
     "result": "Two-seed evaluation curves, Q estimates, a saved model and an actual policy replay.",
-    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. The linked Notebook includes English explanations, exercises and references. Colab and ModelScope execution has not been verified."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "reinforce": {
     "name": "Stabilize policy gradients with a baseline",
     "desc": "Enumerate gradient variance, then train policies with and without a learned state baseline.",
     "result": "Multi-seed returns, gradient diagnostics and a fixed-seed policy replay.",
-    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. The linked Notebook includes English explanations, exercises and references. Colab and ModelScope execution has not been verified."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "pendulum": {
     "name": "Learn continuous control in Pendulum",
     "desc": "Train continuous-torque A2C and save both the policy and normalization statistics.",
     "result": "Raw-return evaluation, normalized value estimates, torque traces and a real replay.",
-    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. The linked Notebook includes English explanations, exercises and references. Colab and ModelScope execution has not been verified."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "dpo": {
     "name": "Change responses with preference data",
     "desc": "Train a tiny autoregressive GRU on CPU, then update its parameters using paired preferences.",
     "result": "DPO loss, held-out reward margins, generated responses and a content-retention counterexample.",
-    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. The linked Notebook includes English explanations, exercises and references. Colab and ModelScope execution has not been verified."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "grpo": {
     "name": "Turn verifiable answers into rewards",
     "desc": "Check a strict answer verifier and inspect token-level clipping, KL and padding gradients.",
     "result": "Group-relative advantages, verifier tests and one real probability-table update.",
-    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. The linked Notebook includes English explanations, exercises and references. Colab and ModelScope execution has not been verified."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "financial": {
     "name": "Train a model to call tools",
     "desc": "Train a tiny autoregressive policy in a restricted tool language, then render calls as JSON.",
     "result": "Mock execution, separate format and argument metrics, and held-out generalization failures.",
-    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. The linked Notebook includes English explanations, exercises and references. Colab and ModelScope execution has not been verified."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "worldmodel": {
     "name": "Learn to predict, then plan",
     "desc": "Learn point-mass dynamics, measure open-loop drift and plan in the actual environment.",
     "result": "Trajectory-held-out errors, planning traces and matched-start real-environment returns.",
-    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. The linked Notebook includes English explanations, exercises and references. Colab and ModelScope execution has not been verified."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "offline": {
     "name": "Evaluate actions beyond the dataset",
     "desc": "Train only on fixed data and compare naive Q maximization, conservative penalties and behavior constraints.",
     "result": "Coverage plots, out-of-distribution Q estimates and three-seed policy-return comparisons.",
-    "next": "The default CPU recipe was executed in a fresh local kernel; package installation time is excluded. The linked Notebook includes English explanations, exercises and references. Colab and ModelScope execution has not been verified."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "agentic-tools": {
     "name": "Multi-turn tools and credit assignment",
     "desc": "Continue decisions after tool responses and inspect credit from terminal rewards.",
     "result": "Actual lookup/calculation, action-loss masking, two-seed evaluation and complete traces.",
-    "next": "Executed locally in a fresh CPU kernel. This finite-action teaching policy uses supplied interface constraints; pretrained language-model training is a separate recipe. Colab and ModelScope hosted execution still need separate verification."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "agentic-code": {
     "name": "Repair code and verify it with tests",
     "desc": "Select a trusted patch, execute Python tests and check separate test inputs.",
     "result": "Public/private tests, patch traces, actual subprocess invocation counts and policy parameters.",
-    "next": "Executed locally in a fresh CPU kernel. This finite-action teaching policy uses supplied interface constraints; pretrained language-model training is a separate recipe. Colab and ModelScope hosted execution still need separate verification."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "agentic-finqa": {
     "name": "Query, calculate and answer with tools",
     "desc": "Use SQL and a calculator over synthetic company data in a multi-turn workflow.",
     "result": "Actual SQLite queries, calculator traces, held-out companies and tool-call costs.",
-    "next": "Executed locally in a fresh CPU kernel. This finite-action teaching policy uses supplied interface constraints; pretrained language-model training is a separate recipe. Colab and ModelScope hosted execution still need separate verification."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   },
   "agentic-research": {
     "name": "Retrieve evidence and verify citations",
     "desc": "Learn candidate query/evidence selection over a fixed teaching corpus; score answers and citations separately.",
     "result": "Three-seed training, matched evaluation and evidence traces. Greedy baseline is already perfect; sampled results improve.",
-    "next": "Executed locally in a fresh CPU kernel. This finite-action teaching policy uses supplied interface constraints; pretrained language-model training is a separate recipe. Colab and ModelScope hosted execution still need separate verification."
+    "next": "The Notebook includes saved plots and outputs. Open its result page or run the cells again."
   }
 }

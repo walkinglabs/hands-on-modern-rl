@@ -44,8 +44,8 @@ print("Rewards:\n", rewards, "\nAdvantages:\n", advantages)
 # ## 1. 验证器要拒绝含糊答案 / A strict verifier
 #
 # 我们只接受形如 `答案: 42` 的单一整数答案，拒绝多个互相矛盾的答案和混入的说明。
-# 这只是小型整数任务的规则，不能据此宣称能检查任意数学推理。
-# 先固定这些测试，后面的训练才不会把格式漏洞当成进步。
+#
+# 下面用正确、错误、冲突和非整数答案检查验证器的返回值。
 
 # %%
 def verify(response, expected):
@@ -110,10 +110,10 @@ assert (mean_change[:2] < 0).all() and (mean_change[2:] > 0).all()
 print("Mean selected-token log-probability change:", mean_change.tolist())
 
 # %% [markdown]
-# ## 3. 梯度测试与结果 / What the experiment establishes
+# ## 3. 梯度与概率变化 / Gradients and probability changes
 #
 # 概率表的更新支持三件事：较好的回答增加概率、较差的回答降低概率、padding 没有梯度。
-# 这些检查不能证明语言模型获得了数学能力；本实验没有预训练模型，也没有进行数学基准评估。
+#
 # 我们使用总体标准差 `correction=0`；部分框架使用样本标准差，数值尺度会有差别。
 
 # %%

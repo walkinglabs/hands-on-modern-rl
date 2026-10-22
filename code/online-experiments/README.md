@@ -1,6 +1,6 @@
 # Chapter and Studio experiment notebooks
 
-The [lab](https://walkinglabs.github.io/hands-on-modern-rl/labs/) contains 26 Notebook entries: 14 self-contained chapter experiments and the original 12 Studio companions. Both language versions of the chapter experiments below have been executed locally with their default CPU budgets. Colab and ModelScope links open the files; hosted execution is a separate verification step.
+The [lab](https://walkinglabs.github.io/hands-on-modern-rl/labs/) contains 26 Notebook entries: 14 self-contained chapter experiments and the original 12 Studio companions. Both language versions of the chapter experiments below have been executed locally with their default CPU budgets. Executed outputs are saved in the Notebook files. Open “View results” in the lab to browse the plots, metrics and policy replays.
 
 [English versions](./en/README.md) · [中文版本](./zh/README.md)
 

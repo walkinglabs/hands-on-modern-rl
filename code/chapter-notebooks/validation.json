@@ -15,8 +15,8 @@
   "notebooks": {
     "bandit": {
       "status": "passed",
-      "seconds": 6.19,
-      "sha256": "69fdb2a9a47430fc3328532f906185647f02e8c28183e4cd5d5187ec4e2938ef",
+      "seconds": 5.13,
+      "sha256": "16f3550497097f881dffca8c70c790cc4332002d55c2f2d4c92868add5689346",
       "code_cells": 5,
       "metrics": {
         "random": {
@@ -35,18 +35,19 @@
           "reward": 1061.82,
           "regret": 37.72000000000026
         }
-      }
+      },
+      "code_sha256": "bf115dbfe2d604306bb6fc0dfa7201079365561c068d4e06375200b51bda88f8"
     },
     "dpo": {
       "status": "passed",
-      "seconds": 2.78,
-      "sha256": "64701dd6221988fa4dc66c2d4c763c52da39c0d8ec4d13a2ecd46a7a16521a3c",
+      "seconds": 2.56,
+      "sha256": "36b587fb1254e266d42b1edac8f11e53ee3cd596a0c4160334b133ebb4a58b80",
       "code_cells": 6,
       "metrics": {
         "before": {
           "chosen_pair_rate": 0.125,
           "logprob_gap": -0.008088342845439911,
-          "reward_margin": -1.1622906015418266e-7
+          "reward_margin": -1.1622906015418266e-07
         },
         "after": {
           "chosen_pair_rate": 1.0,
@@ -99,28 +100,42 @@
             "after": "please read topic3 carefully"
           }
         ]
-      }
+      },
+      "code_sha256": "a6bedb77cc2763a31e7f56768f46e7c183197efd0be41ca7bf8e870aa7e822f3"
     },
     "dqn": {
       "status": "passed",
-      "seconds": 25.63,
-      "sha256": "0bf910f1b960021ca1870107eb27d42db848398257c199c5a3b8fe3e6537c811",
+      "seconds": 12.93,
+      "sha256": "989713298dee3aa3efa535739a3be9e9ff75dc0718f4c1b7161a2e0911f6476e",
       "code_cells": 5,
       "metrics": {
         "DQN": {
-          "evaluation_returns": [143.3, 105.4],
-          "initial_state_q": [52.85267181396485, 48.256884765625]
+          "evaluation_returns": [
+            143.3,
+            105.4
+          ],
+          "initial_state_q": [
+            52.85267181396485,
+            48.256884765625
+          ]
         },
         "Double DQN": {
-          "evaluation_returns": [159.4, 110.9],
-          "initial_state_q": [51.59617614746094, 47.4152530670166]
+          "evaluation_returns": [
+            159.4,
+            110.9
+          ],
+          "initial_state_q": [
+            51.59617614746094,
+            47.4152530670166
+          ]
         }
-      }
+      },
+      "code_sha256": "386faa565c4d7fd81a6647a8203a486c0e028a09d313cb7307d74b8520db0a99"
     },
     "financial": {
       "status": "passed",
-      "seconds": 2.84,
-      "sha256": "dc14570578ab55fcd71d63ad985b45c1c048ae1e0a4bff7cb7d6a889c60f74e1",
+      "seconds": 2.91,
+      "sha256": "a9f641f492e474e8af1ebed35900c74f5ced22cb4ca3e7f15489d494b89bb159",
       "code_cells": 6,
       "metrics": {
         "before": {
@@ -149,96 +164,141 @@
         },
         "examples": [
           {
-            "prompt": ["price", "AAPL", "day1"],
+            "prompt": [
+              "price",
+              "AAPL",
+              "day1"
+            ],
             "before": "{\"arguments\": {\"date\": \"day2\", \"ticker\": \"AAPL\"}, \"name\": \"get_stock_price\"}",
             "after": "{\"arguments\": {\"date\": \"day2\", \"ticker\": \"AAPL\"}, \"name\": \"get_stock_price\"}"
           },
           {
-            "prompt": ["price", "TSLA", "day2"],
+            "prompt": [
+              "price",
+              "TSLA",
+              "day2"
+            ],
             "before": "{\"arguments\": {\"date\": \"day2\", \"ticker\": \"AAPL\"}, \"name\": \"get_stock_price\"}",
             "after": "{\"arguments\": {\"date\": \"day2\", \"ticker\": \"AAPL\"}, \"name\": \"get_stock_price\"}"
           },
           {
-            "prompt": ["revenue", "Apple", "2024"],
+            "prompt": [
+              "revenue",
+              "Apple",
+              "2024"
+            ],
             "before": "{\"arguments\": {\"company\": \"Apple\", \"fiscal_year\": 2025}, \"name\": \"get_revenue\"}",
             "after": "{\"arguments\": {\"company\": \"Apple\", \"fiscal_year\": 2025}, \"name\": \"get_revenue\"}"
           },
           {
-            "prompt": ["revenue", "Tesla", "2025"],
+            "prompt": [
+              "revenue",
+              "Tesla",
+              "2025"
+            ],
             "before": "{\"arguments\": {\"company\": \"Apple\", \"fiscal_year\": 2025}, \"name\": \"get_revenue\"}",
             "after": "{\"arguments\": {\"company\": \"Microsoft\", \"fiscal_year\": 2025}, \"name\": \"get_revenue\"}"
           },
           {
-            "prompt": ["convert", "100", "USD_EUR"],
+            "prompt": [
+              "convert",
+              "100",
+              "USD_EUR"
+            ],
             "before": "{\"arguments\": {\"amount\": 100, \"from_currency\": \"EUR\", \"to_currency\": \"USD\"}, \"name\": \"convert_currency\"}",
             "after": "{\"arguments\": {\"amount\": 100, \"from_currency\": \"EUR\", \"to_currency\": \"USD\"}, \"name\": \"convert_currency\"}"
           },
           {
-            "prompt": ["convert", "300", "EUR_USD"],
+            "prompt": [
+              "convert",
+              "300",
+              "EUR_USD"
+            ],
             "before": "{\"arguments\": {\"amount\": 100, \"from_currency\": \"EUR\", \"to_currency\": \"USD\"}, \"name\": \"convert_currency\"}",
             "after": "{\"arguments\": {\"amount\": 100, \"from_currency\": \"EUR\", \"to_currency\": \"USD\"}, \"name\": \"convert_currency\"}"
           },
           {
-            "prompt": ["story", "none", "none"],
+            "prompt": [
+              "story",
+              "none",
+              "none"
+            ],
             "before": "{\"arguments\": {}, \"name\": \"no_call\"}",
             "after": "{\"arguments\": {}, \"name\": \"no_call\"}"
           }
         ]
-      }
+      },
+      "code_sha256": "6f34aa52288f4c01786337ea7cc84395cca30bce78d14a57601140a1298f7261"
     },
     "gridworld": {
       "status": "passed",
       "seconds": 2.35,
-      "sha256": "f2d980cc1ec64f7267b95b2052eaa42e84f1b7ab4a7aa3690680a2e6aeab1e8f",
+      "sha256": "141dc9626933cfe57803309165b6a147eaa5cb3a874e5a180ccccfc4ba5f5878",
       "code_cells": 5,
       "metrics": {
         "success_rate": 1.0,
         "mean_steps": 6.0
-      }
+      },
+      "code_sha256": "567ab38293c0f4b6a10ca4e50147da88d5e91a548e86699714a6718ada5c60fd"
     },
     "grpo": {
       "status": "passed",
-      "seconds": 1.57,
-      "sha256": "8325bb091430459e94e7f2cd3c81516ee044440d13fa4d47a24b670cb16ed22e",
+      "seconds": 1.66,
+      "sha256": "eb44aa083b62df8780c9b4faa91ff6834e490c4d44c5be3f18e03fb53b3b0b4c",
       "code_cells": 5,
       "metrics": {
         "verifier_tests": 6,
         "token_surrogate": 0.8500000238418579,
         "sequence_surrogate": 0.75,
         "logprob_change": [
-          -0.13198477029800415, -0.08652293682098389, 0.11663806438446045,
+          -0.13198477029800415,
+          -0.08652293682098389,
+          0.11663806438446045,
           0.07964777946472168
         ]
-      }
+      },
+      "code_sha256": "19634f980ad236f1f2b2c45dd97b538c09670e829d50716cd23287fcda65345b"
     },
     "offline": {
       "status": "passed",
-      "seconds": 5.2,
-      "sha256": "9da7d24d25ed24086ddf0f82228920e9f75b0cb828560f952dfd7fc7cc7ac584",
+      "seconds": 4.21,
+      "sha256": "e3b5257bd59acea1de6a2ac26612ee507bbd3303e1bf47f0c2f6ffd12542f1f4",
       "code_cells": 5,
       "metrics": {
         "Naive Q": {
           "true_returns": [
-            -0.13183709979057312, -0.21818819642066956, -0.057053759694099426
+            -0.13183709979057312,
+            -0.21818819642066956,
+            -0.057053759694099426
           ],
           "support_gaps": [
-            0.5113945603370667, 0.6254499554634094, 0.3834943175315857
+            0.5113945603370667,
+            0.6254499554634094,
+            0.3834943175315857
           ]
         },
         "Conservative": {
           "true_returns": [
-            -0.05030469968914986, -0.04521385580301285, -0.04875820875167847
+            -0.05030469968914986,
+            -0.04521385580301285,
+            -0.04875820875167847
           ],
           "support_gaps": [
-            0.021189402788877487, 0.01570889726281166, 0.013902311213314533
+            0.021189402788877487,
+            0.01570889726281166,
+            0.013902311213314533
           ]
         },
         "Q + BC": {
           "true_returns": [
-            -0.02849150076508522, -0.026607640087604523, -0.029490111395716667
+            -0.02849150076508522,
+            -0.026607640087604523,
+            -0.029490111395716667
           ],
           "support_gaps": [
-            0.0489652082324028, 0.05315358191728592, 0.0440630204975605
+            0.0489652082324028,
+            0.05315358191728592,
+            0.0440630204975605
           ]
         },
         "Behavior": {
@@ -247,52 +307,79 @@
         "Oracle": {
           "true_return": 0.0
         }
-      }
+      },
+      "code_sha256": "b24cd80589e22e4cdc03f0ca9d00d834f1dab81064f64290f4fb03aab72beb89"
     },
     "pendulum": {
       "status": "passed",
-      "seconds": 5.73,
-      "sha256": "f78de80d00e5cedb0818c127e2c9d9bc39761f3c819bb0e9aa55ba73548d6f59",
+      "seconds": 6.09,
+      "sha256": "a8083a42c7db32d5696dc05f1d7a45e03438e18977b23c629f36d5207c02081b",
       "code_cells": 5,
       "metrics": {
         "zero_torque_returns": [
-          -616.5846227403325, -942.2967150490249, -970.1812460538372,
-          -1322.12299706458, -1830.6665369115167, -1606.7303503800854,
-          -1069.423959214765, -1651.8971687435771, -1374.9455493560688,
+          -616.5846227403325,
+          -942.2967150490249,
+          -970.1812460538372,
+          -1322.12299706458,
+          -1830.6665369115167,
+          -1606.7303503800854,
+          -1069.423959214765,
+          -1651.8971687435771,
+          -1374.9455493560688,
           -1705.9816890440609
         ],
         "before_returns": [
-          -629.337306154083, -958.8697477183122, -969.5552225354786,
-          -1325.3578921569165, -1831.741622901378, -1609.063323066726,
-          -1070.1215137590723, -1654.01809973512, -1378.9232341319007,
+          -629.337306154083,
+          -958.8697477183122,
+          -969.5552225354786,
+          -1325.3578921569165,
+          -1831.741622901378,
+          -1609.063323066726,
+          -1070.1215137590723,
+          -1654.01809973512,
+          -1378.9232341319007,
           -1707.944495410518
         ],
         "after_returns": [
-          -1100.886027923237, -1160.8816830907372, -1137.8037433976367,
-          -1124.841653518832, -1632.8321858670245, -1222.962293879415,
-          -1096.4351639798394, -1348.2304777619054, -1166.695450868538,
+          -1100.886027923237,
+          -1160.8816830907372,
+          -1137.8037433976367,
+          -1124.841653518832,
+          -1632.8321858670245,
+          -1222.962293879415,
+          -1096.4351639798394,
+          -1348.2304777619054,
+          -1166.695450868538,
           -1460.174869038021
         ]
-      }
+      },
+      "code_sha256": "6f859cdb834468dad9a0b3876eba62aeac85e5336ea76a93e2299cde864c793c"
     },
     "reinforce": {
       "status": "passed",
-      "seconds": 3.73,
-      "sha256": "4ae709eabe1daf880553b2f8d461f16e7bce65fd090f1019057e8e247786f2a0",
+      "seconds": 3.68,
+      "sha256": "70334823ed712a0847a14610ef352a28141e96740eb0a76935258ed8cf21100c",
       "code_cells": 5,
       "metrics": {
         "REINFORCE": {
-          "heldout_returns": [196.3, 142.1]
+          "heldout_returns": [
+            196.3,
+            142.1
+          ]
         },
         "With baseline": {
-          "heldout_returns": [304.9, 383.0]
+          "heldout_returns": [
+            304.9,
+            383.0
+          ]
         }
-      }
+      },
+      "code_sha256": "6fefa272dfe059892b7550bffa143712451fe485ac15c29f633c1f415e38c75a"
     },
     "worldmodel": {
       "status": "passed",
-      "seconds": 3.64,
-      "sha256": "d93aff1d5b02f6bdc686eda9e1ccaac9a351cd93c9f119fc7ac38078451b396c",
+      "seconds": 2.77,
+      "sha256": "24a89a98f9d73828a89d97399caea3e59e70afd44094b47f942e6601c4eb608a",
       "code_cells": 5,
       "metrics": {
         "test_state_mse": 0.032912276685237885,
@@ -300,24 +387,37 @@
         "open_loop_mse_at_29": 21.297061988245694,
         "true_returns": {
           "Random": [
-            -804.86215302255, -2626.5262360572815, -118.54748625401407,
-            -2516.35036611557, -80.57731036795303, -142.7590591609478
+            -804.86215302255,
+            -2626.5262360572815,
+            -118.54748625401407,
+            -2516.35036611557,
+            -80.57731036795303,
+            -142.7590591609478
           ],
           "Zero torque": [
-            -250.0, -250.0, -1010.3533520698547, -1010.3533520698547,
-            -329.9672239422798, -329.9672239422798
+            -250.0,
+            -250.0,
+            -1010.3533520698547,
+            -1010.3533520698547,
+            -329.9672239422798,
+            -329.9672239422798
           ],
           "Learned MPC": [
-            -29.049718314316124, -23.740234406664968, -19.19470847863704,
-            -17.72059811418876, -5.8373159766197205, -4.604384808801115
+            -29.049718314316124,
+            -23.740234406664968,
+            -19.19470847863704,
+            -17.72059811418876,
+            -5.8373159766197205,
+            -4.604384808801115
           ]
         }
-      }
+      },
+      "code_sha256": "20eb49beee1704f0d173824bfef5d4dae8cad753e27df68c0af862739e9c8343"
     },
     "agentic-tools": {
       "status": "passed",
-      "seconds": 4.69,
-      "sha256": "646a2120d4a8f8b875aaec4ad632f340705424103532899fe22985236545cd43",
+      "seconds": 4.32,
+      "sha256": "83ac8ad0a3ffffada1b7b800e72bfb9a5db3dbeec7cf7290faa47ebd3a4fc84d",
       "code_cells": 7,
       "metrics": {
         "runs": [
@@ -387,12 +487,13 @@
         "heldout_tasks": 16,
         "updates": 160,
         "algorithm": "REINFORCE with leave-one-out baseline"
-      }
+      },
+      "code_sha256": "3a9344a20e3c6569ff3cda23ed616dcb727e3eecb0c7fe999007c0d3321516af"
     },
     "agentic-code": {
       "status": "passed",
-      "seconds": 7.78,
-      "sha256": "b8a2206fea014798f0c9f093f92da92bece221260270e2bbf3a0efb1f1e6020f",
+      "seconds": 8.08,
+      "sha256": "c1d12f601796f15a5f7872da0d3fe97171c551900a25fe292c5a1ab452d2a9a8",
       "code_cells": 6,
       "metrics": {
         "runs": [
@@ -430,7 +531,11 @@
             "observation": {
               "spec": "sum",
               "source": "def solve(x, y):\n    return x - y\n",
-              "public_case": [40, 2, 42]
+              "public_case": [
+                40,
+                2,
+                42
+              ]
             },
             "reward": -0.01
           },
@@ -475,12 +580,13 @@
           "maxsize": 4096,
           "currsize": 193
         }
-      }
+      },
+      "code_sha256": "24abc19bb9b489bcf06a6181c99db022ba444076e9e69a45cc7584ca29745d2e"
     },
     "agentic-finqa": {
       "status": "passed",
-      "seconds": 5.66,
-      "sha256": "00561492831149ff9e52745b09bf18e26cc2e717171e4895d99223e8184211d3",
+      "seconds": 6.9,
+      "sha256": "40016db6abd58b83ebbe936d691419aaccfb5810e2216e45214bf9012354e513",
       "code_cells": 6,
       "metrics": {
         "runs": [
@@ -516,7 +622,11 @@
             "turn": 0,
             "action": "list_tables",
             "observation": {
-              "tables": [["accounts"]]
+              "tables": [
+                [
+                  "accounts"
+                ]
+              ]
             },
             "reward": -0.01
           },
@@ -525,10 +635,38 @@
             "action": "schema",
             "observation": {
               "schema": [
-                [0, "company", "TEXT", 0, null, 0],
-                [1, "year", "INT", 0, null, 0],
-                [2, "revenue", "REAL", 0, null, 0],
-                [3, "expense", "REAL", 0, null, 0]
+                [
+                  0,
+                  "company",
+                  "TEXT",
+                  0,
+                  null,
+                  0
+                ],
+                [
+                  1,
+                  "year",
+                  "INT",
+                  0,
+                  null,
+                  0
+                ],
+                [
+                  2,
+                  "revenue",
+                  "REAL",
+                  0,
+                  null,
+                  0
+                ],
+                [
+                  3,
+                  "expense",
+                  "REAL",
+                  0,
+                  null,
+                  0
+                ]
               ]
             },
             "reward": -0.01
@@ -538,8 +676,14 @@
             "action": "query_current",
             "observation": {
               "sql": "SELECT revenue, expense FROM accounts WHERE company = ? AND year = ?",
-              "parameters": ["company-32", 2025],
-              "row": [218.0, 52.0]
+              "parameters": [
+                "company-32",
+                2025
+              ],
+              "row": [
+                218.0,
+                52.0
+              ]
             },
             "reward": -0.01
           },
@@ -564,12 +708,13 @@
         "heldout_tasks": 16,
         "updates": 160,
         "algorithm": "REINFORCE with leave-one-out baseline"
-      }
+      },
+      "code_sha256": "eac20f40ff0f10546347ccb255feeb13e2de0feb067e2f54184c5b760c23eecf"
     },
     "agentic-research": {
       "status": "passed",
-      "seconds": 3.21,
-      "sha256": "2bd47e0413b083f2eba6c800c960a60ca9c473663ecdb287eeb32a205d41e012",
+      "seconds": 1.93,
+      "sha256": "3b909bc9a698afff1b3ecafac2085feb0e7bde01bb0de2d22e668803091c42d1",
       "code_cells": 5,
       "metrics": {
         "runs": [
@@ -673,29 +818,14 @@
         "heldout_questions": 3,
         "epochs": 220,
         "algorithm": "Feature policy with REINFORCE-style baseline updates"
-      }
+      },
+      "code_sha256": "468a18eb9340f07e1ef6a33a37be7c357a6226df454e5a7645aec9ea5553895c"
     }
   },
   "note": "Default CPU budgets executed in fresh kernels. Installation time excluded because dependencies were preinstalled. No hosted-platform or pretrained-Qwen execution is claimed.",
   "additional_runs": [
     {
-      "started_at": "2026-10-21T16:02:19.270173+00:00",
-      "python": "3.12.13",
-      "platform": "macOS-26.5.1-arm64-arm-64bit",
-      "processor": "arm64",
-      "device": "CPU",
-      "locale": "zh",
-      "packages": {
-        "numpy": "2.5.4",
-        "torch": "2.14.1",
-        "matplotlib": "3.11.2",
-        "gymnasium": "1.4.0",
-        "stable-baselines3": "2.9.0"
-      },
-      "hosted_platforms": "Colab and ModelScope not executed in this local run"
-    },
-    {
-      "started_at": "2026-10-21T16:12:55.285175+00:00",
+      "started_at": "2026-10-22T01:04:31.833467+00:00",
       "python": "3.12.13",
       "platform": "macOS-26.5.1-arm64-arm-64bit",
       "processor": "arm64",

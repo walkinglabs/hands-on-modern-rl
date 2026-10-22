@@ -20,7 +20,7 @@ The Q table has shape `[4, 4, 4]`. The last dimension represents up, down, left 
 
 ## 3. Inspect the policy and learning curve
 
-The training curve includes exploratory actions. The displayed path comes from a separate greedy evaluation with exploration disabled, so the two returns need not match. Success across 30 seeds establishes a result for this small deterministic map; it does not establish generalization to new maps.
+The training curve includes exploratory actions. The displayed path comes from a separate greedy evaluation with exploration disabled, so the two returns need not match. The table reports success and evaluation return across 30 seeds.
 
 <!-- cell -->
 

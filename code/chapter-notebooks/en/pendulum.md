@@ -2,7 +2,7 @@
 
 When a pendulum leans to the right, the action includes the magnitude of the applied torque. Pendulum accepts a single number between −2 and 2. We first measure a zero-torque policy, then train a Gaussian policy and a value network.
 
-This experiment uses the book's A2C and VecNormalize recipe: CPU, eight environments and 100,000 steps by default. Set `TOTAL_STEPS=300000` for a longer budget. The short run does not guarantee a stable upright pendulum. Companion source: `code/chapter06_actor_critic/actor_critic_pendulum.py`.
+This experiment uses the book's A2C and VecNormalize recipe: CPU, eight environments and 100,000 steps by default. Set `TOTAL_STEPS=300000` for a longer budget. Companion source: `code/chapter06_actor_critic/actor_critic_pendulum.py`.
 
 <!-- cell -->
 

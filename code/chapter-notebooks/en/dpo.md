@@ -2,7 +2,7 @@
 
 The request `help topic0` can be followed by `please read topic0 carefully` or by `go away topic0 now`. We first teach a small model to generate both responses, then use paired preferences to increase the relative probability of the first response.
 
-This CPU experiment trains a tiny autoregressive GRU from scratch and performs actual DPO parameter updates. All data is synthetic. The defaults are 400 SFT steps and 120 DPO steps, with no model download. The experiment tests preference learning in a limited vocabulary; it does not establish general conversation ability or the removal of sycophancy. The book's Qwen 0.5B recipe remains in `code/chapter17_dpo`.
+This CPU experiment trains a tiny autoregressive GRU from scratch and performs actual DPO parameter updates. All data is synthetic. The defaults are 400 SFT steps and 120 DPO steps, with no model download. The book's Qwen 0.5B recipe remains in `code/chapter17_dpo`.
 
 <!-- cell -->
 
@@ -34,7 +34,7 @@ The reference contributes fixed likelihood values. Both chosen and rejected like
 
 A growing preference margin establishes that the chosen responses become more preferred relative to the rejected responses. Generated answers may still lose their requested topic or repeat words, so we also inspect response content and topic retention.
 
-A larger-model experiment needs new requests, human preferences and independent quality evaluation. This small experiment does not validate Qwen memory requirements or hosted execution.
+Inspect the generated answers together with preference accuracy and topic retention.
 
 <!-- cell -->
 

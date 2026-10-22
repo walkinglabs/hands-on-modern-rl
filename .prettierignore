@@ -2,3 +2,6 @@ node_modules
 docs/.vitepress/dist
 docs/.vitepress/cache
 package-lock.json
+
+# Generated, self-contained experiment reports
+docs/public/lab-results

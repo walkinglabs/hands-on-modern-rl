@@ -14,6 +14,7 @@ from pathlib import Path
 
 from build_chapter_notebooks import LABS, ROOT
 from build_online_experiment_notebooks import EXPERIMENTS
+from notebook_execution import without_execution, with_saved_outputs
 
 DIRECTORY = ROOT / "code/online-experiments"
 COMMENTS = {
@@ -140,15 +141,14 @@ WalkingLab × Hands-On Modern RL 配套实验。
 Notebook 导入 Studio 使用的同一套训练实现。按顺序运行，比较检查点曲线和最终策略回放。
 首次安装需要下载原生环境或模拟器资源；后续运行会复用工作目录缓存。
 """,
-        f"""## 1. 实验目标与运行边界
+        f"""## 1. 实验目标与训练安排
 
 我们观察训练预算增加后，策略在任务评估指标上的变化。先用快速预算检查环境和日志，
 确认结果单元格能产生曲线或结果文件，再延长训练。
 
 {gpu}
 
-短运行能确认流程可执行，不能证明收敛。比较算法或报告学习能力时，应使用更长预算。
-本次语言适配没有新增托管平台或原生 GPU 环境的运行验收。
+观察各轮检查点的评估曲线与策略回放，再增加训练步数进行对照。
 """,
         "## 2. 安装配套 Studio 运行环境\n\n安装当前实验所需的依赖，并加载与 Studio 相同的训练代码。",
         "## 3. 设置训练轮次\n\n选择任务、每轮步数和总轮次。每一轮都保留独立的模型与评估结果。",
@@ -172,7 +172,7 @@ Studio 与 Notebook 使用独立容器，因此这里列出当前 Notebook 工�
 def build_counterpart(lab, specs):
     source_path = ROOT / lab["path"]
     original = json.loads(source_path.read_text(encoding="utf-8"))
-    notebook = copy.deepcopy(original)
+    notebook = without_execution(original)
     chapter = lab["id"] in LABS
     locale = "en" if chapter else "zh"
     if chapter:
@@ -195,7 +195,7 @@ def build_counterpart(lab, specs):
     metadata["modelscope_notebook_url"] = (
         "https://modelscope.cn/notebook/share/github/walkinglabs/hands-on-modern-rl/blob/main/"
         + target.relative_to(ROOT).as_posix())
-    return target, notebook
+    return target, with_saved_outputs(notebook, target)
 
 
 def build_all(check=False):

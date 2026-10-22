@@ -4,7 +4,7 @@ A request asks for AAPL's price on day2. One candidate queries AAPL; another que
 
 We score format, schema, arguments and execution separately, then compare candidates for the same request. The CPU defaults are 500 syntax-pretraining steps and 180 GRPO updates, with eight candidates per group.
 
-A tiny GRU generates three tool-language tokens and EOS; a deterministic renderer converts them to JSON. This is actual parameter training in a restricted calling language. JSON validity here describes rendered calls, not free-form JSON generation. Free-form requests and Qwen training belong to the book's larger recipe. All financial values are synthetic mock data; no external API or real market data is used.
+A tiny GRU generates three tool-language tokens and EOS; a deterministic renderer converts them to JSON. The policy learns tool names and arguments from synthetic requests and local mock-tool results.
 
 <!-- cell -->
 
@@ -38,8 +38,6 @@ A training-reward increase can come from valid formatting alone. Complete held-o
 
 If training success improves but held-out success does not, the experiment exposes failure to generalize across argument combinations. Two possible explanations are insufficient request coverage and failure to copy request arguments. Adding training-side combinations and adding supervised argument-copying pretraining give separate follow-up comparisons.
 
-Unseen tools, new words, free-form natural language and production services remain outside this experiment's scope. Expand the semantic hold-out set before moving to the book's Qwen recipe.
-
 <!-- cell -->
 
 ## Checklist
@@ -57,4 +55,4 @@ A call parses and has the correct schema, but its arguments and result are wrong
 ## References
 
 - [DeepSeekMath](https://arxiv.org/html/2402.03300): the order of group-relative advantages, token-level ratios, clipping and KL aggregation.
-- [Companion financial tool-calling chapter](https://walkinglabs.github.io/hands-on-modern-rl/en/chapter18_grpo/financial-tool-calling-grpo): extend the verifier to a pretrained language model; this experiment uses a smaller restricted calling language.
+- [Companion financial tool-calling chapter](https://walkinglabs.github.io/hands-on-modern-rl/en/chapter18_grpo/financial-tool-calling-grpo): connect the verifier to a Qwen language model.

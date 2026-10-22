@@ -2,7 +2,7 @@
 
 Two actions both have a true value of zero, but their estimates contain noise. Taking the larger estimate on every trial can produce a positive average. We first reproduce this effect, then compare DQN and Double DQN in CartPole.
 
-The default CPU budget is 15,000 steps for each of two seeds per algorithm. Increase `STEPS` to 80,000 and use five seeds for a longer comparison. A short run reveals the learning process; it does not guarantee that every seed solves the task. Companion source: `code/chapter04_dqn/double_dqn_cartpole.py`.
+The default CPU budget is 15,000 steps for each of two seeds per algorithm. Increase `STEPS` to 80,000 and use five seeds for a longer comparison. Companion source: `code/chapter04_dqn/double_dqn_cartpole.py`.
 
 <!-- cell -->
 
@@ -24,7 +24,7 @@ Every 1,500 steps, we disable exploration and evaluate in a separate environment
 
 ## 3. Inspect returns, values and an actual replay
 
-A Q value predicts discounted return. Subtracting it from the undiscounted 500-point episode limit would not measure overestimation. Here we report how the estimates change; conclusions about algorithm performance need longer runs, more seeds and other environments.
+A Q value predicts discounted return. Subtracting it from the undiscounted 500-point episode limit would not measure overestimation. The figures show evaluation rewards, Q estimates and a fixed-seed policy replay.
 
 The replay always uses Double DQN with seed 0. We do not select the best-looking run from the comparison.
 

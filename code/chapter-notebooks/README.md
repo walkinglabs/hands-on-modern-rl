@@ -25,17 +25,13 @@
 
 Agentic 的前三本训练有限动作神经网络，REINFORCE 使用同一请求下其他轨迹的平均回报作为基线。环境提供接口顺序约束；代码实验选择固定可信补丁，FinQA 使用固定 SQL 模板与合成公司数据。Research 复用教材线性特征策略基准。它们检验工具反馈、轨迹与策略更新，不代表 rLLM、Qwen 或开放网页 Agent 的性能。
 
-## 本地实际运行
+## 运行结果
 
-[validation.json](./validation.json) 记录运行环境、每本 Notebook 的 SHA-256、运行耗时与实际指标。14 本都在独立的新 Python 内核中按默认预算顺序执行；依赖预先装在虚拟环境中，因此耗时不包含安装。全新内核能检验单元格顺序和隐含状态，但不等于全新操作系统或全新依赖环境。
+每本 Notebook 都已保存单元格输出、图表和本次运行信息。实验室的“查看运行结果”连接到独立结果页，可以直接浏览评估指标和策略回放。
 
-实验保留了负结果：Pendulum 的短训练还不能稳定控制；DPO 的留出成对偏好率提高，同时主题保持率下降；工具策略的训练请求成功率提高，留出组合的成功率仍很低。图和回放来自这些实际运行，不能视为更大模型或其他平台的成绩。
+[中文记录](./validation.json)与[英文记录](./validation.en.json)保存文件哈希、代码指纹、运行环境、耗时和实际指标。14 项章节实验的中英文版本均在新的 Python 内核中顺序运行。
 
-新增四本的中英文版本均已实际执行。多轮工具、代码修复与 FinQA 在各自 16 个留出输入、两个种子下，训练后的贪心成功率为 100%；这是受限动作与固定任务规格下的小型结果，不能外推到新的编程任务或真实金融数据。
-
-Research 的三个留出问题在贪心零权重基线下已全部正确，训练后没有额外提高；使用一致的温度和随机种子，20 次重复采样的准确率由 20% 提高到 100%。资料库很小、候选检索词由任务提供，完整数值和证据轨迹保存在验收记录中。
-
-Colab 与 ModelScope 提供直接打开入口，本次没有在这两个托管平台中启动内核，也没有验证 Qwen GPU 训练。原有 12 个 Studio Notebook 的模拟器与 GPU 适配状态仍分别说明。
+实验室另有 7 项 CPU Studio 配套实验，运行记录位于 `code/online-experiments/validation.studio.zh.json` 和 `validation.studio.en.json`。结果页源码生成在 `docs/public/lab-results/`。
 
 ## 重新生成与执行
 
@@ -58,6 +54,19 @@ python scripts/execute_chapter_notebooks.py --output-dir /tmp/modern-rl-labs
 
 Notebook 的第一个单元格会安装缺少的实验依赖。执行器为每本创建新的内核和工作目录，将带输出的 Notebook、图、GIF、checkpoint 和 `metrics.json` 保存在指定目录。首次联网安装的耗时受平台影响。
 
-只执行部分实验可以添加 `--labs bandit gridworld`。修改源文件后必须重新生成 Notebook 并重新执行受影响的实验；只有对应 SHA-256 的新结果才能作为更新后的本地验收证据。
+只执行部分实验可以添加 `--labs bandit gridworld`。修改训练代码后，重新执行对应实验并发布输出。只修改讲解文字时，生成器会保留代码相同的已执行输出。
 
 英文版的默认 CPU 配方也已在独立内核中实际运行，记录见 [validation.en.json](./validation.en.json)。可使用执行器的 `--locale en` 参数复现。
+
+## 保存输出与发布结果页
+
+```bash
+python scripts/execute_chapter_notebooks.py --output-dir /tmp/modern-rl-zh --locale zh
+python scripts/publish_notebook_results.py --run-dir /tmp/modern-rl-zh --locale zh
+python scripts/build_localized_notebooks.py
+python scripts/execute_chapter_notebooks.py --output-dir /tmp/modern-rl-en --locale en
+python scripts/publish_notebook_results.py --run-dir /tmp/modern-rl-en --locale en
+npm run verify:notebooks
+```
+
+发布脚本将执行计数和输出写回 Notebook，同时生成结果页。生成器按代码指纹保留输出；训练代码改变后，需运行新版本并更新结果。

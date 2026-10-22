@@ -8,9 +8,7 @@ This CPU mechanism experiment includes a verifier, token-level clipping and an a
 
 ## 1. Reject ambiguous answers
 
-The verifier accepts exactly one integer in the form `Answer: 42`. It rejects conflicting answers and extra explanations. This rule is limited to a small integer-answer task; it does not verify arbitrary mathematical reasoning.
-
-Fix the verifier tests before training so that formatting loopholes cannot be mistaken for progress.
+The verifier accepts exactly one integer in the form `Answer: 42`. It rejects conflicting answers and extra explanations. The cases below cover correct, incorrect, conflicting and non-integer answers.
 
 <!-- cell -->
 
@@ -24,7 +22,7 @@ We preserve shape `[response, token]`, exclude padding from the mean and broadca
 
 ## 3. Inspect gradients and results
 
-The table update checks three effects: better responses gain probability, worse responses lose probability and padding receives zero gradient. These checks do not establish mathematical ability in a language model. No pretrained model or mathematical benchmark is used here.
+The table update checks three effects: better responses gain probability, worse responses lose probability and padding receives zero gradient.
 
 The experiment uses population standard deviation, `correction=0`. Frameworks that use sample standard deviation will produce a different advantage scale.
 

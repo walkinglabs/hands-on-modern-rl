@@ -47,7 +47,7 @@ const copy = english
       planned: 'More experiments to come',
       preparing: 'being prepared',
       footnote:
-        'Hosted environments will be verified individually. Resource requirements and reproduction notes are available in each experiment’s details.',
+        'Open a Notebook to run it, or view saved curves and policy replays from its result page.',
       close: 'Close experiment details',
       bookPreview: 'Environment preview from the book',
       experimentPreview: 'Local experiment result',
@@ -60,11 +60,12 @@ const copy = english
       openColab: 'Open in Colab',
       chapter: 'Companion chapter',
       source: 'Notebook source',
+      savedResult: 'View results',
       runtime: 'Running and reproducing the experiment',
       runtimeDesc:
-        'A Notebook file is available. ModelScope and Colab environments need separate verification. Preview images are existing assets, not results from a new training run.',
+        'Use the resource profile above and run the cells in order to generate training curves and policy replays.',
       runtimeExecutedDesc:
-        'The preview comes from an actual local run of the default CPU recipe. File hashes and measurements are in the execution record below. ModelScope and Colab hosted execution need separate verification.',
+        'The Notebook includes outputs from its completed CPU run. Open the result page for plots, metrics and execution outputs.',
       review: 'View',
       cpu: 'CPU'
     }
@@ -94,7 +95,7 @@ const copy = english
       planned: '接下来，还会有这些实验',
       preparing: '项整理中',
       footnote:
-        '现有 Notebook 的平台环境将逐项验收；硬件需求与复现说明可在实验详情中查看。',
+        '打开 Notebook 运行实验，也可以直接查看已保存的曲线与策略回放。',
       close: '关闭实验说明',
       bookPreview: '书中环境预览',
       experimentPreview: '本地实验结果',
@@ -107,11 +108,12 @@ const copy = english
       openColab: '在 Colab 打开',
       chapter: '配套章节',
       source: 'Notebook 源文件',
+      savedResult: '查看运行结果',
       runtime: '运行与复现说明',
       runtimeDesc:
-        '当前已有 Notebook 文件，ModelScope 与 Colab 的环境适配需分别实测。此页面展示环境素材，不代表本次运行的训练结果。',
+        '按上方资源需求准备环境，再依次运行单元格，生成训练曲线与策略回放。',
       runtimeExecutedDesc:
-        '预览图来自默认 CPU 配方的本地实际运行，文件哈希与测量结果见下方运行记录。ModelScope 与 Colab 的托管运行仍需分别实测。',
+        'Notebook 已保存本次 CPU 运行的输出；结果页包含图表、指标与运行输出。',
       review: '查看',
       cpu: 'CPU'
     }
@@ -302,6 +304,9 @@ const labs = chapters.flatMap((ch) =>
         : presentation?.[2] || lab.kind,
       image: presentation?.[3]
         ? withBase('/lab-previews/' + presentation[3])
+        : null,
+      resultUrl: original.results?.[english ? 'en' : 'zh']
+        ? withBase('/' + original.results[english ? 'en' : 'zh'])
         : null
     }
   })
@@ -715,6 +720,16 @@ onBeforeUnmount(() => {
                     <ArrowUpRight :size="14" />
                   </a>
                 </div>
+                <a
+                  v-if="lab.resultUrl"
+                  class="nl-chapter-link nl-result-link"
+                  :href="lab.resultUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {{ copy.savedResult }}
+                  <ArrowUpRight :size="12" />
+                </a>
                 <a class="nl-chapter-link" :href="lessonUrl(lab.lesson)">
                   <BookOpen :size="12" />
                   {{ lab.chapterName }}
@@ -778,6 +793,15 @@ onBeforeUnmount(() => {
               {{ lab.device.split(' · ')[0] }}
             </span>
             <div class="nl-directory-platforms">
+              <a
+                v-if="lab.resultUrl"
+                :href="lab.resultUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{ copy.savedResult }}
+                <ArrowUpRight :size="13" />
+              </a>
               <a
                 :href="platformUrl(lab, 'modelscope')"
                 target="_blank"
@@ -925,6 +949,15 @@ onBeforeUnmount(() => {
             </a>
           </div>
           <div class="nl-dialog-links">
+            <a
+              v-if="active.resultUrl"
+              :href="active.resultUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {{ copy.savedResult }}
+              <ArrowUpRight :size="14" />
+            </a>
             <a :href="lessonUrl(active.lesson)" @click="closeDetails">
               <BookOpen :size="14" />
               {{ copy.chapter }}

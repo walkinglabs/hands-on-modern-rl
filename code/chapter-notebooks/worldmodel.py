@@ -101,7 +101,7 @@ print({"zero_delta_state_mse": zero_delta_mse, "learned_state_mse": one_step_mse
 assert one_step_mse < zero_delta_mse
 
 # %% [markdown]
-# ## 2. 一步准确不保证长时间准确 / Open-loop drift
+# ## 2. 多步滚动中的误差累积 / Open-loop drift
 #
 # 我们固定测试轨迹上的真实动作，连续用预测状态作为下一步输入。
 # 这一步没有重新接收真实位置，能直接看到误差如何累积。

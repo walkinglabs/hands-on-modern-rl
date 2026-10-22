@@ -6,8 +6,8 @@
 # 我们固定一份数据，比较直接最大化 Q、加入保守正则和加入行为约束的策略。
 #
 # CPU 默认 3 个种子，每种价值网络训练 600 步，策略训练 400 步，数据完全合成。
-# 这里是单步 contextual bandit，展示 CQL 风格正则和行为约束的作用；没有多步 TD 目标，
-# 不等同于完整 CQL 或 TD3+BC 基准。对应书中 `minimal_offline_rl_contextual_bandit.py`。
+# 任务采用单步 contextual bandit，比较 CQL 风格正则与行为约束。
+# 对应书中 `minimal_offline_rl_contextual_bandit.py`。
 
 # %%
 import importlib.util
@@ -157,7 +157,7 @@ assert np.isfinite([value for name in ["Naive Q", "Conservative", "Q + BC"]
 #
 # 左图画出数据覆盖；中图固定一个状态，比较真实奖励和两种 Q 估计；右图画策略。
 # 图固定使用种子 0，多种子结果见上表。真实奖励曲线仅供最终诊断，训练器从未读取它。
-# 若某次运行没有出现明显外推错误，也应保留，并通过改变数据噪声或初始化继续检验解释。
+# 可以调整数据噪声和初始化，观察三种策略的变化。
 
 # %%
 fig, axes = plt.subplots(1, 3, figsize=(12, 3.4))
@@ -197,7 +197,7 @@ torch.save({name: runs[0][name].state_dict() for name in ["Naive Q", "Conservati
 # ## 完成检查 / Checklist
 # - [ ] 固定数据后，训练阶段没有查询新动作的真实奖励。
 # - [ ] 同时报告行为数据拟合误差、支持距离和独立策略回报。
-# - [ ] 能说明单步教学模型与完整离线 RL 算法的边界。
+# - [ ] 能说明保守正则与行为约束分别怎样影响策略。
 #
 # ## 练习 / Exercise
 # 训练数据的动作接近 0，填入“Q(状态, 动作=1) 是否被这些数据直接验证”。
@@ -216,4 +216,4 @@ else:
 # - [Conservative Q-Learning](https://arxiv.org/abs/2006.04779)：
 #   为什么抑制数据之外的过高估计可以帮助离线策略学习。
 # - [TD3+BC](https://arxiv.org/abs/2106.06860)：
-#   行为约束如何限制策略偏离数据；本实验只取其约束直觉，不实现完整 TD3。
+#   行为约束如何限制策略偏离数据。

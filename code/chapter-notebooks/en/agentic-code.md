@@ -10,7 +10,7 @@ The default uses a CPU, two seeds and 160 updates. The policy selects among thre
 
 The tool writes a candidate function into a temporary file and runs assertions in a separate Python process. Identical source/test pairs are cached to avoid repeated process startup; first results always come from execution.
 
-Only our fixed trusted templates are executed here. A separate process and timeout do not provide a security sandbox for arbitrary untrusted code.
+Only our fixed trusted templates are executed here. Candidate code comes from three templates and runs with a two-second timeout.
 
 <!-- cell -->
 
@@ -18,7 +18,7 @@ Only our fixed trusted templates are executed here. A separate process and timeo
 
 The specification exposes whether the function should add or multiply. Public-test feedback enters the next observation; private answers remain in the terminal verifier. Legal actions provide the inspect, patch, test and submit protocol.
 
-Training and evaluation use different numeric inputs. Both still implement the same two function specifications; these results do not establish generalization to new programming tasks.
+Training and evaluation use different numeric inputs. Evaluate the sum and product specifications separately.
 
 <!-- cell -->
 

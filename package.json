@@ -21,7 +21,7 @@
     "verify:english": "node scripts/check-english-quality.mjs",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "fix:headings": "node scripts/fix-heading-numbers.mjs",
-    "verify:notebooks": "python3 scripts/verify_chapter_notebooks.py && python3 scripts/verify_online_experiment_notebooks.py && python3 scripts/verify_localized_notebooks.py"
+    "verify:notebooks": "python3 scripts/verify_chapter_notebooks.py && python3 scripts/verify_online_experiment_notebooks.py && python3 scripts/verify_localized_notebooks.py && python3 scripts/verify_notebook_results.py"
   },
   "keywords": [
     "walkinglabs",

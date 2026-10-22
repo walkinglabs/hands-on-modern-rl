@@ -22,7 +22,7 @@ The policy outputs logits for left and right, while the value network outputs on
 
 <!-- cell -->
 
-## 3. Compare results and preserve the limits
+## 3. Compare curves and policy replays
 
 During training, the policy, visited-state distribution and returns all change. Fluctuating gradient norms therefore do not isolate gradient variance under a fixed policy. The earlier enumerated example isolates the baseline's effect.
 

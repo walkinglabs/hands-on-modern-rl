@@ -10,6 +10,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from notebook_execution import with_saved_outputs
+
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = ROOT / "code/chapter-notebooks"
 DESTINATION = ROOT / "code/online-experiments"
@@ -69,7 +71,7 @@ def build_notebook(lab_id):
         if kind == "code":
             cell.update(execution_count=None, outputs=[])
         cells.append(cell)
-    return {
+    notebook = {
         "cells": cells,
         "metadata": {
             "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
@@ -80,6 +82,8 @@ def build_notebook(lab_id):
         "nbformat": 4,
         "nbformat_minor": 5,
     }
+
+    return with_saved_outputs(notebook, DESTINATION / f"hands-on-modern-rl-{lab_id}.ipynb")
 
 
 def main():

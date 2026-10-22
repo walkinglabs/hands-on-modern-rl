@@ -5,7 +5,7 @@
 # 我们先重现这个偏差，再在 CartPole 中比较 DQN 与 Double DQN。
 #
 # 默认 CPU，每种算法 2 个种子、每个种子 15,000 步。可将 `STEPS` 提高到 80,000、
-# `SEEDS` 增加到 5 做更长的对照。短训练用于观察过程，不承诺每个种子都解出任务。
+# `SEEDS` 增加到 5 做更长的对照。
 # 对应源码：`code/chapter04_dqn/double_dqn_cartpole.py`。
 
 # %%
@@ -149,8 +149,7 @@ for name, double in [("DQN", False), ("Double DQN", True)]:
 # %% [markdown]
 # ## 3. 奖励、价值与真实回放 / Inspect the learned policy
 #
-# Q 值是折扣回报的预测，不能直接与未折扣的 500 分上限相减来证明高估。
-# 下面只报告它的变化。算法的优劣要在更长训练、更多种子和其他环境中继续检验。
+# Q 值预测折扣回报。下面同时画出独立评估回报、Q 值和策略回放。
 # 回放固定使用 Double DQN 的种子 0，避免从多个运行中挑选最好的一条。
 
 # %%
@@ -198,7 +197,7 @@ assert np.isfinite([v for item in metrics.values() for v in item["evaluation_ret
 # ## 完成检查 / Checklist
 # - [ ] 能在两行目标计算中指出动作选择与评价的区别。
 # - [ ] 能区分任务终止和时间上限，解释后继价值的掩码。
-# - [ ] 保存了两个种子的评估曲线和固定种子回放，包括未学好的结果。
+# - [ ] 保存两个种子的评估曲线和固定种子回放。
 #
 # ## 练习 / Exercise
 # 在线网络给出 `[3, 1]`、目标网络给出 `[1, 4]` 时，填入 Double DQN 的后继价值。
@@ -215,6 +214,6 @@ else:
 # %% [markdown]
 # ## 参考资料 / References
 # - [Double Q-learning with deep networks](https://arxiv.org/abs/1509.06461)：
-#   动作选择和动作评价的分离方式，以及实验结论的适用范围。
+#   动作选择和动作评价的分离方式，以及目标值的计算。
 # - [Gymnasium Env](https://gymnasium.farama.org/api/env/)：
 #   `terminated` 与 `truncated` 的接口含义。

@@ -13,6 +13,8 @@ import json
 from pathlib import Path
 from textwrap import dedent
 
+from notebook_execution import with_saved_outputs
+
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "code" / "online-experiments"
@@ -80,7 +82,7 @@ EXPERIMENTS = [
         "resource": "CPU",
         "kind": "runtime",
         "task": "simple-spread",
-        "budget": 2_000,
+        "budget": 2_016,
         "full_budget": "20,000+ environment steps for cooperative navigation",
     },
     {
@@ -200,7 +202,7 @@ def learning_cell(spec: dict) -> dict:
     )
     return markdown_cell(
         f"""
-        ## 1. Question and run boundary
+        ## 1. Experiment and training schedule
 
         This experiment asks whether the selected policy improves on the task's evaluation metric as its training budget
         increases. Start with the quick budget to verify the environment and logs. Then increase the budget only after the
@@ -208,8 +210,7 @@ def learning_cell(spec: dict) -> dict:
 
         {gpu_note}
 
-        A short smoke run proves that the pipeline executes; it does not prove convergence. Use the full budget above when
-        comparing algorithms or reporting a learned behavior.
+        Compare the evaluation curve and replay at each checkpoint. Increase the budget above for a longer training run.
         """
     )
 
@@ -228,7 +229,7 @@ def setup_cell(spec: dict) -> dict:
 
         REPOSITORY_URL = "https://github.com/{REPOSITORY}.git"
         SPACE_SLUG = "{spec['slug']}"
-        INSTALL_DEPENDENCIES = True
+        INSTALL_DEPENDENCIES = os.getenv("HANDS_ON_LAB_PREINSTALLED") != "1"
 
         def locate_or_clone_repo() -> Path:
             here = Path.cwd().resolve()
@@ -632,15 +633,38 @@ def reflection_cell(spec: dict) -> dict:
         ## 6. Read the result before increasing the budget
 
         Compare the first and last checkpoint values, then inspect the replay. A rising curve with an implausible replay can
-        indicate reward shaping, evaluation, or rendering problems. A flat quick run is also inconclusive: this notebook's
-        default budget is a pipeline check. For a training claim, rerun with **{spec['full_budget']}**, keep the seed fixed,
+        help locate differences in reward, evaluation and rendering. Continue with **{spec['full_budget']}**, keep the seed fixed,
         and compare at least three seeds before drawing a conclusion.
         """
     )
 
 
+
+def saved_result_cell(spec):
+    return code_cell("""
+import json
+from IPython.display import Image as NotebookImage, display
+
+records = epoch_models if "epoch_models" in globals() else trained_models
+assert records, "Training must produce a saved checkpoint"
+latest = max(records, key=lambda record: (record.get("created_ns", 0), record.get("step", 0)))
+preview = Path(str(latest.get("preview", "")))
+assert preview.is_file(), "Training must produce a replay or result image"
+display(NotebookImage(filename=str(preview)))
+output_id = os.getenv("HANDS_ON_LAB_ID", SPACE_SLUG)
+output = Path(os.getenv("HANDS_ON_LAB_OUTPUT", str(cache_root / "results"))) / output_id
+output.mkdir(parents=True, exist_ok=True)
+metrics = {"score": latest.get("score"), "steps": latest.get("step"),
+           "epochs": EPOCHS, "checkpoints": len(records), "preview": preview.name}
+(output / "metrics.json").write_text(json.dumps(metrics, indent=2))
+print(json.dumps(metrics, indent=2))
+""")
+
 def build_notebook(spec: dict) -> dict:
     cells = [intro_cell(spec), learning_cell(spec), markdown_cell("## 2. Prepare the matching Studio runtime"), setup_cell(spec)]
+    # Load the training backend before MiniGrid initializes its renderer.
+    if spec["slug"].endswith("experiment06-minigrid-adventure"):
+        cells[3]["source"] += "\nimport stable_baselines3\n"
     if spec["kind"] == "runtime":
         cells.extend([
             markdown_cell("## 3. Configure the epoch schedule"),
@@ -669,10 +693,11 @@ def build_notebook(spec: dict) -> dict:
             gymnasium_cells(spec)[2],
         ])
     cells.append(reflection_cell(spec))
+    cells.append(saved_result_cell(spec))
     notebook_id = hashlib.sha1(spec["slug"].encode("utf-8")).hexdigest()[:10]
     for index, cell in enumerate(cells):
         cell["id"] = f"{notebook_id}-{index:02d}"
-    return {
+    notebook = {
         "cells": cells,
         "metadata": {
             "kernelspec": {"display_name": "Python 3", "language": "python", "name": "python3"},
@@ -687,12 +712,14 @@ def build_notebook(spec: dict) -> dict:
         "nbformat_minor": 5,
     }
 
+    return with_saved_outputs(notebook, OUTPUT / f"{spec['slug']}.ipynb")
+
 
 def main() -> None:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     for spec in EXPERIMENTS:
         path = OUTPUT / f"{spec['slug']}.ipynb"
-        path.write_text(json.dumps(build_notebook(spec), ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        path.write_text(json.dumps(build_notebook(spec), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         print(path.relative_to(ROOT), "->", notebook_url(spec["slug"]))
 
 

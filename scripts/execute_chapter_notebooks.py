@@ -10,6 +10,7 @@ import importlib.metadata
 import json
 import os
 import platform
+import shutil
 import sys
 import tempfile
 import time
@@ -22,12 +23,15 @@ from jupyter_client.kernelspec import KernelSpecManager
 from nbclient import NotebookClient
 
 from build_chapter_notebooks import LABS, ROOT
+from notebook_execution import code_digest
 
 
 def main():
+    catalog = json.loads((ROOT / "docs/.vitepress/theme/components/lab-catalog.json").read_text())
+    all_labs = {lab["id"]: lab for lab in catalog["labs"]}
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", required=True, type=Path)
-    parser.add_argument("--labs", nargs="+", choices=LABS, default=list(LABS))
+    parser.add_argument("--labs", nargs="+", choices=all_labs, default=list(LABS))
     parser.add_argument("--locale", choices=["zh", "en"], default="zh")
     args = parser.parse_args()
     output = args.output_dir.resolve()
@@ -35,6 +39,9 @@ def main():
     os.environ["HANDS_ON_LAB_OUTPUT"] = str(output / "artifacts")
     os.environ["MPLBACKEND"] = "module://matplotlib_inline.backend_inline"
     os.environ["SDL_VIDEODRIVER"] = "dummy"
+    os.environ["OMP_NUM_THREADS"] = "1"
+    os.environ["MKL_NUM_THREADS"] = "1"
+    os.environ["HANDS_ON_LAB_PREINSTALLED"] = "1"
     report = {
         "started_at": datetime.now(timezone.utc).isoformat(),
         "python": sys.version.split()[0],
@@ -55,14 +62,17 @@ def main():
             "display_name": "Hands-on RL validation", "language": "python",
         }))
         for lab_id in args.labs:
-            folder = ROOT / "code/online-experiments"
-            if args.locale == "en":
-                folder = folder / "en"
-            path = folder / f"hands-on-modern-rl-{lab_id}.ipynb"
+            path = ROOT / all_labs[lab_id]["paths"][args.locale]
+            os.environ["HANDS_ON_LAB_ID"] = lab_id
             notebook = nbformat.read(path, as_version=4)
             nbformat.validate(notebook)
             workspace = output / "workspaces" / lab_id
             workspace.mkdir(parents=True, exist_ok=True)
+            if lab_id not in LABS:
+                slug = Path(all_labs[lab_id]["path"]).stem
+                isolated = workspace / "modelscope-space" / slug
+                shutil.copytree(ROOT / "modelscope-space" / slug, isolated, dirs_exist_ok=True,
+                                ignore=shutil.ignore_patterns("artifacts", "__pycache__", ".cache"))
             manager = KernelManager(kernel_name="hands-on-lab", kernel_spec_manager=
                                     KernelSpecManager(kernel_dirs=[directory]))
             client = NotebookClient(notebook, km=manager, timeout=1200,
@@ -76,6 +86,7 @@ def main():
                 item = {"status": "passed", "seconds": round(time.monotonic() - started, 2),
                         "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
                         "code_cells": sum(c.cell_type == "code" for c in notebook.cells),
+                        "code_sha256": code_digest(notebook),
                         "metrics": metrics}
             except Exception as error:
                 item = {"status": "failed", "seconds": round(time.monotonic() - started, 2),

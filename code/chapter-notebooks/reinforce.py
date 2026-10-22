@@ -41,7 +41,7 @@ print({"episodes": EPISODES, "seeds": SEEDS, "batch_episodes": BATCH_EPISODES})
 # ## 1. 基线不改变期望梯度 / Check the score identity
 #
 # 基线必须与“本次选中的动作”无关。对固定状态，策略对所有动作的分数梯度期望为 0，
-# 因此减去一个状态基线不会改变期望梯度。它可能降低方差，但不保证任何基线都有效。
+# 因此减去一个状态基线不会改变期望梯度。基线的取值会影响梯度方差。
 # 下面直接枚举一个两动作例子，比较梯度的均值与方差。
 
 # %%
@@ -151,11 +151,11 @@ for name, samples in runs.items():
     print(name, "held-out return:", [float(row[2][-1, 1]) for row in samples])
 
 # %% [markdown]
-# ## 3. 对照曲线与回放 / Results and limits
+# ## 3. 对照曲线与回放 / Results
 #
 # 训练中策略不断变化，梯度范数的波动同时受到状态分布、回报和学习进度影响，
 # 不能单凭它估计同一策略的梯度方差。前面的固定状态枚举才隔离了基线的方差作用。
-# 这里保留两个种子的独立评估，即使较短训练没有明显优势也不隐藏结果。
+# 下面比较两个种子的独立评估曲线，并回放训练后的策略。
 
 # %%
 fig, axes = plt.subplots(1, 2, figsize=(10, 3.5))

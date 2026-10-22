@@ -2,7 +2,7 @@
 
 The agent answers questions from the book's fixed teaching corpus. It selects a query, retrieves documents, chooses evidence and extracts an answer. Answer correctness and citation correctness are scored separately. We reuse the book's runnable benchmark and add matched before/after held-out evaluation.
 
-The default uses a CPU, three seeds and 220 epochs. Queries are supplied candidates, answers come from document fields, and training updates a shared-feature linear policy. Open-web browsing, freely written reports and Qwen/GRPO language-model training require the book's further recipes.
+The default uses a CPU, three seeds and 220 epochs. Queries are supplied candidates, answers come from document fields, and training updates a shared-feature linear policy.
 
 <!-- cell -->
 
@@ -10,7 +10,7 @@ The default uses a CPU, three seeds and 220 epochs. Queries are supplied candida
 
 The benchmark download is pinned to a repository commit and verified with SHA-256. Its first run requires the network to fetch one Python file. Subsequent runs reuse the verified local cache.
 
-Numerical facts in the fixed corpus are teaching material. This experiment evaluates retrieval and citation behavior; it does not remeasure the cited papers' results.
+Each corpus document contains a title, text, answer and document identifier.
 
 <!-- cell -->
 
@@ -26,7 +26,7 @@ Held-out labels do not enter training updates. Evaluation retains matching retri
 
 Training changes linear weights for query and evidence selection. We report greedy evaluation and repeated sampled evaluation separately, each using identical settings before and after training.
 
-The curve shows training-question rewards. Held-out metrics are saved separately. Success on this small corpus measures the candidate policy's use of shared features, with the fixed training budget and no held-out checkpoint selection.
+The curve shows training-question rewards. Held-out metrics are saved separately. The table separately reports answer accuracy, citation support and total reward.
 
 <!-- cell -->
 
