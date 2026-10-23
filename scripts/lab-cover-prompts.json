@@ -1,0 +1,27 @@
+{
+  "generator": "Built-in image_gen",
+  "purpose": "Task illustrations for the four Agentic RL lab cards",
+  "sharedPrompt": "Use case: scientific-educational. Asset type: one production website card cover for an Agentic RL teaching lab, wide landscape 1.68:1 composition. Style: polished, very legible flat editorial illustration of real software task objects, subtle depth and soft shadows, consistent thin indigo outlines, off-white #f6f7fb background, indigo #4945c7 primary, teal #20a78d success accents. Large simple objects readable at 330px card width. Front-on view, no perspective distortion, no humanoid robots, no brains or neural networks. Leave top 15% and bottom 18% visually quiet for website labels. Keep all important content inside center 80% width and middle 65% height. Three clearly connected stages from left to right, generous space, elegant arrows. No chart axes, no reward plots, no dense tiny text, no decorative floating shapes, no watermarks or logos. This is a teaching task illustration, not a screenshot or experimental result.",
+  "covers": [
+    {
+      "id": "agentic-tools",
+      "request": "Show the multi-turn tool-use process: LEFT a compact conversation bubble containing the exact math question \"6 × 7 = ?\"; CENTER a calculator tool panel displaying \"42\", with a small curved reply arrow back toward the conversation; RIGHT a resolved answer bubble displaying \"42\" and a teal checkmark. The viewer must immediately understand ask -> call a calculator -> use its answer. Use only the exact numerals and math symbols specified, no English or Chinese words. The calculator should clearly have a display and a few recognizable large keypad buttons.",
+      "output": "docs/public/lab-previews/agentic-tools-task.webp"
+    },
+    {
+      "id": "agentic-code",
+      "request": "Show a code-repair task: LEFT a clean editor panel with a red-highlighted broken line, exact code \"return a - b\"; CENTER a compact patch tile showing that minus changes to plus, and the corrected exact code \"return a + b\"; RIGHT a test terminal with three large green checkmarks beside three short neutral line strokes. The viewer must immediately understand broken code -> patch -> passing tests. Include a subtle Python-style angle bracket/code icon without any brand logo. Only the two exact code lines specified may appear; no other words or text.",
+      "output": "docs/public/lab-previews/agentic-code-task.webp"
+    },
+    {
+      "id": "agentic-finqa",
+      "request": "Show a financial question-answering task with a SQL table and calculator: LEFT a clear small database table, three columns and two rows, values \"2024 | 120 | 84\" and \"2025 | 150 | 96\"; CENTER a calculator panel displaying the exact expression \"(150 - 96) / 150\"; RIGHT a tidy answer sheet displaying a large \"36%\" with a teal checkmark. A small database cylinder attached to the table makes it recognizable as a query result. The viewer must immediately understand query company data -> calculate margin -> answer. Only the stated numerals/expression may appear, no English or Chinese labels, no axes or financial price chart.",
+      "output": "docs/public/lab-previews/agentic-finqa-task.webp"
+    },
+    {
+      "id": "agentic-research",
+      "request": "Show a research agent assembling a cited answer: LEFT a search field with a large magnifying glass icon and two short neutral line strokes; CENTER three distinct source document cards, with source badges \"1\", \"2\", \"3\" and a few large line strokes, with evidence snippets on documents 1 and 2 highlighted in teal; RIGHT an answer document with two highlighted answer lines and citation badges \"[1]\" and \"[2]\" that visually match the first two sources. Clear directional arrows connect search -> source evidence -> cited answer. No actual words, no made-up prose, no charts or network diagrams. Only the specified citation numbers may be printed.",
+      "output": "docs/public/lab-previews/agentic-research-task.webp"
+    }
+  ]
+}

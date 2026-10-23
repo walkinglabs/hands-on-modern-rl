@@ -17,6 +17,7 @@ import {
 } from 'lucide-vue-next'
 import catalog from './lab-catalog.json'
 import englishLabs from './lab-english.json'
+import taskCovers from './lab-task-covers.json'
 import { labSections, resolveLabSection } from './lab-sections.js'
 
 const props = defineProps({ locale: { type: String, default: 'zh' } })
@@ -249,6 +250,8 @@ const labs = chapters.flatMap((ch) =>
         }
       : original
     const presentation = info[id]
+    const taskCover = taskCovers[id]
+    const image = taskCover?.image || presentation?.[3]
     return {
       ...lab,
       path: original.paths?.[english ? 'en' : 'zh'] || original.path,
@@ -259,9 +262,10 @@ const labs = chapters.flatMap((ch) =>
       method: english
         ? methodNames[presentation?.[2]] || presentation?.[2] || lab.kind
         : presentation?.[2] || lab.kind,
-      image: presentation?.[3]
-        ? withBase('/lab-previews/' + presentation[3])
-        : null,
+      image: image ? withBase('/lab-previews/' + image) : null,
+      imageKind:
+        taskCover || !image ? 'schematic' : lab.previewKind || 'environment',
+      imageSteps: taskCover?.steps[english ? 'en' : 'zh'],
       resultUrl: original.results?.[english ? 'en' : 'zh']
         ? withBase('/' + original.results[english ? 'en' : 'zh'])
         : null
@@ -269,6 +273,16 @@ const labs = chapters.flatMap((ch) =>
   })
 )
 const existing = labs.filter((l) => l.path)
+function imageLabel(lab) {
+  return lab.imageKind === 'schematic'
+    ? copy.schematic
+    : lab.imageKind === 'result'
+      ? copy.experimentPreview
+      : copy.environment
+}
+function imageDescription(lab) {
+  return [lab.title, imageLabel(lab), ...(lab.imageSteps || [])].join(' · ')
+}
 const planned = labs.filter((l) => !l.path)
 const availableChapters = chapters.filter((ch) =>
   existing.some((l) => l.chapterId === ch.id)
@@ -582,7 +596,7 @@ onBeforeUnmount(() => {
                 class="nl-cover"
                 :class="[
                   'nl-scene-' + lab.id,
-                  { 'nl-result-preview': lab.previewKind === 'result' }
+                  { 'nl-result-preview': lab.imageKind === 'result' }
                 ]"
                 :aria-label="
                   copy.review + ' ' + lab.title + ' · ' + copy.details
@@ -592,13 +606,7 @@ onBeforeUnmount(() => {
                 <img
                   v-if="lab.image"
                   :src="lab.image"
-                  :alt="
-                    lab.title +
-                    ' · ' +
-                    (lab.previewKind === 'result'
-                      ? copy.experimentPreview
-                      : copy.environment)
-                  "
+                  :alt="imageDescription(lab)"
                   :loading="
                     lab.id === 'cartpole' || !lab.image.endsWith('.gif')
                       ? 'eager'
@@ -667,15 +675,17 @@ onBeforeUnmount(() => {
                   <div class="nl-agent c"></div>
                   <div class="nl-target"></div>
                 </div>
-                <span class="nl-cover-label">
-                  {{
-                    lab.previewKind === 'result'
-                      ? copy.experimentPreview
-                      : lab.image
-                        ? copy.environment
-                        : copy.schematic
-                  }}
-                </span>
+                <div
+                  v-if="lab.imageSteps"
+                  class="nl-task-steps"
+                  aria-hidden="true"
+                >
+                  <template v-for="(step, index) in lab.imageSteps" :key="step">
+                    <ArrowRight v-if="index" :size="11" />
+                    <span>{{ step }}</span>
+                  </template>
+                </div>
+                <span class="nl-cover-label">{{ imageLabel(lab) }}</span>
                 <span class="nl-cover-more"><ArrowUpRight :size="17" /></span>
               </button>
               <div class="nl-card-content">
@@ -881,23 +891,8 @@ onBeforeUnmount(() => {
           </button>
         </div>
         <div v-if="active.image" class="nl-dialog-image">
-          <img
-            :src="active.image"
-            :alt="
-              active.title +
-              ' · ' +
-              (active.previewKind === 'result'
-                ? copy.experimentPreview
-                : copy.environment)
-            "
-          />
-          <span>
-            {{
-              active.previewKind === 'result'
-                ? copy.experimentPreview
-                : copy.bookPreview
-            }}
-          </span>
+          <img :src="active.image" :alt="imageDescription(active)" />
+          <span>{{ imageLabel(active) }}</span>
         </div>
         <div class="nl-dialog-content">
           <span class="nl-dialog-chapter">{{ active.chapterName }}</span>
@@ -1220,6 +1215,27 @@ onBeforeUnmount(() => {
   object-fit: contain;
   background: #090b14;
   padding: 7px;
+}
+.nl-task-steps {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #4a4b74;
+  font-size: 10px;
+  line-height: 1.5;
+  pointer-events: none;
+}
+.nl-task-steps span {
+  flex: 1;
+  text-align: center;
+}
+.nl-task-steps svg {
+  flex-shrink: 0;
+  opacity: 0.55;
 }
 .nl-cover-label {
   position: absolute;

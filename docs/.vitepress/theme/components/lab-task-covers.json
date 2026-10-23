@@ -1,0 +1,30 @@
+{
+  "agentic-tools": {
+    "image": "agentic-tools-task.webp",
+    "steps": {
+      "zh": ["调用工具", "读取返回", "继续决策"],
+      "en": ["Call a tool", "Read the result", "Decide again"]
+    }
+  },
+  "agentic-code": {
+    "image": "agentic-code-task.webp",
+    "steps": {
+      "zh": ["发现问题", "修改代码", "运行测试"],
+      "en": ["Find a bug", "Patch the code", "Run tests"]
+    }
+  },
+  "agentic-finqa": {
+    "image": "agentic-finqa-task.webp",
+    "steps": {
+      "zh": ["查询数据", "计算指标", "形成回答"],
+      "en": ["Query data", "Calculate", "Answer"]
+    }
+  },
+  "agentic-research": {
+    "image": "agentic-research-task.webp",
+    "steps": {
+      "zh": ["检索资料", "选择证据", "引用作答"],
+      "en": ["Search", "Select evidence", "Cite sources"]
+    }
+  }
+}
