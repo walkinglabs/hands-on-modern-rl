@@ -315,34 +315,8 @@ const sourceUrl = (lab) =>
   'main/' +
   lab.source
 let observer
-let wheelFrame = 0
-let wheelTarget = 0
-let wheelTime = 0
-let wheelDirection = 0
-const wheelDistanceMultiplier = 3
 let shelfMetrics = { width: 0, stride: 1, inset: 0, count: 0 }
 
-function stopShelfScroll() {
-  cancelAnimationFrame(wheelFrame)
-  wheelFrame = 0
-  wheelTime = 0
-  wheelDirection = 0
-}
-function animateShelf(time) {
-  const el = viewport.value
-  if (!el) return stopShelfScroll()
-  const elapsed = wheelTime ? time - wheelTime : 16
-  wheelTime = time
-  wheelTarget = Math.min(wheelTarget, el.scrollWidth - el.clientWidth)
-  const remaining = wheelTarget - el.scrollLeft
-  if (Math.abs(remaining) <= 1) {
-    el.scrollLeft = wheelTarget
-    stopShelfScroll()
-    return
-  }
-  el.scrollLeft += remaining * (1 - Math.exp(-elapsed / 45))
-  wheelFrame = requestAnimationFrame(animateShelf)
-}
 function canScrollShelf(el, direction) {
   if (!el) return false
   return direction < 0
@@ -350,39 +324,9 @@ function canScrollShelf(el, direction) {
     : el.scrollLeft < el.scrollWidth - el.clientWidth - 2
 }
 
-function scrollShelf(event) {
-  const el = viewport.value
-  if (event.ctrlKey || !el || el.scrollWidth <= el.clientWidth + 2) return
-  const delta =
-    Math.abs(event.deltaX) > Math.abs(event.deltaY)
-      ? event.deltaX
-      : event.deltaY
-  if (!delta) return
-  const direction = Math.sign(delta)
-  event.preventDefault()
-  const unit =
-    event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? el.clientWidth : 1
-  if (!wheelFrame || direction !== wheelDirection) wheelTarget = el.scrollLeft
-  wheelDirection = direction
-  const requested = wheelTarget + delta * unit * wheelDistanceMultiplier
-  wheelTarget = Math.max(
-    0,
-    Math.min(el.scrollWidth - el.clientWidth, requested)
-  )
-  const overflow = (requested - wheelTarget) / wheelDistanceMultiplier
-  if (overflow) window.scrollBy({ top: overflow, behavior: 'instant' })
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    stopShelfScroll()
-    el.scrollLeft = wheelTarget
-  } else if (!wheelFrame) {
-    wheelFrame = requestAnimationFrame(animateShelf)
-  }
-}
 function navigateShelf(event) {
   if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
-  const direction = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[
-    event.key
-  ]
+  const direction = { ArrowLeft: -1, ArrowRight: 1 }[event.key]
   if (!direction) return
   if (!canScrollShelf(viewport.value, direction)) return
   event.preventDefault()
@@ -427,7 +371,6 @@ function cardGap() {
   )
 }
 function slide(direction) {
-  stopShelfScroll()
   const width =
     viewport.value?.querySelector('.nl-card')?.getBoundingClientRect().width ||
     300
@@ -440,7 +383,6 @@ function slide(direction) {
   })
 }
 async function syncViewport() {
-  stopShelfScroll()
   await nextTick()
   observer?.disconnect()
   if (viewport.value) {
@@ -528,7 +470,6 @@ onMounted(() => {
   window.addEventListener('resize', fitChapterMenu)
 })
 onBeforeUnmount(() => {
-  stopShelfScroll()
   observer?.disconnect()
   window.removeEventListener('click', clickAway)
   window.removeEventListener('resize', fitChapterMenu)
@@ -627,8 +568,6 @@ onBeforeUnmount(() => {
           tabindex="0"
           :aria-label="copy.shelfLabel"
           @scroll.passive="updatePosition"
-          @wheel="scrollShelf"
-          @pointerdown="stopShelfScroll"
           @keydown="navigateShelf"
         >
           <div class="nl-track">
