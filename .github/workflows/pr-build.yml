@@ -1,0 +1,48 @@
+name: Build site on pull requests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install image rendering tools
+        run: sudo apt-get update && sudo apt-get install -y webp
+
+      - name: Setup Chrome for static diagram rendering
+        id: setup-chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Build with VitePress
+        run: npm run build
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PUPPETEER_EXECUTABLE_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
